@@ -1,6 +1,6 @@
 # ⚽️ ADRENALUX ⚽️
 
-![repo size]()
+![repo size](https://img.shields.io/github/repo-size/UNIZAR-30226-2025-05/adrenalux-frontend-web)
 
 This is a an online game where players can create their own team and play against other players. It is focused on the La Liga players first division. 
 
