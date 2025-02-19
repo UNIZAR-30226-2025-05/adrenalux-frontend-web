@@ -1,51 +1,114 @@
-import { useState } from "react";
+import { useState } from 'react';
 import googleLogo from "../assets/googleLogo.png";
-import background from "../assets/background.jpeg";
-import { FaEnvelope, FaUser, FaLock } from "react-icons/fa";
+import background from "../assets/background.png";
+import { useNavigate } from 'react-router-dom';  
 
-export default function RegisterPage() {
-  const [form, setForm] = useState({ email: "", username: "", password: "" });
+const Register = () => {
+  const navigate = useNavigate(); 
   
+  // Estados para guardar los valores del formulario
+  const [formData, setFormData] = useState({
+    email: '',
+    name: '',
+    lastname: '',
+    username: '',
+    password: ''
+  });
+
+  // Función para actualizar el estado al escribir en los inputs
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
   };
-  
-  const handleSubmit = (e) => {
+
+  // Función para enviar los datos al backend
+  const handleSignUpClick = async (e) => {
     e.preventDefault();
-    console.log("Registering user:", form);
+    try {
+      const response = await fetch('http://tu-backend.com/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (response.ok) {
+        console.log('Registro exitoso');
+        navigate("/home");
+      } else {
+        console.error('Error al registrar');
+      }
+    } catch (error) {
+      console.error('Error en la solicitud:', error);
+    }
   };
 
   return (
-    <div >
-      <div className="bg-gray-900 bg-opacity-90 p-12 rounded-2xl shadow-lg w-[750px] text-white"> 
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-bold text-left">Registrarse</h2>
-          <button className="bg-gray-700 hover:bg-gray-600 text-white py-3 px-5 rounded flex items-center">
-            <img src={googleLogo} alt="Google" className="w-6 h-6 mr-3" />
-            Continue with Google
+    <div 
+      className="fixed inset-0 flex justify-center items-center bg-cover bg-center" 
+      style={{ backgroundImage: `url(${background})` }}
+    >
+      <div className="bg-gray-900 p-8 w-full max-w-md text-white">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold">Registrarse</h2>
+          <button className="flex items-center bg-gray-800 hover:bg-gray-700 border border-white rounded px-3 py-2">
+            <img src={googleLogo} alt="Google" className="w-5 mr-2" />
+            Continuar con Google
           </button>
         </div>
-        <p className="mb-6 text-left">Crea una nueva cuenta</p>
-        
-    
-        <form onSubmit={handleSubmit}>
-          <div className="relative mb-5">
-            <FaEnvelope className="absolute left-3 top-4 text-gray-400 text-lg" />
-            <input type="email" name="email" placeholder="Mail" value={form.email} onChange={handleChange} className="w-full pl-12 py-3 bg-gray-800 text-white border border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" required />
-          </div>
-          <div className="relative mb-5">
-            <FaUser className="absolute left-3 top-4 text-gray-400 text-lg" />
-            <input type="text" name="username" placeholder="Usuario" value={form.username} onChange={handleChange} className="w-full pl-12 py-3 bg-gray-800 text-white border border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" required />
-          </div>
-          <div className="relative mb-8">
-            <FaLock className="absolute left-3 top-4 text-gray-400 text-lg" />
-            <input type="password" name="password" placeholder="Contraseña" value={form.password} onChange={handleChange} className="w-full pl-12 py-3 bg-gray-800 text-white border border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" required />
-          </div>
-          <button type="submit" className="w-150 bg-blue-600 hover:bg-blue-700 text-white py-3 px-5 rounded font-bold text-lg">
-            REGISTRARSE
+        <p className="text-sm mb-4">Crear una nueva cuenta</p>
+
+        <form onSubmit={handleSignUpClick} className="space-y-4">
+          <input 
+            type="text" 
+            name="email" 
+            placeholder="Mail" 
+            className="w-full bg-gray-800 border border-gray-700 focus:border-gray-600 rounded px-4 py-2 text-white focus:outline-none"
+            value={formData.email}
+            onChange={handleChange}
+          />
+          <input 
+            type="text" 
+            name="name" 
+            placeholder="Nombre" 
+            className="w-full bg-gray-800 border border-gray-700 focus:border-gray-600 rounded px-4 py-2 text-white focus:outline-none"
+            value={formData.nombre}
+            onChange={handleChange}
+          />
+          <input 
+            type="text" 
+            name="lastname" 
+            placeholder="Apellido" 
+            className="w-full bg-gray-800 border border-gray-700 focus:border-gray-600 rounded px-4 py-2 text-white focus:outline-none"
+            value={formData.apellido}
+            onChange={handleChange}
+          />
+          <input 
+            type="text" 
+            name="username" 
+            placeholder="Nombre de usuario" 
+            className="w-full bg-gray-800 border border-gray-700 focus:border-gray-600 rounded px-4 py-2 text-white focus:outline-none"
+            value={formData.username}
+            onChange={handleChange}
+          />
+          <input 
+            type="password" 
+            name="password" 
+            placeholder="Contraseña" 
+            className="w-full bg-gray-800 border border-gray-700 focus:border-gray-600 rounded px-4 py-2 text-white focus:outline-none"
+            value={formData.password}
+            onChange={handleChange}
+          />
+          <button className="w-full bg-blue-600 hover:bg-blue-500 text-white rounded py-2 transition duration-300">
+            Registrarse
           </button>
         </form>
       </div>
     </div>
   );
-}
+};
+
+export default Register;
