@@ -1,5 +1,5 @@
 import React from "react";
-import NavbarGame from "./NavbarGame";
+//import NavbarGame from "./NavbarGame";
 import GameActions from "./GameActions";
 import PlayButton from "./PlayButton";
 
