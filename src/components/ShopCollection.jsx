@@ -5,7 +5,6 @@ import finalCard from "../assets/finalCard.png";
 import teamImage from "../assets/manchester_united.png";
 import countryImage from "../assets/portugal.png";
 import cristiano from "../assets/cristiano.png"
-// Función auxiliar para abreviar la posición.
 import Card from "./layout/game/Card";
 // Simulación de datos obtenidos del backend.
 const cardData = [
@@ -133,7 +132,7 @@ export default function ShopCollection({
         </div>
       )}
 
-      {/* Diálogo (Modal) */}
+      {/* Diálogo  */}
       {showDialog && selectedCard && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-black p-6 rounded-lg shadow-lg text-center max-w-sm mx-auto">

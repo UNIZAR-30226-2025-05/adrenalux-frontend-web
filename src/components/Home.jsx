@@ -1,4 +1,4 @@
-import NavBarGame from './layout/game/NavBarGame'; 
+import NavBarGame from './layout/game/NavbarGame'; 
 import background from '../assets/background.png'; 
 import TournamentButton from './layout/game/TournamentButton'
 import ClassificationButton from './layout/game/ClassificationButton'

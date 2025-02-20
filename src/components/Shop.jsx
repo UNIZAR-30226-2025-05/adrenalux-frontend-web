@@ -4,21 +4,17 @@ import { FaArrowLeft, FaPlusCircle } from "react-icons/fa";
 import background from "../assets/background.png";
 import ShopCollection from "./ShopCollection";
 import Card from "./layout/game/Card";
-import finalCard from "../assets/finalCard.png"; // already imported
-// You can also import any other assets at the top if needed
+import finalCard from "../assets/finalCard.png"; 
 
 export default function Shop() {
   const [showDialog, setShowDialog] = useState(false);
 
-  // States for search
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTeam, setSelectedTeam] = useState("Equipo");
   const [selectedPosition, setSelectedPosition] = useState("Posición");
 
-  // Controls whether to show the shop view or collection view
   const [showCollection, setShowCollection] = useState(false);
 
-  // Example data for Luxuris del día (using the already imported finalCard)
   const luxurisCards = [
     {
       id: 101,
@@ -27,8 +23,7 @@ export default function Shop() {
       team: "Manchester United",
       position: "Delantero",
       price: 500000,
-      image: finalCard, // Using imported finalCard
-      // You can define additional properties if needed
+      image: finalCard, 
     },
     {
       id: 102,
