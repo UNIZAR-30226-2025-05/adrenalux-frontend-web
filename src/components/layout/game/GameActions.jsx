@@ -1,4 +1,3 @@
-import React from "react";
 import ClassificationButton from "./ClassificationButton";
 import TournamentButton from "./TournamentButton";
 import StoreButton from "./StoreButton";

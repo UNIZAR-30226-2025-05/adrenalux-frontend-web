@@ -6,7 +6,8 @@ import Home from './components/Home';
 import Shop from './components/Shop';
 import ShopCollection from './components/ShopCollection';
 import Opening from './components/Opening';
-
+import GridOpenedCards from './components/gridOpendCards';
+import Alineaciones from './components/Alineaciones';
 
 function App() {
   return (
@@ -19,6 +20,8 @@ function App() {
         <Route path="/shop" element={<Shop />} />
         <Route path="/shopC" element={<ShopCollection />} />
         <Route path="/opening" element={<Opening />} />
+        <Route path="/grid" element={<GridOpenedCards />} />
+        <Route path="/alineaciones" element={<Alineaciones />} />
       </Routes>
     </Router>
   );
