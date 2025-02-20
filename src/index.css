@@ -79,3 +79,24 @@ html, body {
   margin: 0;
   padding: 0;
 }
+
+
+@keyframes flipCard {
+  0% {
+    transform: rotateY(0deg);
+  }
+  50% {
+    transform: rotateY(180deg);
+  }
+  100% {
+    transform: rotateY(360deg);
+  }
+}
+
+.group:hover .flip-card-inner {
+  animation: flipCard 2s linear infinite;
+}
+
+
+
+

@@ -5,9 +5,14 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from './components/Home';
 import Shop from './components/Shop';
 import ShopCollection from './components/ShopCollection';
+<<<<<<< Updated upstream
 import Opening from './components/Opening';
 import GridOpenedCards from './components/gridOpendCards';
 import Alineaciones from './components/Alineaciones';
+=======
+import Collection from './components/Collection';
+import Amigo from './components/Amigo';
+>>>>>>> Stashed changes
 
 function App() {
   return (
@@ -19,9 +24,16 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/shopC" element={<ShopCollection />} />
+<<<<<<< Updated upstream
         <Route path="/opening" element={<Opening />} />
         <Route path="/grid" element={<GridOpenedCards />} />
         <Route path="/alineaciones" element={<Alineaciones />} />
+=======
+        <Route path="/collection" element={<Collection />} />
+        <Route path="/amigo" element={<Amigo />} />
+
+
+>>>>>>> Stashed changes
       </Routes>
     </Router>
   );
