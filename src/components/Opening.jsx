@@ -19,6 +19,10 @@ const Opening = () => {
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [showContinueButton, setShowContinueButton] = useState(false);
   const [isOpening, setIsOpening] = useState(true); // Estado para saber si se está abriendo el sobre
+  const handleContinue = () => {
+    navigate("/grid", { state: { openedCards: cards } });
+  };
+  
 
   // Generar las cartas por abrir
   useEffect(() => {
@@ -33,11 +37,6 @@ const Opening = () => {
     } else {
       setShowContinueButton(true);
     }
-  };
-
-  // Función para continuar después de la última carta
-  const handleContinue = () => {
-    navigate("/home"); // Redirigir a la página de inicio
   };
 
   // Función para mostrar la imagen del sobre según el tipo
