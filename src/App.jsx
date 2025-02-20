@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from './components/Home';
 import Shop from './components/Shop';
 import ShopCollection from './components/ShopCollection';
+import Opening from './components/Opening';
 
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/shopC" element={<ShopCollection />} />
+        <Route path="/opening" element={<Opening />} />
       </Routes>
     </Router>
   );
