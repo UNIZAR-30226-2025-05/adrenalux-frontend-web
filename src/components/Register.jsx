@@ -1,12 +1,13 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import googleLogo from "../assets/googleLogo.png";
 import background from "../assets/background.png";
-import { useNavigate } from 'react-router-dom';  
+import { register, login } from '../services/api/authApi'; 
 
 const Register = () => {
-  const navigate = useNavigate(); 
-  
-  // Estados para guardar los valores del formulario
+  const navigate = useNavigate();
+
+  // Estado para los valores del formulario
   const [formData, setFormData] = useState({
     email: '',
     name: '',
@@ -15,7 +16,7 @@ const Register = () => {
     password: ''
   });
 
-  // Función para actualizar el estado al escribir en los inputs
+  // Maneja cambios en los inputs
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -23,23 +24,28 @@ const Register = () => {
     });
   };
 
-  // Función para enviar los datos al backend
+  // Maneja el registro
   const handleSignUpClick = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://tu-backend.com/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      });
+      const { status, data } = await register(
+        formData.email,
+        formData.username,
+        formData.lastname,
+        formData.name,
+        formData.password
+      );
 
-      if (response.ok) {
-        console.log('Registro exitoso');
-        navigate("/home");
+      if (status === 201) {
+        const { status, data } = await login(formData.email, formData.password);
+        if (status == 200) {
+          console.log('Inicio de sesión exitoso');
+          navigate('/Home');
+        } else {
+          console.error('Error al iniciar sesión:', data);
+        }
       } else {
-        console.error('Error al registrar');
+        console.error('Error al registrar:', data);
       }
     } catch (error) {
       console.error('Error en la solicitud:', error);
@@ -65,7 +71,7 @@ const Register = () => {
           <input 
             type="text" 
             name="email" 
-            placeholder="Mail" 
+            placeholder="Correo electrónico" 
             className="w-full bg-gray-800 border border-gray-700 focus:border-gray-600 rounded px-4 py-2 text-white focus:outline-none"
             value={formData.email}
             onChange={handleChange}
@@ -75,7 +81,7 @@ const Register = () => {
             name="name" 
             placeholder="Nombre" 
             className="w-full bg-gray-800 border border-gray-700 focus:border-gray-600 rounded px-4 py-2 text-white focus:outline-none"
-            value={formData.nombre}
+            value={formData.name}
             onChange={handleChange}
           />
           <input 
@@ -83,7 +89,7 @@ const Register = () => {
             name="lastname" 
             placeholder="Apellido" 
             className="w-full bg-gray-800 border border-gray-700 focus:border-gray-600 rounded px-4 py-2 text-white focus:outline-none"
-            value={formData.apellido}
+            value={formData.lastname}
             onChange={handleChange}
           />
           <input 
