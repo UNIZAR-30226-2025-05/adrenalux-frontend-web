@@ -10,6 +10,7 @@ import Amigo from './components/Amigo';
 import Opening from './components/Opening';
 import GridOpenedCards from './components/gridOpendCards';
 import Alineaciones from './components/Alineaciones';
+import AlineacionEditar from './components/AlineacionesEditar';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route path="/alineaciones" element={<Alineaciones />} />
         <Route path="/collection" element={<Collection />} />
         <Route path="/amigo" element={<Amigo />} />
+        <Route path="/alineacionesEditar" element={<AlineacionEditar />} />
       </Routes>
     </Router>
   );

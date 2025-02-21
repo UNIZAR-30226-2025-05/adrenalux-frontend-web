@@ -43,7 +43,6 @@ export default function Alineaciones() {
       favorita: 0,
       nombre: "Los Luxiris",
     },
-    // Añadir más alineaciones si es necesario...
   ];
 
   const handleBackClick = () => {
@@ -51,7 +50,6 @@ export default function Alineaciones() {
   };
 
   const handleAddAlineacion = () => {
-    // Aquí puedes definir la acción que sucederá al hacer clic en el botón de añadir nueva alineación
     console.log("Añadir nueva alineación");
   };
 
