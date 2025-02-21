@@ -54,6 +54,7 @@ export default function Alineaciones() {
   };
 
   return (
+<<<<<<< Updated upstream
     <div className="fixed inset-0 flex justify-center items-start bg-cover bg-center" style={{ backgroundImage: `url(${background})` }}>
       <div className="absolute top-5 left-5">
         <BackButton onClick={handleBackClick} /> 
@@ -79,6 +80,23 @@ export default function Alineaciones() {
             <img src={FondoAlineacion} alt="Fondo" className="w-full h-16 object-cover mt-2 rounded-lg" />
           </div>
         </button>
+=======
+    <div
+      className="fixed inset-0 flex justify-center items-center bg-cover bg-center"
+      style={{ backgroundImage: `url(${background})` }}
+    >
+      {/* Botón de retroceso */}
+      <div className="absolute top-5 left-5">
+        <BackButton onClick={handleBackClick} />{" "}
+        {/* Pasa la función handleBackClick */}
+      </div>
+
+      {/* Aquí puedes agregar el contenido de la pantalla de Alineaciones */}
+      <div className="flex justify-center items-center h-full">
+        <h1 className="text-4xl font-bold text-white">
+          Pantalla de Alineaciones
+        </h1>
+>>>>>>> Stashed changes
       </div>
     </div>
   );
