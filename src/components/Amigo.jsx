@@ -1,6 +1,8 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Importar useNavigate
 import { FaArrowLeft, FaPlus, FaTrash, FaSyncAlt } from "react-icons/fa";
 import background from "../assets/background.png";
+import BackButton from "../components/layout/game/BackButton"; // Importar BackButton
 
 // Example data for each tab:
 const amigosData = [
@@ -40,20 +42,18 @@ const solicitudesRecibidasData = [
   },
 ];
 
-export default function Amigo({ onBack }) {
-  // Tabs: "amigos", "enviadas", "recibidas"
+export default function Amigo() {
+  const navigate = useNavigate(); // Crear la función navigate
+
   const [currentTab, setCurrentTab] = useState("amigos");
 
-  // Example counters
   const [currentFriends, setCurrentFriends] = useState(15);
   const maxFriends = 99;
 
-  // Handle bottom tabs
   const handleTabChange = (tab) => {
     setCurrentTab(tab);
   };
 
-  // Example: handle icon clicks (trash, sync)
   const handleTrashClick = (item) => {
     console.log("Eliminar a:", item.nombre);
   };
@@ -61,16 +61,13 @@ export default function Amigo({ onBack }) {
     console.log("Invitar / Mover / Sincronizar con:", item.nombre);
   };
 
-  // Render a single row item
   const renderRow = (item) => {
     return (
       <div
         key={item.id}
         className="flex items-center justify-between bg-[#0190D2] rounded-lg p-3 mb-2 w-[500px]"
       >
-        {/* Crest + level + name */}
         <div className="flex items-center space-x-3">
-          {/* Club crest */}
           {item.crest && (
             <img
               src={item.crest}
@@ -88,7 +85,6 @@ export default function Amigo({ onBack }) {
           </div>
         </div>
 
-        {/* Icons on the right */}
         <div className="flex space-x-4">
           <FaSyncAlt
             className="text-white cursor-pointer hover:text-gray-200"
@@ -103,7 +99,6 @@ export default function Amigo({ onBack }) {
     );
   };
 
-  // Render the list depending on the tab
   let content;
   if (currentTab === "amigos") {
     if (amigosData.length === 0) {
@@ -118,7 +113,6 @@ export default function Amigo({ onBack }) {
       content = solicitudesEnviadasData.map((sol) => renderRow(sol));
     }
   } else {
-    // recibidas
     if (solicitudesRecibidasData.length === 0) {
       content = <p className="text-white mt-4">No hay solicitudes recibidas</p>;
     } else {
@@ -126,30 +120,28 @@ export default function Amigo({ onBack }) {
     }
   }
 
+  // Función para manejar el click en el botón de regreso
+  const handleBackClick = () => {
+    navigate("/home");
+  };
+
   return (
     <div
       className="relative h-screen w-screen bg-cover bg-center text-white flex flex-col items-center"
       style={{ backgroundImage: `url(${background})` }}
     >
-      {/* Back arrow (top-left) */}
-      {onBack && (
-        <button
-          onClick={onBack}
-          className="absolute top-5 left-5 bg-black/50 p-3 rounded hover:bg-black transition"
-        >
-          <FaArrowLeft className="text-white text-2xl" />
-        </button>
-      )}
+      {/* Back button */}
+      <div className="absolute top-5 left-5">
+        <BackButton onClick={handleBackClick} /> {/* Botón de regreso */}
+      </div>
 
       {/* Title + friend counter + plus icon */}
       <div className="flex items-center justify-between bg-[#006298] px-6 py-4 mt-12 w-[600px] rounded-lg">
         <h2 className="text-2xl font-bold">Amigos</h2>
         <div className="flex items-center space-x-8">
-          {/* 15/99 */}
           <p className="text-white text-sm">
             {currentFriends}/{maxFriends}
           </p>
-          {/* Plus icon */}
           <FaPlus className="text-white text-xl cursor-pointer hover:text-green-300" />
         </div>
       </div>

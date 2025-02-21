@@ -1,6 +1,8 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import SearchTab from "./layout/game/SearchTab";
-import { FaArrowLeft, FaPlusCircle } from "react-icons/fa";
+import { FaPlusCircle } from "react-icons/fa";
+import BackButton from "../components/layout/game/BackButton";
 import background from "../assets/background.png";
 import ShopCollection from "./ShopCollection";
 import Card from "./layout/game/Card";
@@ -9,6 +11,7 @@ import { FaCoins } from "react-icons/fa";
 
 export default function Shop() {
   const [showDialog, setShowDialog] = useState(false);
+  const navigate = useNavigate();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTeam, setSelectedTeam] = useState("Equipo");
@@ -62,6 +65,10 @@ export default function Shop() {
     setShowCollection(false);
   };
 
+  const handleBackClick = () => {
+    navigate("/home");
+  };
+
   // Render shop view
   const renderShopView = () => {
     return (
@@ -71,9 +78,7 @@ export default function Shop() {
       >
         {/* Back Button */}
         <div className="absolute top-5 left-5">
-          <button className="bg-black/50 p-4 rounded-lg hover:bg-black transition">
-            <FaArrowLeft className="text-white text-2xl" />
-          </button>
+          <BackButton onClick={handleBackClick} /> 
         </div>
 
         {/* Coins */}

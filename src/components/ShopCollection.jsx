@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
-import { FaArrowLeft } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import BackButton from "../components/layout/game/BackButton";
 import background from "../assets/background.png";
 import finalCard from "../assets/finalCard.png";
 import teamImage from "../assets/manchester_united.png";
@@ -39,6 +40,7 @@ export default function ShopCollection({
   const [currentPage, setCurrentPage] = useState(1);
   const [showDialog, setShowDialog] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
+  const navigate = useNavigate();
 
   const cardsPerPage = 8;
 
@@ -83,18 +85,19 @@ export default function ShopCollection({
     setSelectedCard(null);
   };
 
+  const handleBackClick = () => {
+    navigate("/shop");
+  };
+
   return (
     <div
       className="relative min-h-screen w-screen bg-cover bg-center text-white flex flex-col items-center"
       style={{ backgroundImage: `url(${background})` }}
     >
       {/* Botón Volver */}
-      <button
-        onClick={onBack}
-        className="absolute top-5 left-5 bg-black/50 p-3 rounded hover:bg-black transition"
-      >
-        <FaArrowLeft className="text-white text-xl" />
-      </button>
+      <div className="absolute top-5 left-5">
+        <BackButton onClick={handleBackClick} /> 
+      </div>
 
       {/* Grid de cartas */}
       <div className="flex-grow grid grid-cols-4 gap-4 place-items-center px-10 mt-16">
