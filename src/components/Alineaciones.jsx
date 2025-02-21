@@ -54,10 +54,12 @@ export default function Alineaciones() {
   };
 
   return (
-<<<<<<< Updated upstream
-    <div className="fixed inset-0 flex justify-center items-start bg-cover bg-center" style={{ backgroundImage: `url(${background})` }}>
+    <div
+      className="fixed inset-0 flex justify-center items-start bg-cover bg-center"
+      style={{ backgroundImage: `url(${background})` }}
+    >
       <div className="absolute top-5 left-5">
-        <BackButton onClick={handleBackClick} /> 
+        <BackButton onClick={handleBackClick} />
       </div>
 
       <div className="absolute top-10 w-full text-center">
@@ -67,9 +69,13 @@ export default function Alineaciones() {
       {/* Contenedor de las alineaciones */}
       <div className="w-full max-h-screen overflow-y-auto grid grid-cols-4 gap-6 mt-40 px-20">
         {alineacionData.map((alineacion) => (
-          <AlineacionMenu key={alineacion.id} nombre={alineacion.nombre} favorito={alineacion.favorita} />
+          <AlineacionMenu
+            key={alineacion.id}
+            nombre={alineacion.nombre}
+            favorito={alineacion.favorita}
+          />
         ))}
-        
+
         {/* Rectángulo al final de las alineaciones con el icono de suma */}
         <button
           className="w-64 h-32 bg-black rounded-lg opacity-80 flex justify-between p-4"
@@ -77,26 +83,13 @@ export default function Alineaciones() {
         >
           <div className="flex flex-col justify-start w-full">
             <p className="text-white">Añadir nueva alineación</p>
-            <img src={FondoAlineacion} alt="Fondo" className="w-full h-16 object-cover mt-2 rounded-lg" />
+            <img
+              src={FondoAlineacion}
+              alt="Fondo"
+              className="w-full h-16 object-cover mt-2 rounded-lg"
+            />
           </div>
         </button>
-=======
-    <div
-      className="fixed inset-0 flex justify-center items-center bg-cover bg-center"
-      style={{ backgroundImage: `url(${background})` }}
-    >
-      {/* Botón de retroceso */}
-      <div className="absolute top-5 left-5">
-        <BackButton onClick={handleBackClick} />{" "}
-        {/* Pasa la función handleBackClick */}
-      </div>
-
-      {/* Aquí puedes agregar el contenido de la pantalla de Alineaciones */}
-      <div className="flex justify-center items-center h-full">
-        <h1 className="text-4xl font-bold text-white">
-          Pantalla de Alineaciones
-        </h1>
->>>>>>> Stashed changes
       </div>
     </div>
   );
