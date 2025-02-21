@@ -8,6 +8,8 @@ import cristiano from "../assets/cristiano.png";
 
 import Card from "./layout/game/Card";
 import SearchTab from "./layout/game/SearchTab";
+import { useNavigate } from "react-router-dom";
+import BackButton from "../components/layout/game/BackButton"; // Importar BackButton
 
 // Example data from backend
 const cardData = [
@@ -124,10 +126,13 @@ export default function Collection({ onBack }) {
   // Filter logic
   const filteredCards = useMemo(() => {
     return cardData.filter((card) => {
-      const matchName = card.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchName = card.name
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
       const matchRarity =
         selectedRarity === "Rareza" ||
-        (card.rarity && card.rarity.toLowerCase() === selectedRarity.toLowerCase());
+        (card.rarity &&
+          card.rarity.toLowerCase() === selectedRarity.toLowerCase());
       const matchTeam =
         selectedTeam === "Equipo" ||
         card.team.toLowerCase() === selectedTeam.toLowerCase();
@@ -141,10 +146,14 @@ export default function Collection({ onBack }) {
 
   const totalPages = Math.ceil(filteredCards.length / cardsPerPage);
   const startIndex = (currentPage - 1) * cardsPerPage;
-  const visibleCards = filteredCards.slice(startIndex, startIndex + cardsPerPage);
+  const visibleCards = filteredCards.slice(
+    startIndex,
+    startIndex + cardsPerPage
+  );
 
   const handlePrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
-  const handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  const handleNextPage = () =>
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
 
   // On card click, show big card in a modal with extra info
   const handleCardClick = (card) => {
@@ -157,22 +166,22 @@ export default function Collection({ onBack }) {
     setShowModal(false);
     setSelectedCard(null);
   };
-
+  const navigate = useNavigate();
+  const handleBackClick = () => {
+    navigate("/home");
+  };
   return (
     <div
       className="relative min-h-screen w-screen bg-cover bg-center text-white flex flex-col items-center"
       style={{ backgroundImage: `url(${background})` }}
     >
-                <h1 className="text-5xl font-bold mt-13">Coleccion</h1>
+      <h1 className="text-5xl font-bold mt-13">Coleccion</h1>
 
       {/* Back Button */}
-      <button
-  onClick={onBack || (() => {})}
-  className="absolute top-5 left-5 bg-black/50 p-3 rounded hover:bg-black transition"
->
-  <FaArrowLeft className="text-white text-xl" />
-</button>
-
+      {/* Back button */}
+      <div className="absolute top-5 left-5">
+        <BackButton onClick={handleBackClick} /> {/* Botón de regreso */}
+      </div>
 
       {/* Search & Filters Bar */}
       <div className="mt-12 flex justify-center">
@@ -192,10 +201,17 @@ export default function Collection({ onBack }) {
       <div className="flex-grow grid grid-cols-4 gap-4 place-items-center px-10 mt-8">
         {visibleCards.length > 0 ? (
           visibleCards.map((card) => (
-            <Card key={card.id} card={card} onClick={handleCardClick} flip={false} />
+            <Card
+              key={card.id}
+              card={card}
+              onClick={handleCardClick}
+              flip={false}
+            />
           ))
         ) : (
-          <p className="text-xl font-semibold col-span-4">No se encontraron resultados</p>
+          <p className="text-xl font-semibold col-span-4">
+            No se encontraron resultados
+          </p>
         )}
       </div>
 
@@ -250,7 +266,9 @@ export default function Collection({ onBack }) {
               <p className="mb-1">Rareza: {selectedCard.rarity}</p>
               <p className="mb-1">Equipo: {selectedCard.team}</p>
               <p className="mb-1">Posición: {selectedCard.position}</p>
-              <p className="mb-1">Valor: {selectedCard.price.toLocaleString()} coins</p>
+              <p className="mb-1">
+                Valor: {selectedCard.price.toLocaleString()} coins
+              </p>
 
               {/* Close button */}
               <button

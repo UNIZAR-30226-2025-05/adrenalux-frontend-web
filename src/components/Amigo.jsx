@@ -1,8 +1,4 @@
 import React, { useState } from "react";
-<<<<<<< Updated upstream
-import { useNavigate } from "react-router-dom"; // Importar useNavigate
-import { FaArrowLeft, FaPlus, FaTrash, FaSyncAlt } from "react-icons/fa";
-=======
 import {
   FaArrowLeft,
   FaPlus,
@@ -11,9 +7,9 @@ import {
   FaTimes,
   FaCheck,
 } from "react-icons/fa";
->>>>>>> Stashed changes
 import background from "../assets/background.png";
 import BackButton from "../components/layout/game/BackButton"; // Importar BackButton
+import { useNavigate } from "react-router-dom";
 
 // Datos iniciales de ejemplo para cada pestaña:
 const initialAmigosData = [
@@ -41,6 +37,30 @@ const initialAmigosData = [
     nombre: "Pablo_villa",
     crest: "/src/assets/manchester_united.png",
   },
+  {
+    id: 8,
+    nivel: 1,
+    nombre: "Pablo_villa",
+    crest: "/src/assets/manchester_united.png",
+  },
+  {
+    id: 7,
+    nivel: 23,
+    nombre: "Dario_hueso",
+    crest: "/src/assets/manchester_united.png",
+  },
+  {
+    id: 6,
+    nivel: 99,
+    nombre: "Tahir_berga",
+    crest: "/src/assets/real.png",
+  },
+  {
+    id: 5,
+    nivel: 1,
+    nombre: "Pablo_villa",
+    crest: "/src/assets/manchester_united.png",
+  },
 ];
 
 const initialSolicitudesEnviadasData = [
@@ -60,16 +80,6 @@ const initialSolicitudesRecibidasData = [
   },
 ];
 
-<<<<<<< Updated upstream
-export default function Amigo() {
-  const navigate = useNavigate(); // Crear la función navigate
-
-  const [currentTab, setCurrentTab] = useState("amigos");
-
-  const [currentFriends, setCurrentFriends] = useState(15);
-  const maxFriends = 99;
-
-=======
 export default function Amigo({ onBack }) {
   // Pestañas: "amigos", "enviadas", "recibidas"
   const [currentTab, setCurrentTab] = useState("amigos");
@@ -97,28 +107,22 @@ export default function Amigo({ onBack }) {
   const [newFriendName, setNewFriendName] = useState("");
 
   // Cambiar pestaña
->>>>>>> Stashed changes
   const handleTabChange = (tab) => {
     setCurrentTab(tab);
   };
 
-<<<<<<< Updated upstream
-=======
   // Al hacer click en eliminar, guardamos el ítem y abrimos el diálogo
->>>>>>> Stashed changes
   const handleTrashClick = (item) => {
     setDeleteItem(item);
     setShowDeleteDialog(true);
   };
+  const navigate = useNavigate();
 
   // Maneja la acción de "sincronizar" o "invitar"
   const handleSyncClick = (item) => {
     console.log("Invitar / Mover / Sincronizar con:", item.nombre);
   };
 
-<<<<<<< Updated upstream
-  const renderRow = (item) => {
-=======
   // Maneja la acción de cancelar solicitud (solicitudes enviadas)
   const handleCancelRequest = (item) => {
     setDeleteItem(item);
@@ -187,16 +191,12 @@ export default function Amigo({ onBack }) {
 
   // Renderiza una fila según la pestaña actual
   const renderRow = (item, tab) => {
->>>>>>> Stashed changes
     return (
       <div
         key={item.id}
         className="flex items-center justify-between bg-[#0190D2] rounded-lg p-3 mb-2 w-[500px]"
       >
-<<<<<<< Updated upstream
-=======
         {/* Crest + nivel + nombre */}
->>>>>>> Stashed changes
         <div className="flex items-center space-x-3">
           {item.crest && (
             <img
@@ -211,18 +211,6 @@ export default function Amigo({ onBack }) {
           </div>
         </div>
 
-<<<<<<< Updated upstream
-        <div className="flex space-x-4">
-          <FaSyncAlt
-            className="text-white cursor-pointer hover:text-gray-200"
-            onClick={() => handleSyncClick(item)}
-          />
-          <FaTrash
-            className="text-white cursor-pointer hover:text-red-300"
-            onClick={() => handleTrashClick(item)}
-          />
-        </div>
-=======
         {/* Parte derecha varía según la pestaña */}
         {tab === "amigos" && (
           <div className="flex space-x-4">
@@ -258,15 +246,11 @@ export default function Amigo({ onBack }) {
             />
           </div>
         )}
->>>>>>> Stashed changes
       </div>
     );
   };
 
-<<<<<<< Updated upstream
-=======
   // Determina el contenido según la pestaña actual
->>>>>>> Stashed changes
   let content;
   if (currentTab === "amigos") {
     content =
@@ -283,20 +267,12 @@ export default function Amigo({ onBack }) {
         solicitudesEnviadas.map((sol) => renderRow(sol, "enviadas"))
       );
   } else {
-<<<<<<< Updated upstream
-    if (solicitudesRecibidasData.length === 0) {
-      content = <p className="text-white mt-4">No hay solicitudes recibidas</p>;
-    } else {
-      content = solicitudesRecibidasData.map((sol) => renderRow(sol));
-    }
-=======
     content =
       solicitudesRecibidas.length === 0 ? (
         <p className="text-white mt-4">No hay solicitudes recibidas</p>
       ) : (
         solicitudesRecibidas.map((sol) => renderRow(sol, "recibidas"))
       );
->>>>>>> Stashed changes
   }
 
   // Función para manejar el click en el botón de regreso
@@ -309,12 +285,11 @@ export default function Amigo({ onBack }) {
       className="relative h-screen w-screen bg-cover bg-center text-white flex flex-col items-center"
       style={{ backgroundImage: `url(${background})` }}
     >
-<<<<<<< Updated upstream
       {/* Back button */}
       <div className="absolute top-5 left-5">
         <BackButton onClick={handleBackClick} /> {/* Botón de regreso */}
       </div>
-=======
+
       {onBack && (
         <button
           onClick={onBack}
@@ -323,7 +298,6 @@ export default function Amigo({ onBack }) {
           <FaArrowLeft className="text-white text-2xl" />
         </button>
       )}
->>>>>>> Stashed changes
 
       <div className="flex items-center justify-between bg-[#006298] px-6 py-4 mt-12 w-[600px] rounded-lg">
         <h2 className="text-2xl font-bold">Amigos</h2>
@@ -331,14 +305,10 @@ export default function Amigo({ onBack }) {
           <p className="text-white text-sm">
             {currentFriends}/{maxFriends}
           </p>
-<<<<<<< Updated upstream
-          <FaPlus className="text-white text-xl cursor-pointer hover:text-green-300" />
-=======
           <FaPlus
             className="text-white text-xl cursor-pointer hover:text-green-300"
             onClick={handleOpenAddFriendModal}
           />
->>>>>>> Stashed changes
         </div>
       </div>
 
