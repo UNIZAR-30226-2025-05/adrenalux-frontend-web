@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom"; // Importar useNavigate
 import logo from "../../../assets/logo.png";
 import {
   FaUsers,
@@ -7,6 +8,13 @@ import {
 } from "react-icons/fa";
 
 export default function NavbarGame() {
+  const navigate = useNavigate(); // Crear la función navigate
+
+  // Función onClick para redirigir a la página de amigos
+  const handleAmigosClick = () => {
+    navigate("/amigo");
+  };
+
   return (
     <div className="fixed top-0 left-0 w-full h-16 bg-gradient-to-r from-[#0E2415] to-[#656D68] shadow-md z-50 flex items-center">
       
@@ -36,7 +44,10 @@ export default function NavbarGame() {
 
       <div className="flex items-center space-x-7 ml-7 mr-[30px]">
         <div className="flex items-center space-x-4">
-          <button className="bg-[#1E1E1E] border-4 border-black w-18 h-14 flex justify-center items-center rounded-none">
+          <button
+            className="bg-[#1E1E1E] border-4 border-black w-18 h-14 flex justify-center items-center rounded-none"
+            onClick={handleAmigosClick} // Asignamos la función al click
+          >
             <FaUsers className="text-white text-4xl" />
           </button>
           <button className="bg-[#1E1E1E] border-4 border-black w-18 h-14 flex justify-center items-center rounded-none">
