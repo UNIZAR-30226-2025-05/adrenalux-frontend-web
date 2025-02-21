@@ -5,7 +5,7 @@ import background from "../assets/background.png";
 import finalCard from "../assets/finalCard.png";
 import teamImage from "../assets/manchester_united.png";
 import countryImage from "../assets/portugal.png";
-import cristiano from "../assets/cristiano.png"
+import cristiano from "../assets/cristiano.png";
 import Card from "./layout/game/Card";
 // Simulación de datos obtenidos del backend.
 const cardData = [
@@ -16,18 +16,74 @@ const cardData = [
     team: "Manchester United",
     position: "Delantero",
     price: 62000000,
-    image: finalCard ,
-    image3: teamImage ,
+    image: finalCard,
+    image3: teamImage,
     image5: countryImage,
-    face: cristiano 
+    face: cristiano,
   },
-  { id: 2, name: "Messi", rating: 93, team: "Barcelona", position: "Delantero", price: 63000000, image: finalCard},
-  { id: 3, name: "Modric", rating: 88, team: "Real Madrid", position: "Mediocampista", price: 35000000, image: finalCard },
-  { id: 4, name: "Pedri", rating: 85, team: "Barcelona", position: "Mediocampista", price: 40000000, image: finalCard },
-  { id: 5, name: "Lewandowski", rating: 92, team: "Barcelona", position: "Delantero", price: 38000000, image: finalCard },
-  { id: 6, name: "Benzema", rating: 91, team: "Real Madrid", position: "Delantero", price: 39000000, image: finalCard },
-  { id: 7, name: "Kroos", rating: 87, team: "Real Madrid", position: "Mediocampista", price: 34000000, image: finalCard },
-  { id: 8, name: "Vinicius", rating: 86, team: "Real Madrid", position: "Delantero", price: 43000000, image: finalCard },
+  {
+    id: 2,
+    name: "Messi",
+    rating: 93,
+    team: "Barcelona",
+    position: "Delantero",
+    price: 63000000,
+    image: finalCard,
+  },
+  {
+    id: 3,
+    name: "Modric",
+    rating: 88,
+    team: "Real Madrid",
+    position: "Mediocampista",
+    price: 35000000,
+    image: finalCard,
+  },
+  {
+    id: 4,
+    name: "Pedri",
+    rating: 85,
+    team: "Barcelona",
+    position: "Mediocampista",
+    price: 40000000,
+    image: finalCard,
+  },
+  {
+    id: 5,
+    name: "Lewandowski",
+    rating: 92,
+    team: "Barcelona",
+    position: "Delantero",
+    price: 38000000,
+    image: finalCard,
+  },
+  {
+    id: 6,
+    name: "Benzema",
+    rating: 91,
+    team: "Real Madrid",
+    position: "Delantero",
+    price: 39000000,
+    image: finalCard,
+  },
+  {
+    id: 7,
+    name: "Kroos",
+    rating: 87,
+    team: "Real Madrid",
+    position: "Mediocampista",
+    price: 34000000,
+    image: finalCard,
+  },
+  {
+    id: 8,
+    name: "Vinicius",
+    rating: 86,
+    team: "Real Madrid",
+    position: "Delantero",
+    price: 43000000,
+    image: finalCard,
+  },
   // Agrega más datos según necesites
 ];
 
@@ -44,10 +100,12 @@ export default function ShopCollection({
 
   const cardsPerPage = 8;
 
-  // Filtrado de cartas según criterios (por ejemplo, defensas, mediocampistas, etc.)
+  // Filtrado de cartas según criterios
   const filteredCards = useMemo(() => {
     return cardData.filter((card) => {
-      const matchName = card.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchName = card.name
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
       const matchTeam =
         !selectedTeam ||
         selectedTeam === "Equipo" ||
@@ -63,9 +121,13 @@ export default function ShopCollection({
 
   const totalPages = Math.ceil(filteredCards.length / cardsPerPage);
   const handlePrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
-  const handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  const handleNextPage = () =>
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
   const startIndex = (currentPage - 1) * cardsPerPage;
-  const visibleCards = filteredCards.slice(startIndex, startIndex + cardsPerPage);
+  const visibleCards = filteredCards.slice(
+    startIndex,
+    startIndex + cardsPerPage
+  );
 
   // Al hacer clic en una carta, se muestra un diálogo (modal) de confirmación
   const handleCardClick = (card) => {
@@ -162,4 +224,3 @@ export default function ShopCollection({
     </div>
   );
 }
-

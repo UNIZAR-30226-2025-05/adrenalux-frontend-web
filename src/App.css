@@ -40,3 +40,11 @@
 .read-the-docs {
   color: #888;
 }
+
+@import url("https://fonts.googleapis.com/css2?family=Sriracha&display=swap");
+
+.sriracha-regular {
+  font-family: "Sriracha", serif;
+  font-weight: 400;
+  font-style: normal;
+}

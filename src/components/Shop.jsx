@@ -6,9 +6,9 @@ import BackButton from "../components/layout/game/BackButton";
 import background from "../assets/background.png";
 import ShopCollection from "./ShopCollection";
 import Card from "./layout/game/Card";
-import finalCard from "../assets/finalCard.png"; 
+import finalCard from "../assets/finalCard.png";
 import { FaCoins } from "react-icons/fa";
-
+import MarqueeText from "./layout/MarqueesText";
 export default function Shop() {
   const [showDialog, setShowDialog] = useState(false);
   const navigate = useNavigate();
@@ -18,6 +18,7 @@ export default function Shop() {
   const [selectedPosition, setSelectedPosition] = useState("Posición");
 
   const [showCollection, setShowCollection] = useState(false);
+  const [selectedCard, setSelectedCard] = useState(null);
 
   const luxurisCards = [
     {
@@ -27,7 +28,7 @@ export default function Shop() {
       team: "Manchester United",
       position: "Delantero",
       price: 500000,
-      image: finalCard, 
+      image: finalCard,
     },
     {
       id: 102,
@@ -52,6 +53,7 @@ export default function Shop() {
   // Handles click on a Luxuris card
   const handleLuxurisCardClick = (card) => {
     console.log(`Clicked card: ${card.name}`);
+    setSelectedCard(card);
     setShowDialog(true);
   };
 
@@ -94,15 +96,28 @@ export default function Shop() {
 
         {/* Luxuris del día section */}
         <div className="bg-[#2B5C94] text-center py-8 px-10 mt-16 w-[800px] rounded-lg shadow-lg flex flex-col items-center">
-          <h2 className="text-2xl font-semibold mb-8">Luxuris del día</h2>
+          <div
+            className="relative overflow-hidden w-full h-12 flex items-center justify-center mb-8"
+            style={{
+              maskImage:
+                "linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%)",
+              WebkitMaskImage:
+                "linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%)",
+            }}
+          >
+            <MarqueeText text="Luxuris  del  día" />
+          </div>
 
           {/* Render each card using the Card component AQUI*/}
           <div className="flex justify-center space-x-16">
-          {luxurisCards.map((card) => (
-  <Card key={card.id} card={card} onClick={handleLuxurisCardClick} flip={true} />
-))}
-
-
+            {luxurisCards.map((card) => (
+              <Card
+                key={card.id}
+                card={card}
+                onClick={handleLuxurisCardClick}
+                flip={true}
+              />
+            ))}
           </div>
         </div>
 
@@ -123,7 +138,9 @@ export default function Shop() {
         {showDialog && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-black p-6 rounded-lg shadow-lg text-center max-w-sm mx-auto">
-              <p className="text-lg mb-6">¿Quieres comprar a <b>{luxurisCards.name}</b> luxury?</p>
+              <p className="text-lg mb-6">
+                ¿Quieres comprar a <b>{selectedCard.name}</b> luxury?
+              </p>
               <div className="flex justify-center space-x-6">
                 <button
                   onClick={() => {
