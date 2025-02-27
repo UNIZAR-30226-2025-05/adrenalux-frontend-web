@@ -11,6 +11,7 @@ import Opening from "./components/Opening";
 import GridOpenedCards from "./components/gridOpendCards";
 import Alineaciones from "./components/Alineaciones";
 import AlineacionEditar from "./components/AlineacionesEditar";
+import BuscandoJugador from "./components/BuscandoJugador";
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
         <Route path="/collection" element={<Collection />} />
         <Route path="/amigo" element={<Amigo />} />
         <Route path="/alineacionesEditar" element={<AlineacionEditar />} />
+        <Route path="/buscandoPartida" element={<BuscandoJugador />} />
       </Routes>
     </Router>
   );

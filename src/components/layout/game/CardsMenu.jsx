@@ -1,21 +1,28 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Importar useNavigate
-import SobreEpico from "../../../assets/SobreEpico.png";
-import SobreComun from "../../../assets/SobreComun.png";
-import SobreRaro from "../../../assets/SobreRaro.png";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-
-const cards = [
-  { id: 1, img: SobreEpico, name: "Epico", price: 250 },
-  { id: 2, img: SobreComun, name: "Comun", price: 50 },
-  { id: 3, img: SobreRaro, name: "Raro", price: 150 },
-];
+import { abrirSobre, sobresDisponibles } from '../../../services/api/cardApi';
 
 export default function CardsMenu() {
-  const [centerCard, setCenterCard] = useState(2);
+  const [sobres, setSobres] = useState([]);
+  const [centerCard, setCenterCard] = useState(null);
   const [showAlert, setShowAlert] = useState(false);
-  const [selectedCard, setSelectedCard] = useState(null); // Corregido: Estado para almacenar la carta seleccionada
-  const navigate = useNavigate(); // Hook de navegación
+  const [selectedCard, setSelectedCard] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchSobres = async () => {
+      try {
+        const sobresData = await sobresDisponibles();
+        setSobres(sobresData);
+        if (sobresData.length > 0) setCenterCard(sobresData[0].id);
+      } catch (error) {
+        console.error("Error obteniendo sobres:", error);
+      }
+    };
+
+    fetchSobres();
+  }, []);
 
   const handleCardClick = (id) => {
     setCenterCard(id);
@@ -25,11 +32,17 @@ export default function CardsMenu() {
     setShowAlert(true);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     setShowAlert(false);
-    const card = cards.find((card) => card.id === centerCard);
-    setSelectedCard(card); // Guardar la carta seleccionada en el estado
-    navigate("/opening", { state: { card: card } }); // Enviar el estado a la nueva página
+    const sobre = sobres.find((s) => s.id === centerCard);
+    setSelectedCard(sobre);
+
+    try {
+      const openedCards = await abrirSobre(sobre.tipo);
+      navigate("/opening", { state: { openedCards, selectedCard: sobre } });
+    } catch (error) {
+      console.error("Error al abrir el sobre:", error);
+    }
   };
 
   const handleCancel = () => {
@@ -40,23 +53,23 @@ export default function CardsMenu() {
     return id === centerCard ? "z-10 scale-125" : "z-0 scale-90 opacity-80";
   };
 
-  const currentCard = cards.find((card) => card.id === centerCard);
+  const currentCard = sobres.find((s) => s.id === centerCard);
 
   return (
     <div className="flex flex-col justify-center items-center h-screen gap-4">
       <div className="flex justify-center items-center gap-4">
         <AnimatePresence>
-          {cards.map((card) => (
+          {sobres.map((sobre) => (
             <motion.img
-              key={card.id}
-              src={card.img}
-              alt={card.name}
-              className={`w-40 h-60 cursor-pointer rounded-lg shadow-lg ${getCardStyle(card.id)}`}
-              initial={{ scale: card.id === centerCard ? 1.25 : 0.9, x: 0 }}
-              animate={{ scale: card.id === centerCard ? 1.25 : 0.9, x: 0 }}
+              key={sobre.id}
+              src={sobre.img} // Asegúrate de que el backend envíe la URL de la imagen
+              alt={sobre.nombre}
+              className={`w-40 h-60 cursor-pointer rounded-lg shadow-lg ${getCardStyle(sobre.id)}`}
+              initial={{ scale: sobre.id === centerCard ? 1.25 : 0.9, x: 0 }}
+              animate={{ scale: sobre.id === centerCard ? 1.25 : 0.9, x: 0 }}
               whileTap={{ scale: 1.3 }}
               transition={{ type: "spring", stiffness: 300 }}
-              onClick={() => handleCardClick(card.id)}
+              onClick={() => handleCardClick(sobre.id)}
             />
           ))}
         </AnimatePresence>
@@ -68,11 +81,11 @@ export default function CardsMenu() {
         Abrir
       </button>
 
-      {showAlert && (
+      {showAlert && currentCard && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-20">
           <div className="bg-[#1C1A1A] p-6 rounded-lg shadow-lg text-center text-white">
             <p className="mb-4 text-lg">
-              ¿Quieres comprar el sobre <strong>{currentCard.name}</strong> por <strong>{currentCard.price}</strong> monedas?
+              ¿Quieres comprar el sobre <strong>{currentCard.nombre}</strong> por <strong>{currentCard.precio}</strong> monedas?
             </p>
             <div className="flex justify-center gap-4">
               <button
