@@ -5,7 +5,7 @@ export default function CollectionButton() {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate("/shop");
+    navigate("/collection");
   };
   return (
     <button
