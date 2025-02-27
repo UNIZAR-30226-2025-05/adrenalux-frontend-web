@@ -9,6 +9,10 @@ export default function PlayButton() {
     navigate("/alineaciones"); 
   };
 
+  const handleJugarClick = () => {
+    navigate("/buscandoPartida"); 
+  };
+
   return (
     <div className="absolute bottom-5 left-1/2 transform -translate-x-1/2 flex items-center bg-gradient-to-r from-[#9FA383] to-[#464929] border-4 border-[#1E1E1E] rounded-full shadow-xl">
       <div className="flex flex-col w-[100px] items-center justify-center bg-transparent px-4 py-2 rounded-l-full hover:bg-[#7A7E68] transition">
@@ -17,6 +21,7 @@ export default function PlayButton() {
       </div>
 
       <button
+        onClick={handleJugarClick}
         className="flex items-center rounded-sm justify-center w-[150px] h-[78px] text-xl font-bold text-white bg-gradient-to-b from-[#777771] to-[#41401A] hover:bg-[#5C5F4A] transition"
         style={{clipPath: "polygon(0% 50%, 10% 0%, 100% 0%, 80% 100%, 10% 100%)"}}>
         Jugar

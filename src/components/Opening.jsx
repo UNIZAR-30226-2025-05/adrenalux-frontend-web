@@ -5,52 +5,43 @@ import SobreEpico from "../assets/SobreEpico.png";
 import SobreComun from "../assets/SobreComun.png";
 import SobreRaro from "../assets/SobreRaro.png";
 import background from "../assets/background.png";
-import finalCard from "../assets/finalCard.png"; // Imagen de la carta final
+import finalCard from "../assets/finalCard.png";
 
 const Opening = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { card } = location.state;
+  const { openedCards, selectedCard } = location.state;
 
-  // Definir la cantidad de cartas según el tipo de sobre
-  const cardCount = card.name === "Epico" ? 10 : card.name === "Raro" ? 7 : 5;
-
-  const [cards, setCards] = useState([]);
-  const [currentCardIndex, setCurrentCardIndex] = useState(0);
-  const [showContinueButton, setShowContinueButton] = useState(false);
-  const [isOpening, setIsOpening] = useState(true); // Estado para saber si se está abriendo el sobre
-  const handleContinue = () => {
-    navigate("/grid", { state: { openedCards: cards } });
-  };
-  
-
-  // Generar las cartas por abrir
-  useEffect(() => {
-    const newCards = Array(cardCount).fill(finalCard); // Usamos la carta final para todas
-    setCards(newCards);
-  }, [cardCount]);
+  const [currentCardIndex, setCurrentCardIndex] = useState(0); // Mantener el índice de la carta actual
+  const [showContinueButton, setShowContinueButton] = useState(false); // Botón de continuar
+  const [isOpening, setIsOpening] = useState(true); // Estado para abrir el sobre
 
   // Función para manejar el avance de las cartas
   const handleNextCard = () => {
-    if (currentCardIndex < cards.length - 1) {
-      setCurrentCardIndex(currentCardIndex + 1);
+    if (currentCardIndex < openedCards.length - 1) {
+      setCurrentCardIndex(currentCardIndex + 1); // Avanzar al siguiente índice
     } else {
-      setShowContinueButton(true);
+      setShowContinueButton(true); // Si todas las cartas se han mostrado, mostrar el botón de continuar
     }
   };
 
   // Función para mostrar la imagen del sobre según el tipo
   const getEnvelopeImage = () => {
-    switch (card.name) {
-      case "Epico":
+    switch (selectedCard.name) {
+      case "Sobre Master Lux":
         return SobreEpico;
-      case "Comun":
+      case "Sobre Energia Lux":
         return SobreComun;
-      case "Raro":
+      case "Sobre Elite Lux":
         return SobreRaro;
       default:
         return null;
     }
+  };
+
+  // Función para continuar a la siguiente pantalla
+  const handleContinue = () => {
+    navigate("/grid", { state: { openedCards } });
   };
 
   return (
@@ -59,7 +50,7 @@ const Opening = () => {
       style={{ backgroundImage: `url(${background})` }}
     >
       <AnimatePresence>
-        {/* Animación de la carta del sobre al principio */}
+        {/* Animación del sobre al principio */}
         {isOpening && (
           <motion.div
             key="envelope"
@@ -94,10 +85,10 @@ const Opening = () => {
             }}
           >
             <motion.img
-              src={cards[currentCardIndex]}
+              src={openedCards[currentCardIndex]?.foto || finalCard} // Mostrar la carta
               alt={`Carta ${currentCardIndex + 1}`}
               className="w-80 h-140 rounded-lg shadow-lg cursor-pointer"
-              onClick={handleNextCard}
+              onClick={handleNextCard} // Avanzar a la siguiente carta
             />
           </motion.div>
         )}

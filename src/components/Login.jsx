@@ -24,7 +24,7 @@ const Login = () => {
 
   const handleLoginClick = async (e) => {
     e.preventDefault();
-    setError(null); // Limpiar errores anteriores
+    setError(null); 
     try {
       const { status } = await login(formData.email, formData.password);
       if (status === 200) {
@@ -39,7 +39,6 @@ const Login = () => {
       }else {
         setError('Error en la conexión con el servidor');
       }
-      
     }
   };
 

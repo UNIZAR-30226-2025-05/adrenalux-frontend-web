@@ -12,7 +12,7 @@ const Formacion3_4_3 = ({ jugadores }) => {
     <div className="formacion-3-4-3 grid grid-rows-6 gap-1">
       {/* Fila 1: Delanteros */}
       <div className="flex justify-between mb-1">
-        {["ed", "dc", "el"].map((pos, index) => (
+        {["dc", "dc", "dc"].map((pos, index) => (
           <div key={index} className={`relative ${getOpacity(pos)}`}>
             <img src={Card} alt="Carta Jugador" className="w-20 h-32" /> {/* Tamaño de carta ajustado */}
             <p className="absolute inset-0 text-center text-white">
