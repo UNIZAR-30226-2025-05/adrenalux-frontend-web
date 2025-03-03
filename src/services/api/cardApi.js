@@ -28,7 +28,7 @@ export const abrirSobre = async (tipo) => {
       equipo: carta.club || "Sin club",           
       escudo: carta.escudo || "default_escudo.png",   
       ataque: carta.ataque ?? 0,             
-      control: carta.medio ?? 0,            
+      control: carta.control ?? 0,            
       defensa: carta.defensa ?? 0,         
       tipo_carta: carta.rareza || "Común",       
       posicion: carta.posicion || "N/A",         
