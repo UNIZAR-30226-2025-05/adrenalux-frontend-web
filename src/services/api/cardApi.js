@@ -1,11 +1,9 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://54.37.50.18:3000/api/v1';
+const API_BASE_URL = 'http://54.37.50.18:3000/api/v1/cartas';
 
-// Obtener token de autenticación si es necesario
 const getToken = () => localStorage.getItem("auth_token");
 
-// Función para abrir un sobre
 export const abrirSobre = async (tipo) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/abrirSobre/${tipo}`, {
@@ -15,24 +13,26 @@ export const abrirSobre = async (tipo) => {
       }
     });
 
-    const cartas = response.data?.data?.cartas;
+    const cartas = response.data?.data?.responseJson.cartas;
+    console.log("Cartas ", cartas);
+
     if (!Array.isArray(cartas)) {
       throw new Error('Estructura de respuesta incorrecta');
     }
 
     return cartas.map((carta) => ({
-      id: carta.id || "N/A",
-      nombreCompleto: carta.nombreCompleto || "Desconocido",
-      club: carta.club || "Sin club",
-      posicion: carta.posicion || "N/A",
-      nacionalidad: carta.nacionalidad || "N/A",
-      stats: {
-        defensa: carta.stats?.defensa ?? 0,
-        medio: carta.stats?.medio ?? 0,
-        ataque: carta.stats?.ataque ?? 0
-      },
-      rareza: carta.rareza || "Común",
-      foto: carta.foto || "default.png"
+      id: carta.id || "N/A",                      
+      nombre: carta.nombre || "Desconocido",      
+      alias: carta.alias || "Desconocido",   
+      pais: carta.pais || "N/A",                  
+      photo: carta.photo || "default.png",          
+      equipo: carta.club || "Sin club",           
+      escudo: carta.escudo || "default_escudo.png",   
+      ataque: carta.ataque ?? 0,             
+      control: carta.medio ?? 0,            
+      defensa: carta.defensa ?? 0,         
+      tipo_carta: carta.rareza || "Común",       
+      posicion: carta.posicion || "N/A",         
     }));
   } catch (error) {
     console.error('Error al abrir el sobre:', error.response?.data?.message || error.message);
@@ -40,7 +40,6 @@ export const abrirSobre = async (tipo) => {
   }
 };
 
-// Función para obtener sobres disponibles
 export const sobresDisponibles = async () => {
   try {
     const response = await axios.get(`${API_BASE_URL}/sobres`, {
@@ -50,9 +49,12 @@ export const sobresDisponibles = async () => {
       }
     });
 
-    return response.data;
+    return response.data.map(sobre => ({
+      ...sobre,
+    }));
+    
   } catch (error) {
     console.error('Error al obtener los sobres disponibles:', error.response?.data?.message || error.message);
-    throw error
+    throw error;
   }
 };
