@@ -7,6 +7,7 @@ import SobreRaro from "../assets/SobreRaro.png";
 import background from "../assets/background.png";
 import Carta from './layout/game/Carta';
 
+
 const Opening = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -57,11 +58,13 @@ const Opening = () => {
               alt="Sobre"
               className="w-80 h-140 rounded-lg shadow-lg cursor-pointer"
               onClick={() => setIsOpening(false)}
+
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
               transition={{ duration: 0.3 }}
             />
           </motion.div>
+
         ) : (
           <div className="flex flex-col items-center">
             <motion.div

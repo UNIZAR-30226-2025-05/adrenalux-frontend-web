@@ -5,10 +5,14 @@ import { FaPlusCircle } from "react-icons/fa";
 import BackButton from "../components/layout/game/BackButton";
 import background from "../assets/background.png";
 import ShopCollection from "./ShopCollection";
-import Card from "./layout/game/Card";
 import finalCard from "../assets/finalCard.png";
 import { FaCoins } from "react-icons/fa";
 import MarqueeText from "./layout/MarqueesText";
+import Card3D from "./layout/game/Card3D";
+import { Canvas } from "@react-three/fiber";
+import { useGLTF } from "@react-three/drei";
+import RotatingModel from "./layout/game/RotatingModel";
+
 export default function Shop() {
   const [showDialog, setShowDialog] = useState(false);
   const navigate = useNavigate();
@@ -50,6 +54,9 @@ export default function Shop() {
     },
   ];
 
+  // Carga el modelo 3D una sola vez
+  const gltf = useGLTF("/models/card_3d.glb");
+
   // Handles click on a Luxuris card
   const handleLuxurisCardClick = (card) => {
     console.log(`Clicked card: ${card.name}`);
@@ -80,14 +87,13 @@ export default function Shop() {
       >
         {/* Back Button */}
         <div className="absolute top-5 left-5">
-          <BackButton onClick={handleBackClick} /> 
+          <BackButton onClick={handleBackClick} />
         </div>
 
         {/* Coins */}
         <div className="absolute top-5 right-5 flex items-center bg-black px-6 py-3 rounded-lg shadow-md">
           <span className="text-2xl font-semibold mr-2">5,000</span>
           <FaCoins className="text-yellow-400 text-2xl" />
-
           <FaPlusCircle className="text-green-500 ml-3 text-2xl cursor-pointer hover:text-green-400 transition" />
         </div>
 
@@ -108,14 +114,13 @@ export default function Shop() {
             <MarqueeText text="Luxuris  del  día" />
           </div>
 
-          {/* Render each card using the Card component AQUI*/}
+          {/* Render multiple 3D cards in a single Canvas */}
           <div className="flex justify-center space-x-16">
             {luxurisCards.map((card) => (
-              <Card
+              <Card3D
                 key={card.id}
                 card={card}
                 onClick={handleLuxurisCardClick}
-                flip={true}
               />
             ))}
           </div>

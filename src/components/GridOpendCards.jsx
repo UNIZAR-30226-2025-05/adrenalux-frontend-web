@@ -6,9 +6,7 @@ const GridOpenedCards = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Recibimos las cartas desde el estado
   const { openedCards } = location.state;
-  console.log(openedCards);
 
   return (
     <div className="fixed inset-0 flex justify-center items-center bg-cover bg-center" style={{ backgroundImage: `url(${background})` }}>
@@ -25,7 +23,6 @@ const GridOpenedCards = () => {
             </div>
           ))}
         </div>
-
         <button
           className="px-6 py-2 bg-gradient-to-r from-[#8302CE] to-[#490174] text-white rounded-lg shadow-lg hover:opacity-90 transition"
           onClick={() => navigate("/home")}

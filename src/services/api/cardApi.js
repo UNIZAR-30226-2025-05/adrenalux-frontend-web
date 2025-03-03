@@ -14,7 +14,6 @@ export const abrirSobre = async (tipo) => {
     });
 
     const cartas = response.data?.data?.responseJson.cartas;
-    console.log("Cartas ", cartas);
 
     if (!Array.isArray(cartas)) {
       throw new Error('Estructura de respuesta incorrecta');
