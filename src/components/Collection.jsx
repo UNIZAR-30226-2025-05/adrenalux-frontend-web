@@ -255,7 +255,7 @@ export default function Collection({ onBack }) {
                 <img
                   src={selectedCard.face}
                   alt="Player Face"
-                  className="absolute top-[40%] right-2 transform -translate-y-1/2 w-16 h-16 object-cover"
+                  className="absolute top-[40%] right-2 transform -translate-x-1/3 -translate-y-1/3 w-16 h-16 object-cover"
                 />
               )}
             </div>
@@ -269,7 +269,13 @@ export default function Collection({ onBack }) {
               <p className="mb-1">
                 Valor: {selectedCard.price.toLocaleString()} coins
               </p>
-
+              {/* Close button */}
+              <button
+                onClick={handleCloseModal}
+                className="bg-red-600 px-4 py-2 rounded mt-4 hover:bg-red-500 transition"
+              >
+                Vender
+              </button>
               {/* Close button */}
               <button
                 onClick={handleCloseModal}
