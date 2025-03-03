@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import Card from "../../../assets/finalCard.png"; // Imagen de la carta
+import Card from "../../../assets/cartaNormal.png"; // Imagen de la carta
 
 const Formacion4_5_1 = ({ jugadores }) => {
   // Función para verificar si una posición está libre
@@ -24,7 +24,7 @@ const Formacion4_5_1 = ({ jugadores }) => {
 
       {/* Fila 2: Centrocampistas */}
       <div className="flex justify-between mb-1">
-        {["mc", "mc", "mco", "mco", "mc"].map((pos, index) => (
+        {["mc", "mc", "mc", "mc", "mc"].map((pos, index) => (
           <div key={index} className={`relative ${getOpacity(pos)}`}>
             <img src={Card} alt="Carta Jugador" className="w-20 h-32" /> {/* Tamaño de carta ajustado */}
             <p className="absolute inset-0 text-center text-white">
@@ -34,9 +34,9 @@ const Formacion4_5_1 = ({ jugadores }) => {
         ))}
       </div>
 
-      {/* Fila 3: Defensores laterales */}
+      {/* Fila 3: Defensores */}
       <div className="flex justify-between mb-1">
-        {["ld", "dfc", "dfc", "li"].map((pos, index) => (
+        {["dc", "dc", "dc", "dc"].map((pos, index) => (
           <div key={index} className={`relative ${getOpacity(pos)}`}>
             <img src={Card} alt="Carta Jugador" className="w-20 h-32" /> {/* Tamaño de carta ajustado */}
             <p className="absolute inset-0 text-center text-white">
@@ -64,7 +64,7 @@ Formacion4_5_1.propTypes = {
     PropTypes.shape({
       nombre: PropTypes.string.isRequired,
       posicion: PropTypes.oneOf([
-        "ed", "el", "dc", "mc", "mco", "mcd", "mi", "md", "ld", "li", "dfc", "por"
+        "ed", "dc", "mc", "por"
       ]).isRequired
     })
   ).isRequired

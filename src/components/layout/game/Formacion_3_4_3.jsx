@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import Card from "../../../assets/finalCard.png"; // Imagen de la carta
+import Card from "../../../assets/cartaNormal.png"; // Imagen de la carta
 
 const Formacion3_4_3 = ({ jugadores }) => {
   // Función para verificar si una posición está libre
@@ -10,11 +10,11 @@ const Formacion3_4_3 = ({ jugadores }) => {
 
   return (
     <div className="formacion-3-4-3 grid grid-rows-6 gap-1">
-      {/* Fila 1: Delanteros */}
+      {/* Fila 1: Defensores centrales (dc) */}
       <div className="flex justify-between mb-1">
         {["dc", "dc", "dc"].map((pos, index) => (
           <div key={index} className={`relative ${getOpacity(pos)}`}>
-            <img src={Card} alt="Carta Jugador" className="w-20 h-32" /> {/* Tamaño de carta ajustado */}
+            <img src={Card} alt="Carta Jugador" className="w-20 h-32" />
             <p className="absolute inset-0 text-center text-white">
               {jugadores.find((jugador) => jugador.posicion === pos)?.nombre || "Vacío"}
             </p>
@@ -22,11 +22,11 @@ const Formacion3_4_3 = ({ jugadores }) => {
         ))}
       </div>
 
-      {/* Fila 2: Centrocampistas */}
+      {/* Fila 2: Centrocampistas (mc) */}
       <div className="flex justify-between mb-1">
-        {["mc", "mc", "mco", "mco"].map((pos, index) => (
+        {["mc", "mc", "mc", "mc"].map((pos, index) => (
           <div key={index} className={`relative ${getOpacity(pos)}`}>
-            <img src={Card} alt="Carta Jugador" className="w-20 h-32" /> {/* Tamaño de carta ajustado */}
+            <img src={Card} alt="Carta Jugador" className="w-20 h-32" />
             <p className="absolute inset-0 text-center text-white">
               {jugadores.find((jugador) => jugador.posicion === pos)?.nombre || "Vacío"}
             </p>
@@ -34,11 +34,11 @@ const Formacion3_4_3 = ({ jugadores }) => {
         ))}
       </div>
 
-      {/* Fila 3: Defensores */}
+      {/* Fila 3: Defensores centrales (dfc) */}
       <div className="flex justify-between mb-1">
         {["dfc", "dfc", "dfc"].map((pos, index) => (
           <div key={index} className={`relative ${getOpacity(pos)}`}>
-            <img src={Card} alt="Carta Jugador" className="w-20 h-32" /> {/* Tamaño de carta ajustado */}
+            <img src={Card} alt="Carta Jugador" className="w-20 h-32" />
             <p className="absolute inset-0 text-center text-white">
               {jugadores.find((jugador) => jugador.posicion === pos)?.nombre || "Vacío"}
             </p>
@@ -46,10 +46,10 @@ const Formacion3_4_3 = ({ jugadores }) => {
         ))}
       </div>
 
-      {/* Fila 4: Portero */}
+      {/* Fila 4: Portero (por) */}
       <div className="flex justify-center mb-1">
         <div className={`relative ${getOpacity("por")}`}>
-          <img src={Card} alt="Carta Jugador" className="w-20 h-32" /> {/* Tamaño de carta ajustado */}
+          <img src={Card} alt="Carta Jugador" className="w-20 h-32" />
           <p className="absolute inset-0 text-center text-white">
             {jugadores.find((jugador) => jugador.posicion === "por")?.nombre || "Vacío"}
           </p>
@@ -64,7 +64,7 @@ Formacion3_4_3.propTypes = {
     PropTypes.shape({
       nombre: PropTypes.string.isRequired,
       posicion: PropTypes.oneOf([
-        "ed", "el", "dc", "mc", "mco", "mcd", "mi", "md", "ld", "li", "dfc", "por"
+        "dc", "mc", "dfc", "por"
       ]).isRequired
     })
   ).isRequired

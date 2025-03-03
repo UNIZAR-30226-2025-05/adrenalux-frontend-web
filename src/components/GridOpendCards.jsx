@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import background from '../assets/background.png';
-import Carta from './layout/game/Carta';
+import Carta from './layout/game/CartaMediana';
 
 const GridOpenedCards = () => {
   const location = useLocation();
@@ -19,7 +19,7 @@ const GridOpenedCards = () => {
               key={index}
               className="relative w-32 h-48 flex justify-center items-center bg-black bg-opacity-50 rounded-lg shadow-lg"
             >
-              <Carta jugador={card} className="w-32 h-48" />
+              <Carta jugador={card}/>
             </div>
           ))}
         </div>

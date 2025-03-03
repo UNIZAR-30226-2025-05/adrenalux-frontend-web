@@ -5,8 +5,9 @@ import background from "../assets/backgroundAlineacion.png";
 import BackButton from "../components/layout/game/BackButton";
 import Formacion433 from "../components/layout/game/Formacion_4_3_3";
 import Formacion442 from "../components/layout/game/Formacion_4_4_2";  
-import Formacion451 from "../components/layout/game/Formacion_4_5_1";  // Añadido 4-5-1
-import Formacion343 from "../components/layout/game/Formacion_3_4_3";  // Añadido 3-4-3
+import Formacion451 from "../components/layout/game/Formacion_4_5_1";  
+import Formacion343 from "../components/layout/game/Formacion_3_4_3";  
+import Formacion532 from "../components/layout/game/Formacion_5_3_2";  
 
 export default function AlineacionEditar({ nombre = "", formacion = "", jugadores = [] }) {
   const navigate = useNavigate();
@@ -53,9 +54,11 @@ export default function AlineacionEditar({ nombre = "", formacion = "", jugadore
       case "4-4-2":
         return <Formacion442 jugadores={jugadoresState} />;
       case "4-5-1":
-        return <Formacion451 jugadores={jugadoresState} />; // Renderiza 4-5-1
+        return <Formacion451 jugadores={jugadoresState} />; 
       case "3-4-3":
-        return <Formacion343 jugadores={jugadoresState} />; // Renderiza 3-4-3
+        return <Formacion343 jugadores={jugadoresState} />; 
+      case "5-3-2":
+        return <Formacion532 jugadores={jugadoresState} />; 
       default:
         return null;
     }
@@ -93,6 +96,7 @@ export default function AlineacionEditar({ nombre = "", formacion = "", jugadore
               <option value="3-4-3">3-4-3</option>
               <option value="4-5-1">4-5-1</option>
               <option value="4-3-3">4-3-3</option>
+              <option value="5-3-2">5-3-2</option>
             </select>
           </div>
         </form>

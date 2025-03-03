@@ -5,7 +5,7 @@ import SobreEpico from "../assets/SobreEpico.png";
 import SobreComun from "../assets/SobreComun.png";
 import SobreRaro from "../assets/SobreRaro.png";
 import background from "../assets/background.png";
-import Carta from './layout/game/Carta';
+import Carta from './layout/game/CartaGrande';
 
 
 const Opening = () => {

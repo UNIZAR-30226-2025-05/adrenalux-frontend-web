@@ -1,8 +1,11 @@
 /* eslint-disable no-unused-vars */
 import PropTypes from "prop-types";
-import FondoCarta from "../../../assets/finalCard.png";
+import FondoCartaNormal from "../../../assets/cartaNormal.png";
+import FondoCartaLuxury from "../../../assets/card_luxury.png";
+import FondoCartaLuxuryXI from "../../../assets/card_luxuryxi.png";
+import FondoCartaMegaLuxury from "../../../assets/card_megaluxury.png";
 
-function Carta({ jugador, className }) {
+function CartaGrande({ jugador, className }) {
   const { 
     alias, 
     ataque, 
@@ -18,15 +21,28 @@ function Carta({ jugador, className }) {
     posicion
   } = jugador;
 
-  // Calcular la media de las estadísticas
+  const getFondo = () => {
+    switch (tipo_carta) {
+      case "Común":
+        return FondoCartaNormal;
+      case "Luxury":
+        return FondoCartaLuxury;
+      case "Megaluxury":
+        return FondoCartaMegaLuxury;
+      case "Luxury XI":
+        return FondoCartaLuxuryXI;
+      default:
+        return null;
+    }
+  };
+
   const media = Math.round((ataque + control + defensa) / 3);
 
   return (
     <div
       className={`relative w-80 h-[500px] bg-cover rounded-lg overflow-hidden ${className}`}
-      style={{ backgroundImage: `url(${FondoCarta})`, backgroundSize: "cover" }}
+      style={{ backgroundImage: `url(${getFondo()})`, backgroundSize: "cover" }}
     >
-      {/* Imagen del jugador - Pegada al borde de la franja negra */}
       <div className="absolute left-[170px] transform -translate-x-1/2 bottom-[46%]">
         <img
           src={photo}
@@ -35,19 +51,16 @@ function Carta({ jugador, className }) {
         />
       </div>
 
-      {/* Escudo del equipo en la esquina superior derecha */}
       <img
         src={escudo}
         alt={equipo}
         className="absolute top-11 right-6 w-16 h-16"
       />
 
-      {/* Nombre del jugador pegado a la izquierda, justo en la franja negra */}
       <div className="absolute bottom-[39%] left-[60px] text-white font-semibold">
         <p className="text-lg">{alias}</p>
       </div>
 
-      {/* Estadísticas de ataque, control, defensa centradas en la parte baja */}
       <div className="absolute bottom-[135px] left-[170px] transform -translate-x-1/2 flex gap-4">
         <div className="w-12 h-12 bg-red-600 rounded-lg flex items-center justify-center text-white font-semibold">
           {ataque}
@@ -60,7 +73,6 @@ function Carta({ jugador, className }) {
         </div>
       </div>
 
-      {/* Media de las estadísticas, centrada debajo */}
       <div className="absolute bottom-[70px] left-[170px] transform -translate-x-1/2 flex items-center justify-center w-12 h-12 bg-yellow-500 rounded-lg">
         <p className="text-white font-semibold">{media}</p>
       </div>
@@ -68,8 +80,7 @@ function Carta({ jugador, className }) {
   );
 }
 
-// Definición de los props con PropTypes
-Carta.propTypes = {
+CartaGrande.propTypes = {
   jugador: PropTypes.shape({
     alias: PropTypes.string.isRequired,
     ataque: PropTypes.number.isRequired,
@@ -87,4 +98,4 @@ Carta.propTypes = {
   className: PropTypes.string, 
 };
 
-export default Carta;
+export default CartaGrande;
