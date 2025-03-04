@@ -12,7 +12,7 @@ const getDeviceId = () => {
 
 // Funciones para manejar el token en localStorage
 const setToken = (token) => localStorage.setItem("auth_token", token);
-const getToken = () => localStorage.getItem("auth_token");
+export const getToken = () => localStorage.getItem("auth_token");
 const removeToken = () => localStorage.removeItem("auth_token");
 
 // Función para iniciar sesión
