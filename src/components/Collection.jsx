@@ -1,112 +1,12 @@
 import React, { useState, useMemo } from "react";
 import { FaArrowLeft, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import background from "../assets/background.png";
-import finalCard from "../assets/finalCard.png";
-import teamImage from "../assets/manchester_united.png";
-import countryImage from "../assets/portugal.png";
-import cristiano from "../assets/cristiano.png";
 
 import Card from "./layout/game/Card";
 import SearchTab from "./layout/game/SearchTab";
 import { useNavigate } from "react-router-dom";
 import BackButton from "../components/layout/game/BackButton"; // Importar BackButton
 
-// Example data from backend
-const cardData = [
-  {
-    id: 1,
-    name: "Cristiano",
-    rating: 91,
-    rarity: "Épica",
-    team: "Manchester United",
-    position: "Delantero",
-    price: 62000000,
-    image: finalCard,
-    image3: teamImage,
-    image5: countryImage,
-    face: cristiano,
-  },
-  {
-    id: 2,
-    name: "Messi",
-    rating: 93,
-    rarity: "Épica",
-    team: "Barcelona",
-    position: "Delantero",
-    price: 63000000,
-    image: finalCard,
-  },
-  {
-    id: 3,
-    name: "Modric",
-    rating: 88,
-    rarity: "Rara",
-    team: "Real Madrid",
-    position: "Mediocampista",
-    price: 35000000,
-    image: finalCard,
-  },
-  {
-    id: 4,
-    name: "Pedri",
-    rating: 85,
-    rarity: "Rara",
-    team: "Barcelona",
-    position: "Mediocampista",
-    price: 40000000,
-    image: finalCard,
-  },
-  {
-    id: 5,
-    name: "Lewandowski",
-    rating: 92,
-    rarity: "Épica",
-    team: "Barcelona",
-    position: "Delantero",
-    price: 38000000,
-    image: finalCard,
-  },
-  {
-    id: 6,
-    name: "Benzema",
-    rating: 91,
-    rarity: "Épica",
-    team: "Real Madrid",
-    position: "Delantero",
-    price: 39000000,
-    image: finalCard,
-  },
-  {
-    id: 7,
-    name: "Kroos",
-    rating: 87,
-    rarity: "Rara",
-    team: "Real Madrid",
-    position: "Mediocampista",
-    price: 34000000,
-    image: finalCard,
-  },
-  {
-    id: 8,
-    name: "Vinicius",
-    rating: 86,
-    rarity: "Rara",
-    team: "Real Madrid",
-    position: "Delantero",
-    price: 43000000,
-    image: finalCard,
-  },
-  {
-    id: 9,
-    name: "Casemiro",
-    rating: 89,
-    rarity: "Rara",
-    team: "Real Madrid",
-    position: "Mediocampista",
-    price: 33000000,
-    image: finalCard,
-  },
-];
 
 export default function Collection({ onBack }) {
   // Search states

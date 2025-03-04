@@ -5,7 +5,7 @@ import { FaPlusCircle } from "react-icons/fa";
 import BackButton from "../components/layout/game/BackButton";
 import background from "../assets/background.png";
 import ShopCollection from "./ShopCollection";
-import finalCard from "../assets/finalCard.png";
+import finalCard from "../assets/CartaNormal.png";
 import { FaCoins } from "react-icons/fa";
 import MarqueeText from "./layout/MarqueesText";
 import Card3D from "./layout/game/Card3D";

@@ -23,7 +23,7 @@ function CartaMediana({ jugador, className }) {
 
   const getFondo = () => {
     switch (tipo_carta) {
-      case "Común":
+      case "Normal":
         return FondoCartaNormal;
       case "Luxury":
         return FondoCartaLuxury;

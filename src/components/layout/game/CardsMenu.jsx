@@ -74,6 +74,7 @@ export default function CardsMenu() {
   
     try {
       const openedCards = await abrirSobre(sobre.tipo);
+      console.log(openedCards);
       navigate("/opening", { state: { openedCards, selectedCard: sobre } });  // Pasa directamente 'sobre'
     } catch (error) {
       console.error("Error al abrir el sobre:", error);

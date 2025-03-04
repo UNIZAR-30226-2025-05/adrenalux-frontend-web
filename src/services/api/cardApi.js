@@ -25,12 +25,12 @@ export const abrirSobre = async (tipo) => {
       alias: carta.alias || "Desconocido",   
       pais: carta.pais || "N/A",                  
       photo: carta.photo || "default.png",          
-      equipo: carta.club || "Sin club",           
+      equipo: carta.equipo || "Sin club",           
       escudo: carta.escudo || "default_escudo.png",   
       ataque: carta.ataque ?? 0,             
       control: carta.control ?? 0,            
       defensa: carta.defensa ?? 0,         
-      tipo_carta: carta.rareza || "Común",       
+      tipo_carta: carta.tipo_carta || "Común",       
       posicion: carta.posicion || "N/A",         
     }));
   } catch (error) {
