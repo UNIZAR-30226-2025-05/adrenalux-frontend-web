@@ -1,25 +1,13 @@
-<<<<<<< Updated upstream
-import React, { useState, useMemo } from "react";
-import { FaArrowLeft, FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import background from "../assets/background.png";
-
-import Card from "./layout/game/Card";
-import SearchTab from "./layout/game/SearchTab";
-import { useNavigate } from "react-router-dom";
-import BackButton from "../components/layout/game/BackButton"; // Importar BackButton
-
-=======
 import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import background from "../assets/background.png";
-import Carta from "./layout/game/Carta";
+import Carta from "./layout/game/CartaMediana"; //Mirar que carta era!!!!!!!!!
 import SearchTab from "./layout/game/SearchTab";
 import { getCollection, filterCards } from "../services/api/collectionApi";
 import { publicarCarta } from "../services/api/shopApi";
 import BackButton from "../components/layout/game/BackButton";
->>>>>>> Stashed changes
 
 export default function Collection({ onBack }) {
   const [cards, setCards] = useState([]);

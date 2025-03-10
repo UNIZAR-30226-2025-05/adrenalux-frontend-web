@@ -5,16 +5,11 @@ import SearchTab from "./layout/game/SearchTab";
 import BackButton from "../components/layout/game/BackButton";
 import background from "../assets/background.png";
 import ShopCollection from "./ShopCollection";
-<<<<<<< Updated upstream
-import finalCard from "../assets/CartaNormal.png";
-import { FaCoins } from "react-icons/fa";
-=======
-import finalCard from "../assets/finalCard.png";
->>>>>>> Stashed changes
+import finalCard from "../assets/cartaNormal.png";
 import MarqueeText from "./layout/MarqueesText";
 import Card3D from "./layout/game/Card3D";
 import { obtenerCartasEnVenta, filterCards } from "../services/api/shopApi";
-import Carta from "./layout/game/Carta";
+import Carta from "./layout/game/CartaMediana"; //Miraaarrrr!!!
 
 export default function Shop() {
   const [showDialog, setShowDialog] = useState(false);

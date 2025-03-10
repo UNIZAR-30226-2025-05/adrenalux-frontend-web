@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import NavBarGame from "./layout/game/NavbarGame";
 import BackButton from "../components/layout/game/BackButton";
 import background from "../assets/background.png";
-import profilePic from "../assets/cristiano.png";
+import profilePic from "../assets/profile_2.png";
 import { FaTimes, FaCheck, FaPen } from "react-icons/fa";
 import { FiCopy } from "react-icons/fi";
 import { getLevelXP } from "../services/api/profileApi";
