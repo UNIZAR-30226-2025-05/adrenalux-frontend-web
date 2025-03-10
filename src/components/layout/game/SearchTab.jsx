@@ -10,27 +10,24 @@ export default function SearchTab({
   setSelectedPosition,
   onSearchEnter,
 }) {
-  const [teams, setTeams] = useState([]); 
+  const [teams, setTeams] = useState([]);
   const positions = ["Portero", "Defensa", "Centrocampista", "Delantero"]; // Posiciones estáticas
   const API_URL = "http://5234.37.50.18:3000/api/v1"; //
-  // Fetch de equipos al montar el componente
   useEffect(() => {
-    fetch(`${API_URL}/teams`) // Ajusta la ruta si tu API es distinta
-      .then(response => response.json())
-      .then(data => setTeams(data))
-      .catch(error => console.error("Error fetching teams:", error));
+    fetch(`${API_URL}/teams`)
+      .then((response) => response.json())
+      .then((data) => setTeams(data))
+      .catch((error) => console.error("Error fetching teams:", error));
   }, []);
 
-  // Detectar Enter en el input de texto
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
-      onSearchEnter(); // Llamamos a la función que nos pasen por props
+      onSearchEnter();
     }
   };
 
   return (
     <div className="flex items-center space-x-6 bg-black/70 p-6 rounded-lg w-[850px] shadow-md">
-      {/* Dropdown: Equipo */}
       <select
         className="bg-gray-100 text-black px-6 py-3 text-lg rounded-lg cursor-pointer
                    hover:bg-gray-200 transition-colors 
@@ -46,7 +43,6 @@ export default function SearchTab({
         ))}
       </select>
 
-      {/* Dropdown: Posición */}
       <select
         className="bg-gray-100 text-black px-6 py-3 text-lg rounded-lg cursor-pointer
                    hover:bg-gray-200 transition-colors
@@ -62,7 +58,6 @@ export default function SearchTab({
         ))}
       </select>
 
-      {/* Barra de búsqueda */}
       <div
         className="flex items-center bg-gray-100 rounded-lg px-5 py-3 w-[320px]
                    focus-within:ring-2 focus-within:ring-blue-500 transition-shadow"

@@ -4,7 +4,6 @@ import { useFrame } from "@react-three/fiber";
 export default function RotatingModel({ scene, ...props }) {
   const groupRef = useRef();
 
-  // Clonamos la escena para que cada instancia tenga su propio objeto
   const clonedScene = useMemo(() => scene.clone(), [scene]);
 
   useFrame(() => {

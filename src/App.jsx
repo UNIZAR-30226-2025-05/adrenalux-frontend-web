@@ -12,9 +12,13 @@ import GridOpenedCards from "./components/gridOpendCards";
 import Alineaciones from "./components/Alineaciones";
 import AlineacionEditar from "./components/AlineacionesEditar";
 import BuscandoJugador from "./components/BuscandoJugador";
+<<<<<<< Updated upstream
 import Logros from "./components/Logros";
 import Intercambios from "./components/Intercambio";
 
+=======
+import Profile from "./components/Profile";
+>>>>>>> Stashed changes
 function App() {
   return (
     <Router>
@@ -32,8 +36,12 @@ function App() {
         <Route path="/amigo" element={<Amigo />} />
         <Route path="/alineacionesEditar" element={<AlineacionEditar />} />
         <Route path="/buscandoPartida" element={<BuscandoJugador />} />
+<<<<<<< Updated upstream
         <Route path="/logros" element={<Logros />} />
         <Route path="/intercambio" element={<Intercambios />} />
+=======
+        <Route path="/profile" element={<Profile />} />
+>>>>>>> Stashed changes
       </Routes>
     </Router>
   );

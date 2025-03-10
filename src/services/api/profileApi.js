@@ -1,142 +1,194 @@
-import { getToken } from "../api/authApi";
+import axios from "axios";
 
 const API_URL = "http://54.37.50.18:3000/api/v1";
 
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("auth_token");
+  if (!token) {
+    console.error("❌ Error: Token no encontrado");
+    throw new Error("Token not found");
+  }
+  return {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  };
+};
+
+/**
+ * 📌 Obtener perfil del usuario
+ */
 export const getProfile = async () => {
-    const token = getToken();
-    if (!token) throw new Error("Token not found");
-    try {
-        const response = await fetch(`${API_URL}/profile`, {
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`,
-            },
-        });
-        return await response.json();
-    } catch (error) {
-        console.error("Error fetching user profile:", error);
-        throw error;
-    }
+  try {
+    const response = await axios.get(`${API_URL}/profile`, {
+      headers: getAuthHeaders(),
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      "❌ Error al obtener el perfil:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
 };
 
+/**
+ * 📌 Actualizar perfil del usuario
+ */
 export const updateProfile = async (profileData) => {
-    const token = getToken();
-    if (!token) throw new Error("Token not found");
-    try {
-        const response = await fetch(`${API_URL}/profile`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`,
-            },
-            body: JSON.stringify(profileData),
-        });
-        return response.status === 204;
-    } catch (error) {
-        console.error("Error updating profile:", error);
-        throw error;
-    }
+  try {
+    const response = await axios.put(`${API_URL}/profile`, profileData, {
+      headers: getAuthHeaders(),
+    });
+    return response.status === 204;
+  } catch (error) {
+    console.error(
+      "❌ Error al actualizar el perfil:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
 };
 
+/**
+ * 📌 Obtener nivel y XP del usuario
+ */
 export const getLevelXP = async () => {
-    const token = getToken();
-    if (!token) throw new Error("Token not found");
-    try {
-        const response = await fetch(`${API_URL}/levelxp`, {
-            headers: { "Authorization": `Bearer ${token}` }
-        });
-        return await response.json();
-    } catch (error) {
-        console.error("Error fetching level and XP:", error);
-        throw error;
-    }
+  try {
+    const response = await axios.get(`${API_URL}/profile/levelxp`, {
+      headers: getAuthHeaders(),
+    });
+    if (!response.data) throw new Error("Respuesta vacía de la API");
+    return response.data;
+  } catch (error) {
+    console.error(
+      "❌ Error al obtener nivel y XP:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
 };
 
+/**
+ * 📌 Obtener clasificación
+ */
 export const getClasificacion = async () => {
-    const token = getToken();
-    if (!token) throw new Error("Token not found");
-    try {
-        const response = await fetch(`${API_URL}/clasificacion`, {
-            headers: { "Authorization": `Bearer ${token}` }
-        });
-        return await response.json();
-    } catch (error) {
-        console.error("Error fetching classification:", error);
-        throw error;
-    }
+  try {
+    const response = await axios.get(`${API_URL}/clasificacion`, {
+      headers: getAuthHeaders(),
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      "❌ Error al obtener clasificación:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
 };
 
+/**
+ * 📌 Obtener logros del usuario
+ */
 export const getAchievements = async () => {
-    const token = getToken();
-    if (!token) throw new Error("Token not found");
-    try {
-        const response = await fetch(`${API_URL}/achievements`, {
-            headers: { "Authorization": `Bearer ${token}` }
-        });
-        return await response.json();
-    } catch (error) {
-        console.error("Error fetching achievements:", error);
-        throw error;
-    }
+  try {
+    const response = await axios.get(`${API_URL}/achievements`, {
+      headers: getAuthHeaders(),
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      "❌ Error al obtener logros:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
 };
 
+/**
+ * 📌 Obtener lista de amigos
+ */
 export const getFriends = async () => {
-    const token = getToken();
-    if (!token) throw new Error("Token not found");
-    try {
-        const response = await fetch(`${API_URL}/friends`, {
-            headers: { "Authorization": `Bearer ${token}` }
-        });
-        return await response.json();
-    } catch (error) {
-        console.error("Error fetching friends:", error);
-        throw error;
-    }
+  try {
+    const response = await axios.get(`${API_URL}/friends`, {
+      headers: getAuthHeaders(),
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      "❌ Error al obtener amigos:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
 };
 
+/**
+ * 📌 Obtener solicitudes de amistad
+ */
 export const getFriendRequests = async () => {
-    const token = getToken();
-    if (!token) throw new Error("Token not found");
-    try {
-        const response = await fetch(`${API_URL}/friend-requests`, {
-            headers: { "Authorization": `Bearer ${token}` }
-        });
-        return await response.json();
-    } catch (error) {
-        console.error("Error fetching friend requests:", error);
-        throw error;
-    }
+  try {
+    const response = await axios.get(`${API_URL}/friend-requests`, {
+      headers: getAuthHeaders(),
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      "❌ Error al obtener solicitudes de amistad:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
 };
 
+/**
+ * 📌 Enviar una solicitud de amistad
+ */
 export const sendFriendRequest = async (friendId) => {
-    const token = getToken();
-    if (!token) throw new Error("Token not found");
-    try {
-        const response = await fetch(`${API_URL}/friend-requests`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`,
-            },
-            body: JSON.stringify({ friendId }),
-        });
-        return response.status === 204;
-    } catch (error) {
-        console.error("Error sending friend request:", error);
-        throw error;
-    }
+  try {
+    const response = await axios.post(
+      `${API_URL}/friend-requests`,
+      { friendId },
+      {
+        headers: getAuthHeaders(),
+      }
+    );
+    return response.status === 204;
+  } catch (error) {
+    console.error(
+      "❌ Error al enviar solicitud de amistad:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
 };
 
+/**
+ * 📌 Obtener Adrenacoins del usuario
+ */
 export const getAdrenacoins = async () => {
-    const token = getToken();
-    if (!token) throw new Error("Token not found");
-    try {
-        const response = await fetch(`${API_URL}/adrenacoins`, {
-            headers: { "Authorization": `Bearer ${token}` }
-        });
-        return await response.json();
-    } catch (error) {
-        console.error("Error fetching adrenacoins:", error);
-        throw error;
-    }
+  try {
+    const response = await axios.get(`${API_URL}/adrenacoins`, {
+      headers: getAuthHeaders(),
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      "❌ Error al obtener Adrenacoins:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+export default {
+  getProfile,
+  updateProfile,
+  getLevelXP,
+  getClasificacion,
+  getAchievements,
+  getFriends,
+  getFriendRequests,
+  sendFriendRequest,
+  getAdrenacoins,
 };

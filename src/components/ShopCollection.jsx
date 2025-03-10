@@ -3,6 +3,87 @@ import { useNavigate } from "react-router-dom";
 import BackButton from "../components/layout/game/BackButton";
 import background from "../assets/background.png";
 import Card from "./layout/game/Card";
+<<<<<<< Updated upstream
+=======
+// Simulación de datos obtenidos del backend.
+const cardData = [
+  {
+    id: 1,
+    name: "Cristiano",
+    rating: 91,
+    team: "Manchester United",
+    position: "Delantero",
+    price: 62000000,
+    image: finalCard,
+    image3: teamImage,
+    image5: countryImage,
+    face: cristiano,
+  },
+  {
+    id: 2,
+    name: "Messi",
+    rating: 93,
+    team: "Barcelona",
+    position: "Delantero",
+    price: 63000000,
+    image: finalCard,
+  },
+  {
+    id: 3,
+    name: "Modric",
+    rating: 88,
+    team: "Real Madrid",
+    position: "Mediocampista",
+    price: 35000000,
+    image: finalCard,
+  },
+  {
+    id: 4,
+    name: "Pedri",
+    rating: 85,
+    team: "Barcelona",
+    position: "Mediocampista",
+    price: 40000000,
+    image: finalCard,
+  },
+  {
+    id: 5,
+    name: "Lewandowski",
+    rating: 92,
+    team: "Barcelona",
+    position: "Delantero",
+    price: 38000000,
+    image: finalCard,
+  },
+  {
+    id: 6,
+    name: "Benzema",
+    rating: 91,
+    team: "Real Madrid",
+    position: "Delantero",
+    price: 39000000,
+    image: finalCard,
+  },
+  {
+    id: 7,
+    name: "Kroos",
+    rating: 87,
+    team: "Real Madrid",
+    position: "Mediocampista",
+    price: 34000000,
+    image: finalCard,
+  },
+  {
+    id: 8,
+    name: "Vinicius",
+    rating: 86,
+    team: "Real Madrid",
+    position: "Delantero",
+    price: 43000000,
+    image: finalCard,
+  },
+];
+>>>>>>> Stashed changes
 
 export default function ShopCollection({
   searchQuery = "",
@@ -17,7 +98,6 @@ export default function ShopCollection({
 
   const cardsPerPage = 8;
 
-  // Filtrado de cartas según criterios
   const filteredCards = useMemo(() => {
     return cardData.filter((card) => {
       const matchName = card.name
@@ -46,7 +126,6 @@ export default function ShopCollection({
     startIndex + cardsPerPage
   );
 
-  // Al hacer clic en una carta, se muestra un diálogo (modal) de confirmación
   const handleCardClick = (card) => {
     setSelectedCard(card);
     setShowDialog(true);
@@ -75,7 +154,7 @@ export default function ShopCollection({
     >
       {/* Botón Volver */}
       <div className="absolute top-5 left-5">
-        <BackButton onClick={handleBackClick} /> 
+        <BackButton onClick={handleBackClick} />
       </div>
 
       {/* Grid de cartas */}

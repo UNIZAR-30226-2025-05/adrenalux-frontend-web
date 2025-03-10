@@ -1,7 +1,6 @@
-// Card3D.jsx
 import React from "react";
 import { Canvas } from "@react-three/fiber";
-import { Text } from "@react-three/drei"; // Si deseas seguir usando Text
+import { Text } from "@react-three/drei";
 import Model3D from "./Model3D";
 
 export default function Card3D({ card, onClick }) {
@@ -17,7 +16,6 @@ export default function Card3D({ card, onClick }) {
         <ambientLight intensity={0.5} />
         <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
         <pointLight position={[-10, -10, -10]} />
-        {/* Ahora Model3D se encarga de cargar el modelo y renderizar la información */}
         <Model3D
           card={card}
           scenePath="/models/card_3d.glb"

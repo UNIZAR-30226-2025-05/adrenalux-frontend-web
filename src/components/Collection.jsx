@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import React, { useState, useMemo } from "react";
 import { FaArrowLeft, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import background from "../assets/background.png";
@@ -7,42 +8,90 @@ import SearchTab from "./layout/game/SearchTab";
 import { useNavigate } from "react-router-dom";
 import BackButton from "../components/layout/game/BackButton"; // Importar BackButton
 
+=======
+import React, { useState, useEffect, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import background from "../assets/background.png";
+import Carta from "./layout/game/Carta";
+import SearchTab from "./layout/game/SearchTab";
+import { getCollection, filterCards } from "../services/api/collectionApi";
+import { publicarCarta } from "../services/api/shopApi";
+import BackButton from "../components/layout/game/BackButton";
+>>>>>>> Stashed changes
 
 export default function Collection({ onBack }) {
-  // Search states
+  const [cards, setCards] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedCard, setSelectedCard] = useState(null);
+  const [price, setPrice] = useState("");
+  const [showModal, setShowModal] = useState(false);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRarity, setSelectedRarity] = useState("Rareza");
   const [selectedTeam, setSelectedTeam] = useState("Equipo");
   const [selectedPosition, setSelectedPosition] = useState("Posición");
 
-  // Modal state
-  const [showModal, setShowModal] = useState(false);
-  const [selectedCard, setSelectedCard] = useState(null);
+  const navigate = useNavigate();
 
-  // Pagination
+  const handleBackClick = () => {
+    if (onBack) onBack();
+    else navigate("/home");
+  };
+
   const [currentPage, setCurrentPage] = useState(1);
-  const cardsPerPage = 8; // 8 => 4 columns × 2 rows
+  const cardsPerPage = 8;
 
-  // Filter logic
+  useEffect(() => {
+    const fetchCollection = async () => {
+      setLoading(true);
+      try {
+        const params = {};
+        if (selectedRarity !== "Rareza") params.rareza = selectedRarity;
+        if (selectedTeam !== "Equipo") params.equipo = selectedTeam;
+        if (selectedPosition !== "Posición") params.posicion = selectedPosition;
+
+        let data =
+          Object.keys(params).length > 0
+            ? await filterCards(params)
+            : await getCollection();
+
+        const mappedData = data.map((card) => ({
+          alias: card.nombreCompleto || card.nombre || "Sin nombre",
+          ataque: card.ataque ?? 0,
+          control: card.control ?? 0,
+          medio: card.medio ?? 0,
+          defensa: card.defensa ?? 0,
+          equipo: card.club || "Sin club",
+          escudo: card.escudo || "default_escudo.png",
+          photo: card.photo || "default.png",
+          tipo_carta: card.rareza || "Común",
+          id: card.id,
+          nombre: card.nombreCompleto || card.nombre || "Sin nombre",
+          pais: card.nacionalidad || "Desconocido",
+          posicion: card.posicion || "N/A",
+          disponible: card.disponible,
+          cantidad: card.cantidad,
+        }));
+
+        setCards(mappedData);
+        setCurrentPage(1);
+      } catch (error) {
+        console.error("Error al cargar la colección:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCollection();
+  }, [selectedRarity, selectedTeam, selectedPosition]);
+
   const filteredCards = useMemo(() => {
-    return cardData.filter((card) => {
-      const matchName = card.name
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
-      const matchRarity =
-        selectedRarity === "Rareza" ||
-        (card.rarity &&
-          card.rarity.toLowerCase() === selectedRarity.toLowerCase());
-      const matchTeam =
-        selectedTeam === "Equipo" ||
-        card.team.toLowerCase() === selectedTeam.toLowerCase();
-      const matchPosition =
-        selectedPosition === "Posición" ||
-        card.position.toLowerCase() === selectedPosition.toLowerCase();
-
-      return matchName && matchRarity && matchTeam && matchPosition;
-    });
-  }, [searchQuery, selectedRarity, selectedTeam, selectedPosition]);
+    return cards.filter((card) =>
+      (card.alias || "").toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [cards, searchQuery]);
 
   const totalPages = Math.ceil(filteredCards.length / cardsPerPage);
   const startIndex = (currentPage - 1) * cardsPerPage;
@@ -55,36 +104,65 @@ export default function Collection({ onBack }) {
   const handleNextPage = () =>
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
 
-  // On card click, show big card in a modal with extra info
   const handleCardClick = (card) => {
     setSelectedCard(card);
+    setPrice("");
     setShowModal(true);
   };
 
-  // Close modal
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setSelectedCard(null);
+  const handleConfirmSale = async () => {
+    if (!price || isNaN(price) || price <= 0) {
+      alert("Por favor, ingresa un precio válido.");
+      return;
+    }
+
+    try {
+      await publicarCarta(selectedCard.id, price);
+
+      setCards((prevCards) =>
+        prevCards.filter((card) => card.id !== selectedCard.id)
+      );
+
+      alert(
+        `Carta ${selectedCard.nombre} puesta en venta por ${price} monedas.`
+      );
+      setShowModal(false);
+    } catch (error) {
+      console.error("Error al poner la carta en venta:", error);
+      alert("Hubo un error al poner la carta en venta.");
+    }
   };
-  const navigate = useNavigate();
-  const handleBackClick = () => {
-    navigate("/home");
-  };
+
   return (
     <div
-      className="relative min-h-screen w-screen bg-cover bg-center text-white flex flex-col items-center"
+      className="relative min-h-screen w-screen bg-cover bg-center text-white flex flex-col items-center pt-10"
       style={{ backgroundImage: `url(${background})` }}
     >
-      <h1 className="text-5xl font-bold mt-13">Coleccion</h1>
+      <h1 className="text-5xl font-bold mb-8 mt-10">Colección</h1>
 
-      {/* Back Button */}
-      {/* Back button */}
-      <div className="absolute top-5 left-5">
-        <BackButton onClick={handleBackClick} /> {/* Botón de regreso */}
+      <div className="grid grid-cols-4 gap-6 place-items-center px-6">
+        <AnimatePresence>
+          {visibleCards.map((card, index) => (
+            <motion.div
+              key={card.id}
+              className="cursor-pointer transform scale-75 hover:scale-90 transition-transform duration-300"
+              initial={{ scale: 0.1, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.1, opacity: 0 }}
+              transition={{
+                duration: 0.4,
+                ease: "easeOut",
+                delay: index * 0.05,
+              }}
+              onClick={() => handleCardClick(card)}
+            >
+              <Carta jugador={card} />
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
 
-      {/* Search & Filters Bar */}
-      <div className="mt-12 flex justify-center">
+      <div className="mt-10 flex justify-center w-full">
         <SearchTab
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
@@ -97,91 +175,55 @@ export default function Collection({ onBack }) {
         />
       </div>
 
-      {/* Cards Grid (4 columns => 2 rows => 8 per page) */}
-      <div className="flex-grow grid grid-cols-4 gap-4 place-items-center px-10 mt-8">
-        {visibleCards.length > 0 ? (
-          visibleCards.map((card) => (
-            <Card
-              key={card.id}
-              card={card}
-              onClick={handleCardClick}
-              flip={false}
-            />
-          ))
-        ) : (
-          <p className="text-xl font-semibold col-span-4">
-            No se encontraron resultados
-          </p>
-        )}
+      <div className="flex justify-center items-center my-6">
+        <button
+          onClick={handlePrevPage}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-black/50 rounded disabled:opacity-50 hover:bg-black transition mr-4"
+        >
+          <FaChevronLeft />
+        </button>
+        <span className="text-lg">
+          Página {currentPage} de {totalPages}
+        </span>
+        <button
+          onClick={handleNextPage}
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 bg-black/50 rounded disabled:opacity-50 hover:bg-black transition ml-4"
+        >
+          <FaChevronRight />
+        </button>
       </div>
 
-      {/* Pagination */}
-      {visibleCards.length > 0 && totalPages > 1 && (
-        <div className="flex justify-center items-center mb-6">
-          <button
-            onClick={handlePrevPage}
-            disabled={currentPage === 1}
-            className="px-4 py-2 bg-black/50 rounded disabled:opacity-50 hover:bg-black transition mr-4"
-          >
-            <FaChevronLeft />
-          </button>
-          <span className="text-lg">
-            Página {currentPage} de {totalPages}
-          </span>
-          <button
-            onClick={handleNextPage}
-            disabled={currentPage === totalPages}
-            className="px-4 py-2 bg-black/50 rounded disabled:opacity-50 hover:bg-black transition ml-4"
-          >
-            <FaChevronRight />
-          </button>
-        </div>
-      )}
+      <div className="fixed top-10 left-10 z-[50] bg-black/60 p-3 rounded-full">
+        <BackButton onClick={handleBackClick} />
+      </div>
 
-      {/* Modal: show bigger card + extra info */}
       {showModal && selectedCard && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          {/* Modal content */}
-          <div className="bg-black p-6 rounded-lg shadow-lg text-white max-w-2xl mx-auto flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6">
-            {/* Left side: bigger card */}
-            <div className="relative w-[250px] h-[350px]">
-              <img
-                src={selectedCard.image}
-                alt={selectedCard.name}
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-              {/* Optionally re-show rating, position, face, etc. */}
-              {selectedCard.face && (
-                <img
-                  src={selectedCard.face}
-                  alt="Player Face"
-                  className="absolute top-[40%] right-2 transform -translate-x-1/3 -translate-y-1/3 w-16 h-16 object-cover"
-                />
-              )}
-            </div>
-
-            {/* Right side: additional info */}
-            <div className="flex flex-col justify-center">
-              <h2 className="text-2xl font-bold mb-2">{selectedCard.name}</h2>
-              <p className="mb-1">Rareza: {selectedCard.rarity}</p>
-              <p className="mb-1">Equipo: {selectedCard.team}</p>
-              <p className="mb-1">Posición: {selectedCard.position}</p>
-              <p className="mb-1">
-                Valor: {selectedCard.price.toLocaleString()} coins
-              </p>
-              {/* Close button */}
+          <div className="bg-black p-6 rounded-lg shadow-lg text-center max-w-sm mx-auto">
+            <p className="text-lg mb-4">
+              ¿Cuánto quieres pedir por <b>{selectedCard.nombre}</b>?
+            </p>
+            <input
+              type="number"
+              className="w-full px-3 py-2 border rounded bg-gray-800 text-white"
+              placeholder="Introduce el precio"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+            />
+            <div className="flex justify-center space-x-6 mt-4">
               <button
-                onClick={handleCloseModal}
-                className="bg-red-600 px-4 py-2 rounded mt-4 hover:bg-red-500 transition"
+                onClick={handleConfirmSale}
+                className="bg-green-600 px-4 py-2 rounded hover:bg-green-500 transition"
               >
                 Vender
               </button>
-              {/* Close button */}
               <button
-                onClick={handleCloseModal}
-                className="bg-red-600 px-4 py-2 rounded mt-4 hover:bg-red-500 transition"
+                onClick={() => setShowModal(false)}
+                className="bg-red-600 px-4 py-2 rounded hover:bg-red-500 transition"
               >
-                Cerrar
+                Cancelar
               </button>
             </div>
           </div>
