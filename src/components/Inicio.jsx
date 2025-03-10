@@ -65,7 +65,8 @@ const Inicio = () => {
       </main>
 
       {/* Pie de página con botones */}
-      <footer className="bg-gray-700 text-white py-4 text-center opacity-80 w-full">
+      <footer className="bg-gray-700 text-white py-4 text-center opacity-80 w-screen">
+
         <div className="flex justify-center gap-4 flex-wrap">
           <a href="#" className="hover:bg-blue-100 transition duration-300 py-2 px-4 rounded-md">Política de Privacidad</a>
           <a href="#" className="hover:bg-blue-100 transition duration-300 py-2 px-4 rounded-md">Términos de Uso</a>

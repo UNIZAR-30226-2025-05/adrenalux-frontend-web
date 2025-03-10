@@ -47,7 +47,7 @@ const Opening = () => {
       case "Sobre Elite Lux":
         return SobreRaro;
       default:
-        return null;
+        return SobreComun;
     }
   };
 

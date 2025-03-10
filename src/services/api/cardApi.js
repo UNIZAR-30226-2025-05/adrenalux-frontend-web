@@ -60,7 +60,7 @@ export const sobresDisponibles = async () => {
 
 export const abrirSobreGratis = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/abrirSobreGratis`, {
+    const response = await axios.get(`${API_BASE_URL}/abrirSobreRandom`, {
       headers: {
         Authorization: `Bearer ${getToken()}`,
         "Content-Type": "application/json"

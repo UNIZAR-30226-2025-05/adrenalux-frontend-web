@@ -13,6 +13,7 @@ import Alineaciones from "./components/Alineaciones";
 import AlineacionEditar from "./components/AlineacionesEditar";
 import BuscandoJugador from "./components/BuscandoJugador";
 import Logros from "./components/Logros";
+import Intercambios from "./components/Intercambio";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
         <Route path="/alineacionesEditar" element={<AlineacionEditar />} />
         <Route path="/buscandoPartida" element={<BuscandoJugador />} />
         <Route path="/logros" element={<Logros />} />
+        <Route path="/intercambio" element={<Intercambios />} />
       </Routes>
     </Router>
   );

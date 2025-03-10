@@ -51,7 +51,6 @@ export default function NavbarGame() {
     }
   }, [infoUser]);
 
-  // Validar todas las propiedades de infoUser para evitar errores
   const avatar = infoUser?.data?.avatar || ""; // Si no tiene avatar, usamos un string vacío
   const username = infoUser?.data?.username || "Cargando..."; // Si no tiene username, mostramos "Cargando..."
   const level = infoUser?.data?.level || 1; // Si no tiene nivel, asignamos nivel 1
@@ -71,10 +70,10 @@ export default function NavbarGame() {
   // Función para manejar el evento de abrir sobre gratis
   const handleAbrirSobreGratis = async () => {
     try {
-      const cartas = await abrirSobreGratis(); // Llamada para abrir sobre gratis
-      setOpenedCards(cartas); // Guardar las cartas abiertas en la variable
-      // Redirigir a la página de apertura del sobre, pasando las cartas como estado
-      navigate("/opening", { state: { openedCards: cartas } });
+      const cartas = await abrirSobreGratis();
+      console.log(cartas);
+      setOpenedCards(cartas); 
+      navigate("/opening", { state: { openedCards: cartas , selectedCard: "Sobre Energia Lux"} });
     } catch (error) {
       console.error("Error al abrir el sobre gratis:", error);
     }
@@ -132,7 +131,7 @@ export default function NavbarGame() {
             <img
               src={SobreComun}
               alt="Sobre Comun"
-              className="w-8 h-8 object-cover ml-2"
+              className="w-7 h-17 object-cover ml-2"
             />
           </div>
         )}

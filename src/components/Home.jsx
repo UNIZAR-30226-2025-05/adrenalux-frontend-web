@@ -12,9 +12,9 @@ const Home = () => {
       <div className="fixed inset-0 flex justify-center items-center bg-cover bg-center" style={{ backgroundImage: `url(${background})` }}>
         <NavBarGame />
 
-        <div className="relative h-screen w-full flex items-center px-64">
+        <div className="relative h-screen w-full flex items-center px-[20%]">
           {/* Left Side */}
-          <div className="absolute left-20 top-[150px] flex flex-col space-y-10">
+          <div className="absolute left-[10%] top-[25%] flex flex-col space-y-10">
             <ClassificationButton />
             <TournamentButton />
           </div>
@@ -25,7 +25,7 @@ const Home = () => {
           </div>
 
           {/* Right Side */}
-          <div className="absolute right-20 top-[150px] flex flex-col space-y-10">
+          <div className="absolute right-[10%] top-[25%] flex flex-col space-y-10">
             <StoreButton />
             <CollectionButton />
           </div>
