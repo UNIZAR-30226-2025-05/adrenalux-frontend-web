@@ -10,7 +10,7 @@ const Logros = () => {
 
         <div className="relative h-screen w-full flex items-center px-64">
           {/* Botón de volver */}
-          <div className="absolute left-10 top-10">
+          <div className="absolute left-10 top-10 mt-16">
             <BackButton />
           </div>
 
