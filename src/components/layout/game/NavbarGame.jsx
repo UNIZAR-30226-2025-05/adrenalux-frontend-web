@@ -151,12 +151,12 @@ export default function NavbarGame() {
       <div className="flex items-center space-x-7 ml-7 mr-[30px]">
         <div className="flex items-center space-x-4">
           <button
-            className="bg-[#1E1E1E] border-4 border-black w-18 h-14 flex justify-center items-center rounded-none"
+            className="bg-[#1E1E1E] border-4 border-black w-18 h-14 flex justify-center items-center rounded"
             onClick={handleAmigosClick}
           >
             <FaUsers className="text-white text-4xl" />
           </button>
-          <button className="bg-[#1E1E1E] border-4 border-black w-18 h-14 flex justify-center items-center rounded-none">
+          <button className="bg-[#1E1E1E] border-4 border-black w-18 h-14 flex justify-center items-center rounded">
             <FaCog className="text-white text-4xl" />
           </button>
         </div>

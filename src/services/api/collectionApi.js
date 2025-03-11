@@ -25,6 +25,7 @@ export const filterCards = async (params) => {
       headers: getAuthHeaders(),
       params,
     });
+    console.log(response);
     return response.data.data;
   } catch (error) {
     console.error("Error al filtrar las cartas:", error);
