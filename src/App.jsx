@@ -14,8 +14,9 @@ import AlineacionEditar from "./components/AlineacionesEditar";
 import BuscandoJugador from "./components/BuscandoJugador";
 import Logros from "./components/Logros";
 import Intercambios from "./components/Intercambio";
-
+import Ajustes from "./components/Ajustes";
 import Profile from "./components/Profile";
+
 function App() {
   return (
     <Router>
@@ -36,6 +37,7 @@ function App() {
         <Route path="/logros" element={<Logros />} />
         <Route path="/intercambio" element={<Intercambios />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/ajustes" element={<Ajustes />} />
       </Routes>
     </Router>
   );
