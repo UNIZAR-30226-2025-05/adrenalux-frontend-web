@@ -83,6 +83,11 @@ export default function NavbarGame() {
     navigate("/amigo");
   };
 
+  // Función para manejar el clic en el botón de ajustes
+  const handleAjustesClick = () => {
+    navigate("/ajustes");
+  };
+
   return (
     <div className="fixed top-0 left-0 w-full h-16 bg-gradient-to-r from-[#0E2415] to-[#656D68] shadow-md z-50 flex items-center">
       {/* Logo */}
@@ -156,7 +161,10 @@ export default function NavbarGame() {
           >
             <FaUsers className="text-white text-4xl" />
           </button>
-          <button className="bg-[#1E1E1E] border-4 border-black w-18 h-14 flex justify-center items-center rounded">
+          <button
+            className="bg-[#1E1E1E] border-4 border-black w-18 h-14 flex justify-center items-center rounded"
+            onClick={handleAjustesClick} // Añadir la función de navegación
+          >
             <FaCog className="text-white text-4xl" />
           </button>
         </div>

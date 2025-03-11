@@ -20,8 +20,8 @@ const achievements = [
 const AchievementList = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-blue-900 py-10">
-      <h1 className="text-white text-4xl font-bold mt-16 mb-6">Logros</h1> {/* Ajustado margen superior */}
-      <div className="bg-gray-900 bg-opacity-90 p-6 rounded-lg w-11/12 max-w-5xl max-h-[70vh] overflow-y-auto mb-10"> {/* Ajustado margen inferior y altura máxima */}
+      <h1 className="text-white text-4xl font-bold mt-16 mb-6">Logros</h1>
+      <div className="bg-gray-900 bg-opacity-90 p-6 rounded-lg w-11/12 max-w-5xl max-h-[70vh] overflow-y-auto mb-10">
         <div className="grid grid-cols-2 gap-4">
           {achievements.map((achievement, index) => (
             <div
