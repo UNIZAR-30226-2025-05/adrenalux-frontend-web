@@ -6,19 +6,19 @@ import FondoCartaLuxuryXI from "../../../assets/card_luxuryxi.png";
 import FondoCartaMegaLuxury from "../../../assets/card_megaluxury.png";
 
 function CartaMediana({ jugador, className }) {
-  const { 
-    alias, 
-    ataque, 
-    control, 
-    defensa, 
-    equipo, 
-    escudo, 
-    photo, 
+  const {
+    alias,
+    ataque,
+    control,
+    defensa,
+    equipo,
+    escudo,
+    photo,
     tipo_carta,
     id,
     nombre,
     pais,
-    posicion
+    posicion,
   } = jugador;
 
   const getFondo = () => {
@@ -44,30 +44,25 @@ function CartaMediana({ jugador, className }) {
       style={{ backgroundImage: `url(${getFondo()})`, backgroundSize: "cover" }}
     >
       <div className="absolute left-[70px] transform -translate-x-1/2 bottom-[46%]">
-        <img
-          src={photo}
-          alt={alias}
-          className="w-15 h-[70px] object-cover"
-        />
+        <img src={photo} alt={alias} className="w-15 h-[70px] object-cover" />
       </div>
 
       <img
         src={escudo}
         alt={equipo}
-        className="absolute top-4 right-2 w-8 h-8"
+        className="absolute top-4 right-6 w-8 h-8"
       />
 
       <div className="absolute bottom-[35%] left-[25px] text-white font-semibold">
         <p className="text-xs">{alias}</p>
       </div>
 
-      <div className="absolute bottom-[70px] left-[170px] transform -translate-x-1/2 flex items-center justify-center w-12 h-12 bg-yellow-500 rounded-lg">
+      {/* <div className="absolute bottom-[70px] left-[170px] transform -translate-x-1/2 flex items-center justify-center w-12 h-12 bg-yellow-500 rounded-lg">
         <p className="text-white font-semibold">{media}</p>
-      </div>
+      </div>*/}
     </div>
   );
 }
-
 
 CartaMediana.propTypes = {
   jugador: PropTypes.shape({
@@ -84,7 +79,7 @@ CartaMediana.propTypes = {
     pais: PropTypes.string.isRequired,
     posicion: PropTypes.string.isRequired,
   }).isRequired,
-  className: PropTypes.string, 
+  className: PropTypes.string,
 };
 
 export default CartaMediana;

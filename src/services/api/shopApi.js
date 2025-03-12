@@ -83,7 +83,7 @@ export const publicarCarta = async (cartaId, precio) => {
 export const comprarCarta = async (id) => {
   try {
     const response = await axios.post(
-      `${API_BASE_URL}/mercadoCartas/comprar/${id}`,
+      `${API_BASE_URL}/mercadoCartas/comprarCarta/${id}`,
       {},
       {
         headers: {
@@ -108,7 +108,7 @@ export const comprarCarta = async (id) => {
 export const retirarCarta = async (id) => {
   try {
     const response = await axios.delete(
-      `${API_BASE_URL}/mercadoCartas/retirar/${id}`,
+      `${API_BASE_URL}/mercadoCartas/retirarCarta/${id}`, // Nota el cambio aquí
       {
         headers: getAuthHeaders(),
       }
@@ -123,10 +123,58 @@ export const retirarCarta = async (id) => {
   }
 };
 
+/**
+ * Carta diaria obtener
+ */
+export const obtenerCartasDiarias = async () => {
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/mercadoDiario/obtenerCartasEspeciales`,
+      { headers: getAuthHeaders() }
+    );
+    console.log("📥 Respuesta API obtenerCartasDiarias:", response.data);
+    return response.data.data;
+  } catch (error) {
+    console.error(
+      "❌ Error al obtener cartas diarias:",
+      error.response ? error.response.data : error.message
+    );
+    throw error;
+  }
+};
+
+/**
+ * Carta diaria comprar
+ */
+export const comprarCartaDiaria = async (id) => {
+  try {
+    const response = await axios.post(
+      `${API_BASE_URL}/mercadoDiario/comprarCartaEspecial/${id}`,
+      {},
+      {
+        headers: {
+          ...getAuthHeaders(),
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    console.log("✅ Respuesta API comprarCartaDiaria:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "❌ Error al comprar carta diaria:",
+      error.response ? error.response.data : error.message
+    );
+    throw error;
+  }
+};
+
 export default {
   obtenerCartasEnVenta,
   filterCards,
   publicarCarta,
   comprarCarta,
   retirarCarta,
+  obtenerCartasDiarias,
+  comprarCartaDiaria,
 };

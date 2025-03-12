@@ -6,19 +6,19 @@ import FondoCartaLuxuryXI from "../../../assets/card_luxuryxi.png";
 import FondoCartaMegaLuxury from "../../../assets/card_megaluxury.png";
 
 function CartaGrande({ jugador, className }) {
-  const { 
-    alias, 
-    ataque, 
-    control, 
-    defensa, 
-    equipo, 
-    escudo, 
-    photo, 
+  const {
+    alias,
+    ataque,
+    control,
+    defensa,
+    equipo,
+    escudo,
+    photo,
     tipo_carta,
     id,
     nombre,
     pais,
-    posicion
+    posicion,
   } = jugador;
 
   const getFondo = () => {
@@ -44,11 +44,7 @@ function CartaGrande({ jugador, className }) {
       style={{ backgroundImage: `url(${getFondo()})`, backgroundSize: "cover" }}
     >
       <div className="absolute left-[170px] transform -translate-x-1/2 bottom-[46%]">
-        <img
-          src={photo}
-          alt={alias}
-          className="w-58 h-58 object-cover"
-        />
+        <img src={photo} alt={alias} className="w-58 h-58 object-cover" />
       </div>
 
       <img
@@ -95,7 +91,7 @@ CartaGrande.propTypes = {
     pais: PropTypes.string.isRequired,
     posicion: PropTypes.string.isRequired,
   }).isRequired,
-  className: PropTypes.string, 
+  className: PropTypes.string,
 };
 
 export default CartaGrande;

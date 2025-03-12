@@ -16,7 +16,7 @@ import Logros from "./components/Logros";
 import Intercambios from "./components/Intercambio";
 import Ajustes from "./components/Ajustes";
 import Profile from "./components/Profile";
-
+import CardsForSale from "./components/CardsForSale";
 function App() {
   return (
     <Router>
@@ -38,6 +38,7 @@ function App() {
         <Route path="/intercambio" element={<Intercambios />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/ajustes" element={<Ajustes />} />
+        <Route path="/cards-for-sale" element={<CardsForSale />} />
       </Routes>
     </Router>
   );
