@@ -26,6 +26,31 @@ const Ajustes = () => {
     };
   };
 
+  // Función para manejar el cierre de sesión
+  const handleLogout = async () => {
+    try {
+      // Hacer una solicitud POST al endpoint de cierre de sesión
+      const response = await fetch('/api/signout', {
+        method: 'POST',
+        credentials: 'include', // Incluir cookies en la solicitud
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al cerrar sesión');
+      }
+
+      // Limpiar el estado local (opcional, dependiendo de tu aplicación)
+      localStorage.removeItem('token'); // Si estás usando un token
+      localStorage.removeItem('user'); // Si guardas información del usuario en localStorage
+
+      // Redirigir al usuario a la pantalla de inicio de sesión
+      navigate("/login"); // Cambia "/login" por la ruta que uses para el inicio de sesión
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+      alert('Hubo un error al intentar cerrar sesión. Por favor, inténtalo de nuevo.');
+    }
+  };
+
   return (
     <div
       className="fixed inset-0 flex justify-center items-center bg-cover bg-center"
@@ -100,7 +125,10 @@ const Ajustes = () => {
 
           {/* Cerrar sesión y Acerca de nosotros */}
           <div className="flex justify-between">
-            <button className="text-white bg-red-600 hover:bg-red-700 py-2 px-4 rounded">
+            <button
+              className="text-white bg-red-600 hover:bg-red-700 py-2 px-4 rounded"
+              onClick={handleLogout} // Conectar la función de cierre de sesión
+            >
               Cerrar Sesión
             </button>
             <button
@@ -117,7 +145,7 @@ const Ajustes = () => {
       {showAboutUs && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-gray-900 p-6 rounded-lg w-11/12 max-w-md">
-            <h2 className="text-center text-white text-2xl font-bold mb-4">Acerca de nosotros</h2>
+            <h2 className="text-white text-2xl font-bold mb-4">Acerca de nosotros</h2>
             <p className="text-white mb-6">
               Este es un texto de ejemplo para la sección "Acerca de nosotros". Puedes añadir
               aquí información sobre tu aplicación, equipo, o cualquier otro detalle relevante.
