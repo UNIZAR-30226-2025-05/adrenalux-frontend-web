@@ -17,9 +17,12 @@ import Intercambios from "./components/Intercambio";
 import Ajustes from "./components/Ajustes";
 import Profile from "./components/Profile";
 import CardsForSale from "./components/CardsForSale";
+import Notificacion from "./components/NotificacionIntercambio"; 
+
 function App() {
   return (
     <Router>
+      <Notificacion />
       <Routes>
         <Route path="/" element={<Inicio />} />
         <Route path="/register" element={<Register />} />

@@ -43,23 +43,20 @@ function CartaMediana({ jugador, className }) {
       className={`relative w-40 h-[200px] bg-cover rounded-lg overflow-hidden ${className}`}
       style={{ backgroundImage: `url(${getFondo()})`, backgroundSize: "cover" }}
     >
-      <div className="absolute left-[70px] transform -translate-x-1/2 bottom-[46%]">
+      {/* Cambio de distancias a porcentajes */}
+      <div className="absolute left-[55%] transform -translate-x-1/2 bottom-[46%]">
         <img src={photo} alt={alias} className="w-15 h-[70px] object-cover" />
       </div>
 
       <img
         src={escudo}
         alt={equipo}
-        className="absolute top-4 right-6 w-8 h-8"
+        className="absolute top-[10%] right-[5%] w-8 h-8"
       />
 
-      <div className="absolute bottom-[35%] left-[25px] text-white font-semibold">
+      <div className="absolute bottom-[37%] left-[20%] text-white font-semibold">
         <p className="text-xs">{alias}</p>
       </div>
-
-      {/* <div className="absolute bottom-[70px] left-[170px] transform -translate-x-1/2 flex items-center justify-center w-12 h-12 bg-yellow-500 rounded-lg">
-        <p className="text-white font-semibold">{media}</p>
-      </div>*/}
     </div>
   );
 }
