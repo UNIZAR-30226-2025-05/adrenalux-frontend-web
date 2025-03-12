@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import background from "../assets/background.png";
 import Carta from "./layout/game/CartaMediana"; // Carta cuando el usuario la tiene y no está en venta
 import Carta2 from "./layout/game/CartaGrande"; // Carta en el modal (vista ampliada)
-import Carta3 from "./layout/game/CartaNoDisponible"; // Carta cuando no la tiene/disponible (en venta)
+import Carta3 from "./layout/game/CartaNoDisponible"; // Carta cuando no la tiene/disponible
 import { getCollection } from "../services/api/collectionApi";
 import { publicarCarta, retirarCarta } from "../services/api/shopApi";
 import BackButton from "../components/layout/game/BackButton";
@@ -135,7 +135,7 @@ export default function Collection({ onBack }) {
       className="relative min-h-screen w-screen bg-cover bg-center text-white flex flex-col items-center pt-10"
       style={{ backgroundImage: `url(${background})` }}
     >
-      <div className="fixed top-10 left-10 z-50 bg-black/60 p-3 rounded-full">
+      <div className="fixed top-10 left-10 z-50 ">
         <BackButton onClick={handleBackClick} />
       </div>
 

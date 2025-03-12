@@ -3,7 +3,7 @@ import { Canvas } from "@react-three/fiber";
 import { Text } from "@react-three/drei";
 import Model3D from "./Model3D";
 
-export default function Card3D({ card, onClick }) {
+export default function Card3D({ card, onClick = () => {} }) {
   console.log("Card3D render:", card);
 
   return (
@@ -22,9 +22,6 @@ export default function Card3D({ card, onClick }) {
           scale={[2.5, 2.5, 2]}
         />
       </Canvas>
-      <p className="mt-2 text-yellow-300 font-bold text-lg">
-        {new Intl.NumberFormat("en-US").format(card.price)}
-      </p>
     </div>
   );
 }

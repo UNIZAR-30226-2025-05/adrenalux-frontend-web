@@ -23,11 +23,17 @@ class SocketService {
     });
 
     this.socket.on("connect", () => console.log("✅ Connected to WebSocket"));
-    
-    this.socket.on("notification", (data) => this.handleNotification(data, handleNotification));
 
-    this.socket.on("connect_error", (error) => console.error("⚠️ WebSocket connection error:", error));
-    this.socket.on("disconnect", () => console.log("❌ Disconnected from WebSocket"));
+    this.socket.on("notification", (data) =>
+      this.handleNotification(data, handleNotification)
+    );
+
+    this.socket.on("connect_error", (error) =>
+      console.error("⚠️ WebSocket connection error:", error)
+    );
+    this.socket.on("disconnect", () =>
+      console.log("❌ Disconnected from WebSocket")
+    );
   }
 
   handleNotification(data, handleNotification) {

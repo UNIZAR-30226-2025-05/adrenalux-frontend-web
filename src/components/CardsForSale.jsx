@@ -19,6 +19,7 @@ export default function CardsForSaleAlbum() {
   const [showDialog, setShowDialog] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
   const [infoUser, setInfoUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const cardsPerPage = 18;
   const navigate = useNavigate();
@@ -37,6 +38,8 @@ export default function CardsForSaleAlbum() {
 
   useEffect(() => {
     const fetchCards = async () => {
+      setLoading(true);
+
       try {
         const data = await obtenerCartasEnVenta();
         const mappedData = data.map((card) => ({
@@ -60,6 +63,8 @@ export default function CardsForSaleAlbum() {
         setCards(mappedData);
       } catch (error) {
         console.error("Error al obtener cartas en venta:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchCards();
@@ -218,6 +223,11 @@ export default function CardsForSaleAlbum() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+      {loading && (
+        <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black/50">
+          <p className="text-white text-lg">Cargando todas las cartas...</p>
         </div>
       )}
     </div>

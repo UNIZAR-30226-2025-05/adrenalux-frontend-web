@@ -1,9 +1,8 @@
 import React, { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 
-export default function RotatingModel({ scene, ...props }) {
+export default function RotatingModel({ scene, children, ...props }) {
   const groupRef = useRef();
-
   const clonedScene = useMemo(() => scene.clone(), [scene]);
 
   useFrame(() => {
@@ -15,6 +14,7 @@ export default function RotatingModel({ scene, ...props }) {
   return (
     <group ref={groupRef} {...props}>
       <primitive object={clonedScene} />
+      {children}
     </group>
   );
 }

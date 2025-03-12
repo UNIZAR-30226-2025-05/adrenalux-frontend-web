@@ -14,7 +14,7 @@ export const getCollection = async () => {
     });
     return response.data.data;
   } catch (error) {
-    console.error("Error al obtener la colección:", error);
+    console.error("❌ Error al obtener la colección:", error);
     throw error;
   }
 };
@@ -28,7 +28,7 @@ export const filterCards = async (params) => {
     console.log(response);
     return response.data.data;
   } catch (error) {
-    console.error("Error al filtrar las cartas:", error);
+    console.error("❌ Error al filtrar las cartas:", error);
     throw error;
   }
 };

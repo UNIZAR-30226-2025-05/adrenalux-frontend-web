@@ -1,22 +1,34 @@
 import React from "react";
 import { useGLTF, useTexture, Text } from "@react-three/drei";
 import RotatingModel from "./RotatingModel";
+import { DoubleSide } from "three";
 
 export default function Model3D({ card, scenePath, scale }) {
   const { scene } = useGLTF(scenePath);
-  const faceTexture = card?.face ? useTexture(card.face) : null;
+  const playerTexture = card?.photo ? useTexture(card.photo) : null;
 
   return (
     <RotatingModel scene={scene} scale={scale}>
-      <Text position={[1, 0, 25]} fontSize={0.5} color="black" renderOrder={1}>
-        ¡Prueba!
-      </Text>
-      {faceTexture && (
-        <mesh position={[0, 0, 2]}>
+      {playerTexture && (
+        <mesh position={[0, 0.4, 0.15]}>
+          {" "}
           <planeGeometry args={[1, 1]} />
-          <meshBasicMaterial map={faceTexture} transparent />
+          <meshBasicMaterial
+            map={playerTexture}
+            transparent
+            side={DoubleSide}
+          />
         </mesh>
       )}
+
+      <Text
+        position={[0, -0.6, 0.2]}
+        fontSize={0.1}
+        color="white"
+        renderOrder={1}
+      >
+        {card.alias}
+      </Text>
     </RotatingModel>
   );
 }

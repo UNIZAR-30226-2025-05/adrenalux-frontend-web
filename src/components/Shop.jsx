@@ -27,6 +27,7 @@ export default function Shop() {
   const [cards, setCards] = useState([]); // Cartas generales
   const [infoUser, setInfoUser] = useState(null);
   const [visibleCount, setVisibleCount] = useState(4);
+  const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
 
@@ -44,9 +45,10 @@ export default function Shop() {
 
   const adrenacoins = infoUser?.data?.adrenacoins || 0;
 
-  // Obtener cartas generales del mercado
   useEffect(() => {
     const fetchShopCards = async () => {
+      setLoading(true);
+
       try {
         let data;
         if (
@@ -85,12 +87,13 @@ export default function Shop() {
         setCards(mappedData);
       } catch (error) {
         console.error("Error al obtener cartas del mercado:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchShopCards();
   }, [searchQuery, selectedTeam, selectedPosition]);
 
-  // Obtener cartas diarias
   useEffect(() => {
     const fetchDailyCards = async () => {
       try {
@@ -123,7 +126,6 @@ export default function Shop() {
     fetchDailyCards();
   }, []);
 
-  // Función para manejar el click en una carta (diferencia diaria vs general)
   const handleCardClick = (card, isDaily = false) => {
     setSelectedCard({ ...card, isDaily });
     setShowDialog(true);
@@ -136,15 +138,12 @@ export default function Shop() {
   const handleBuyCard = async () => {
     try {
       if (selectedCard.isDaily) {
-        // Para cartas diarias
         const response = await comprarCartaDiaria(selectedCard.id);
-        alert(`Carta ${selectedCard.nombre} (diaria) comprada exitosamente.`);
+        alert(`Carta ${selectedCard.nombre} Comprada exitosamente.`);
       } else {
-        // Para cartas generales
         const response = await comprarCarta(selectedCard.mercadoCartaId);
         alert(`Carta ${selectedCard.nombre} comprada exitosamente.`);
       }
-      // Actualizar perfil para nuevo saldo
       const data = await getProfile();
       setInfoUser(data);
       setShowDialog(false);
@@ -170,7 +169,7 @@ export default function Shop() {
         <FaCoins className="text-yellow-400 text-2xl" />
         <FaPlusCircle className="text-green-500 ml-3 text-2xl cursor-pointer hover:text-green-400 transition" />
       </div>
-      <h1 className="text-5xl font-bold mt-28">Tienda</h1>
+      <h1 className="text-5xl font-bold mt-20">Tienda</h1>
       {/* Sección de "Luxuris del día" */}
       <div className="bg-[#2B5C94] text-center py-8 px-10 mt-16 w-[800px] rounded-lg shadow-lg flex flex-col items-center">
         <div
@@ -186,25 +185,32 @@ export default function Shop() {
         </div>
         <div className="flex justify-center space-x-16">
           {luxurisCards.map((card) => (
-            <Card3D
+            <div
               key={card.id}
-              card={card}
+              className="cursor-pointer"
               onClick={() => handleCardClick(card, true)}
-            />
+            >
+              <Card3D card={card} />
+              <div className="flex items-center justify-center mt-2 text-lg font-semibold">
+                <span>{card.precio}</span>
+                <FaCoins className="ml-1 text-yellow-400" />
+              </div>
+            </div>
           ))}
         </div>
       </div>
+
       <div className="mt-12 flex justify-center">
-        <SearchTab
+        {/*<SearchTab
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           selectedTeam={selectedTeam}
           setSelectedTeam={setSelectedTeam}
           selectedPosition={selectedPosition}
           setSelectedPosition={setSelectedPosition}
-        />
+        />*/}
       </div>
-      <div className="grid grid-cols-4 gap-4 place-items-center px-10 mt-8">
+      <div className="grid grid-cols-4 gap-2 place-items-center px-10 mt-0">
         {cards.length > 0 ? (
           cards.slice(0, visibleCount).map((card) => (
             <div
@@ -221,7 +227,7 @@ export default function Shop() {
           ))
         ) : (
           <p className="text-xl font-semibold col-span-4">
-            No se encontraron resultados
+            No hay cartas a la venta
           </p>
         )}
       </div>
@@ -237,20 +243,15 @@ export default function Shop() {
       {showDialog && selectedCard && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-black p-6 rounded-lg shadow-lg text-center max-w-sm mx-auto">
-            {/* Mostrar la carta en vista ampliada */}
             <div className="flex justify-center mb-4">
               <Carta2 jugador={selectedCard} />
             </div>
-            {/* Mostrar información adicional */}
             <div className="mb-4">
               <p className="text-xl font-semibold">{selectedCard.nombre}</p>
               <p className="text-lg">{selectedCard.tipo_carta}</p>
               <p className="text-lg">{selectedCard.posicion}</p>
             </div>
-            <p className="text-lg my-4">
-              ¿Deseas comprar esta carta{" "}
-              {selectedCard.isDaily ? "(Diaria)" : ""}?
-            </p>
+            <p className="text-lg my-4">¿Deseas comprar esta carta?</p>
             <div className="flex justify-center space-x-6">
               <button
                 onClick={handleBuyCard}
@@ -266,6 +267,11 @@ export default function Shop() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+      {loading && (
+        <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black/50">
+          <p className="text-white text-lg">Cargando tienda...</p>
         </div>
       )}
     </div>
