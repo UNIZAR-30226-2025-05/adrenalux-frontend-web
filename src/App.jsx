@@ -8,7 +8,7 @@ import ShopCollection from "./components/ShopCollection";
 import Collection from "./components/Collection";
 import Amigo from "./components/Amigo";
 import Opening from "./components/Opening";
-import GridOpenedCards from "./components/gridOpendCards";
+import GridOpenedCards from "./components/GridOpendCards";
 import Alineaciones from "./components/Alineaciones";
 import AlineacionEditar from "./components/AlineacionesEditar";
 import BuscandoJugador from "./components/BuscandoJugador";
@@ -17,12 +17,11 @@ import Intercambios from "./components/Intercambio";
 import Ajustes from "./components/Ajustes";
 import Profile from "./components/Profile";
 import CardsForSale from "./components/CardsForSale";
-import Notificacion from "./components/layout/game/NotificacionIntercambio.jsx"; 
+import EsperandoJugador from "./components/EsperandoJugador";
 
 function App() {
   return (
     <Router>
-      <Notificacion/>
       <Routes>
         <Route path="/" element={<Inicio />} />
         <Route path="/register" element={<Register />} />
@@ -42,6 +41,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/ajustes" element={<Ajustes />} />
         <Route path="/cards-for-sale" element={<CardsForSale />} />
+        <Route path="/esperando" element={<EsperandoJugador />} />
       </Routes>
     </Router>
   );

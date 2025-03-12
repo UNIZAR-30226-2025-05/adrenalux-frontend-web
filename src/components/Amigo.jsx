@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaArrowLeft, FaPlus, FaTrash, FaTimes, FaCheck } from "react-icons/fa";
+import { FaExchangeAlt, FaPlus, FaTrash, FaTimes, FaCheck } from "react-icons/fa";
 import background from "../assets/background.png";
 import BackButton from "../components/layout/game/BackButton";
 import { useNavigate } from "react-router-dom";
@@ -26,6 +26,9 @@ export default function Amigo({ onBack }) {
   const [showAddFriendModal, setShowAddFriendModal] = useState(false);
   const [newFriendCode, setNewFriendCode] = useState("");
 
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false); // Nuevo estado
+  const [friendToDelete, setFriendToDelete] = useState(null); // Para almacenar el amigo a eliminar
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -37,11 +40,9 @@ export default function Amigo({ onBack }) {
       const friends = await getFriends();
       const requests = await getFriendRequests();
       setAmigos(friends);
-      setSolicitudesEnviadas(requests.sent || []);
-      setSolicitudesRecibidas(requests.received || []);
-      setCurrentFriends(friends.length);
+      setSolicitudesRecibidas(requests || []);
     } catch (error) {
-      console.error("❌ Error cargando los datos:", error);
+      console.error("Error cargando los datos:", error);
     }
   };
 
@@ -57,6 +58,7 @@ export default function Amigo({ onBack }) {
   const handleAddFriend = async () => {
     if (!newFriendCode.trim()) return;
     try {
+      console.log(newFriendCode)
       await sendFriendRequest(newFriendCode);
       setSolicitudesEnviadas([
         ...solicitudesEnviadas,
@@ -65,49 +67,50 @@ export default function Amigo({ onBack }) {
       handleCloseAddFriendModal();
       fetchData();
     } catch (error) {
-      console.error("❌ Error al enviar solicitud de amistad:", error);
+      console.error("Error al enviar solicitud de amistad:", error);
     }
   };
 
   const handleAcceptRequest = async (item) => {
     try {
-      await acceptFriendRequest(item.id);
+      await acceptFriendRequest(item);
       setSolicitudesRecibidas(
-        solicitudesRecibidas.filter((sol) => sol.id !== item.id)
+        solicitudesRecibidas.filter((sol) => sol.id !== item)
       );
       setAmigos([...amigos, item]);
       setCurrentFriends(currentFriends + 1);
       fetchData();
     } catch (error) {
-      console.error("❌ Error al aceptar solicitud:", error);
+      console.error("Error al aceptar solicitud:", error);
     }
   };
 
   const handleRejectRequest = async (item) => {
     try {
-      await declineFriendRequest(item.id);
+      await declineFriendRequest(item);
       setSolicitudesRecibidas(
-        solicitudesRecibidas.filter((sol) => sol.id !== item.id)
+        solicitudesRecibidas.filter((sol) => sol.id !== item)
       );
       fetchData();
     } catch (error) {
-      console.error("❌ Error al rechazar solicitud:", error);
+      console.error("Error al rechazar solicitud:", error);
     }
   };
 
   const handleDeleteFriend = async () => {
     try {
-      await deleteFriend(deleteItem.id);
-      setAmigos(amigos.filter((amigo) => amigo.id !== deleteItem.id));
+      if (!friendToDelete) return; 
+      await deleteFriend(friendToDelete.id);
+      setAmigos(amigos.filter((amigo) => amigo.id !== friendToDelete.id));
       setCurrentFriends(currentFriends - 1);
-      setShowDeleteDialog(false);
+      setShowDeleteConfirmation(false); 
       fetchData();
     } catch (error) {
-      console.error("❌ Error al eliminar amigo:", error);
+      console.error("Error al eliminar amigo:", error);
     }
   };
 
-  const renderRow = (item, tab) => {
+  const renderRow = (item, tab, id) => {
     return (
       <div
         key={item.id}
@@ -122,39 +125,38 @@ export default function Amigo({ onBack }) {
             />
           )}
           <div className="flex flex-col">
-            <p className="text-sm text-white">Nivel {item.nivel}</p>
-            <p className="text-md text-white font-bold">{item.nombre}</p>
+            <p className="text-sm text-white">Nivel {item.level}</p>
+            <p className="text-md text-white font-bold">{item.username}</p>
           </div>
         </div>
 
         {tab === "amigos" && (
-          <FaTrash
-            className="text-white cursor-pointer hover:text-red-500"
-            onClick={() => {
-              setDeleteItem(item);
-              setShowDeleteDialog(true);
-            }}
-          />
-        )}
-
-        {tab === "enviadas" && (
-          <button
-            onClick={() => handleRejectRequest(item)}
-            className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-500 transition"
-          >
-            Cancelar solicitud
-          </button>
+          <div className="flex space-x-3">
+            <FaExchangeAlt
+              className="text-white cursor-pointer hover:text-yellow-500"
+              onClick={() => {
+                console.log("Intercambio con:", item);
+              }}
+            />
+            <FaTrash
+              className="text-white cursor-pointer hover:text-red-500"
+              onClick={() => {
+                setFriendToDelete(item); 
+                setShowDeleteConfirmation(true); 
+              }}
+            />
+          </div>
         )}
 
         {tab === "recibidas" && (
           <div className="flex space-x-4">
             <FaCheck
               className="text-green-500 cursor-pointer hover:text-green-400"
-              onClick={() => handleAcceptRequest(item)}
+              onClick={() => handleAcceptRequest(id)}
             />
             <FaTimes
               className="text-red-500 cursor-pointer hover:text-red-400"
-              onClick={() => handleRejectRequest(item)}
+              onClick={() => handleRejectRequest(id)}
             />
           </div>
         )}
@@ -185,12 +187,17 @@ export default function Amigo({ onBack }) {
       </div>
 
       <div className="bg-black/50 mt-6 w-[600px] rounded-lg p-4 flex flex-col items-center max-h-[500px] overflow-y-auto">
+        {(currentTab === "amigos" && (amigos == null || amigos.length === 0)) && (
+          <p className="text-white">Aún no tienes amigos.</p>
+        )}
         {currentTab === "amigos" &&
-          amigos.map((amigo) => renderRow(amigo, "amigos"))}
-        {currentTab === "enviadas" &&
-          solicitudesEnviadas.map((sol) => renderRow(sol, "enviadas"))}
+          amigos?.map((amigo) => renderRow(amigo, "amigos"))}
+       
+        {currentTab === "recibidas" && (solicitudesRecibidas == null || solicitudesRecibidas.length === 0) && (
+          <p className="text-white">No tienes solicitudes de amistad.</p>
+        )}
         {currentTab === "recibidas" &&
-          solicitudesRecibidas.map((sol) => renderRow(sol, "recibidas"))}
+          solicitudesRecibidas?.map((sol) => renderRow(sol.sender, "recibidas", sol.id))}
       </div>
 
       <div className="flex space-x-8 mt-6">
@@ -202,14 +209,7 @@ export default function Amigo({ onBack }) {
         >
           Amigos
         </button>
-        <button
-          onClick={() => setCurrentTab("enviadas")}
-          className={`px-4 py-2 rounded-md ${
-            currentTab === "enviadas" ? "bg-[#2B5C94]" : "bg-black/50"
-          }`}
-        >
-          Solicitudes enviadas
-        </button>
+          
         <button
           onClick={() => setCurrentTab("recibidas")}
           className={`px-4 py-2 rounded-md ${
@@ -220,25 +220,49 @@ export default function Amigo({ onBack }) {
         </button>
       </div>
 
+      {showDeleteConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-[#2B5C94] p-6 rounded-lg shadow-lg w-80">
+            <h2 className="text-xl font-bold mb-4 text-center">
+              ¿Estás seguro de que deseas eliminar a {friendToDelete?.username}?
+            </h2>
+            <div className="flex justify-around">
+              <button
+                onClick={handleDeleteFriend}
+                className="bg-green-600 px-4 py-2 rounded hover:bg-green-500 transition"
+              >
+                Sí
+              </button>
+              <button
+                onClick={() => setShowDeleteConfirmation(false)}
+                className="bg-red-600 px-4 py-2 rounded hover:bg-red-500 transition"
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showAddFriendModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-[#2B5C94] p-6 rounded-lg shadow-lg w-80">
             <h2 className="text-xl font-bold mb-4 text-center">
-              Agregar amigo
+              Ingresa el código de amigo
             </h2>
             <input
               type="text"
-              className="w-full px-3 py-2 mb-4 rounded text-white bg-black"
-              placeholder="Código de amigo..."
               value={newFriendCode}
               onChange={(e) => setNewFriendCode(e.target.value)}
+              className="w-full px-4 py-2 mb-4 rounded-md text-white"
+              placeholder="Código de amigo"
             />
             <div className="flex justify-around">
               <button
                 onClick={handleAddFriend}
-                className="bg-green-600 px-4 py-2 rounded hover:bg-green-500 transition"
+                className="bg-blue-600 px-4 py-2 rounded hover:bg-blue-500 transition"
               >
-                Agregar
+                Enviar solicitud
               </button>
               <button
                 onClick={handleCloseAddFriendModal}

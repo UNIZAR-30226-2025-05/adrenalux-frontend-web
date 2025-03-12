@@ -1,15 +1,5 @@
 const API_URL = "http://54.37.50.18:3000/api/v1/auth";
 
-// Función para obtener o generar un identificador único para el dispositivo
-const getDeviceId = () => {
-  let deviceId = localStorage.getItem("device_id");
-  if (!deviceId) {
-    deviceId = crypto.randomUUID(); // Generar un ID único
-    localStorage.setItem("device_id", deviceId);
-  }
-  return deviceId;
-};
-
 // Funciones para manejar el token en localStorage
 const setToken = (token) => localStorage.setItem("auth_token", token);
 export const getToken = () => localStorage.getItem("auth_token");
@@ -23,7 +13,7 @@ export const login = async (email, password) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email, password, device_id: getDeviceId() }),
+      body: JSON.stringify({ email, password}),
     });
 
     const data = await response.json();

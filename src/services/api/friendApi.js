@@ -60,15 +60,15 @@ export const sendFriendRequest = async (friendCode) => {
 
 export const acceptFriendRequest = async (requestId) => {
   try {
-    const response = await axios.patch(
-      `${API_URL}/friends/requests/${requestId}/accept`,
+    console.log(requestId)
+    const response = await axios.patch(`${API_URL}/friends/requests/${requestId}/accept`,
       {},
-      { headers: getAuthHeaders() }
-    );
+      { headers: getAuthHeaders() 
+      });
     return response.data;
   } catch (error) {
     console.error(
-      "❌ Error al aceptar solicitud de amistad:",
+      "Error al aceptar solicitud de amistad:",
       error.response?.data || error.message
     );
     throw error;
@@ -85,7 +85,7 @@ export const declineFriendRequest = async (requestId) => {
     return response.data;
   } catch (error) {
     console.error(
-      "❌ Error al rechazar solicitud de amistad:",
+      "Error al rechazar solicitud de amistad:",
       error.response?.data || error.message
     );
     throw error;
