@@ -17,12 +17,12 @@ import Intercambios from "./components/Intercambio";
 import Ajustes from "./components/Ajustes";
 import Profile from "./components/Profile";
 import CardsForSale from "./components/CardsForSale";
-import Notificacion from "./components/NotificacionIntercambio"; 
+import Notificacion from "./components/layout/game/NotificacionIntercambio.jsx"; 
 
 function App() {
   return (
     <Router>
-      <Notificacion />
+      <Notificacion/>
       <Routes>
         <Route path="/" element={<Inicio />} />
         <Route path="/register" element={<Register />} />

@@ -1,4 +1,3 @@
-import io from "socket.io-client";
 import { getToken } from "../api/authApi";
 
 class SocketService {

@@ -19,7 +19,7 @@ export const getFriends = async () => {
     return response.data.data;
   } catch (error) {
     console.error(
-      "❌ Error al obtener amigos:",
+      "Error al obtener amigos:",
       error.response?.data || error.message
     );
     throw error;
@@ -34,7 +34,7 @@ export const getFriendRequests = async () => {
     return response.data.data;
   } catch (error) {
     console.error(
-      "❌ Error al obtener solicitudes de amistad:",
+      "Error al obtener solicitudes de amistad:",
       error.response?.data || error.message
     );
     throw error;
@@ -51,7 +51,7 @@ export const sendFriendRequest = async (friendCode) => {
     return response.data;
   } catch (error) {
     console.error(
-      "❌ Error al enviar solicitud de amistad:",
+      "Error al enviar solicitud de amistad:",
       error.response?.data || error.message
     );
     throw error;
