@@ -42,7 +42,6 @@ export default function Amigo() {
       const friends = await getFriends();
       const requests = await getFriendRequests();
       const user = await getProfile();
-      console.log(user)
       setUser(user);
       setAmigos(friends);
       setSolicitudesRecibidas(requests || []);

@@ -7,7 +7,7 @@ export default function RotatingModel({ scene, children, ...props }) {
 
   useFrame(() => {
     if (groupRef.current) {
-      groupRef.current.rotation.y += 0.006;
+      groupRef.current.rotation.y += 0.016;
     }
   });
 

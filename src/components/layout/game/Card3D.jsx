@@ -19,7 +19,7 @@ export default function Card3D({ card, onClick = () => {} }) {
         <Model3D
           card={card}
           scenePath="/models/card_3d.glb"
-          scale={[2.5, 2.5, 2]}
+          scale={[2.5, 2.5, 0.5]}
         />
       </Canvas>
     </div>

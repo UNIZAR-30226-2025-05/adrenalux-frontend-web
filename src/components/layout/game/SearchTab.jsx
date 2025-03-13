@@ -12,7 +12,7 @@ export default function SearchTab({
 }) {
   const [teams, setTeams] = useState([]);
   const positions = ["Portero", "Defensa", "Centrocampista", "Delantero"]; // Posiciones estáticas
-  const API_URL = "http://5234.37.50.18:3000/api/v1"; //
+  const API_URL = "http://52.34.37.50.18:3000/api/v1"; //
   useEffect(() => {
     fetch(`${API_URL}/teams`)
       .then((response) => response.json())

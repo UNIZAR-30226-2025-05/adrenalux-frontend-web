@@ -11,6 +11,7 @@ import { getProfile } from "../services/api/profileApi";
 const Profile = () => {
   const [infoUser, setInfoUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const friendCode = infoUser?.data?.friend_code;
 
   const navigate = useNavigate();
 
