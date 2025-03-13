@@ -1,6 +1,4 @@
 import io from 'socket.io-client';
-import { getToken } from '../api/authApi';
-import { getProfile } from '../api/profileApi';
 
 class SocketService {
   constructor() {
@@ -137,16 +135,10 @@ class SocketService {
   }
 
   requestExchange(id, username){
-    console.log(id)
-    console.log(username)
-    this.socket.emit('request_exchange', {id, username})
+    console.log("Id: ", String(id), "Username ", username);
+    this.socket.emit('request_exchange', { id, username });
   }
 }
 
 // Usar la instancia única
 export const socketService = SocketService.getInstance();
-
-const token = await getToken();
-const profile = await getProfile();
-
-socketService.initialize(token, profile.data.username);

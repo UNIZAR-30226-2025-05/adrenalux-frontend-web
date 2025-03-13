@@ -1,3 +1,7 @@
+import { useEffect } from 'react';
+import { socketService } from '../services/websocket/socketService';
+import { getToken } from '../services/api/authApi';
+import { getProfile } from '../services/api/profileApi';
 import NavBarGame from './layout/game/NavbarGame'; 
 import background from '../assets/background.png'; 
 import TournamentButton from './layout/game/TournamentButton';
@@ -8,6 +12,18 @@ import PlayButton from './layout/game/PlayButton';
 import CardsMenu from './layout/game/CardsMenu';
 
 const Home = () => {
+    useEffect(() => {
+        const initializeSocket = async () => {
+            if (!socketService.socket) { // Solo inicializa si no hay socket
+                const token = await getToken();
+                const profile = await getProfile();
+                socketService.initialize(token, profile.data.username);
+            }
+        };
+
+        initializeSocket();
+    }, []);
+
     return (
       <div className="fixed inset-0 flex justify-center items-center bg-cover bg-center" style={{ backgroundImage: `url(${background})` }}>
         <NavBarGame />
