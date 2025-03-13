@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { FaExchangeAlt, FaPlus, FaTrash, FaTimes, FaCheck } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import { FaArrowLeft, FaPlus, FaTrash, FaTimes, FaCheck } from "react-icons/fa";
 import background from "../assets/background.png";
 import BackButton from "../components/layout/game/BackButton";
 import { socketService } from "../services/websocket/socketService";
@@ -10,11 +10,8 @@ import {
   sendFriendRequest,
   acceptFriendRequest,
   declineFriendRequest,
-  deleteFriend, 
+  deleteFriend,
 } from "../services/api/friendApi";
-import {
-  getProfile, 
-} from "../services/api/profileApi"
 
 export default function Amigo() {
   const [currentTab, setCurrentTab] = useState("amigos");
@@ -39,12 +36,15 @@ export default function Amigo() {
 
   const fetchData = async () => {
     try {
-      const friends = await getFriends();
+      const friends = (await getFriends()) ?? [];
       const requests = await getFriendRequests();
       const user = await getProfile();
       setUser(user);
       setAmigos(friends);
-      setSolicitudesRecibidas(requests || []);
+      setSolicitudesEnviadas(requests.sent || []);
+      setSolicitudesRecibidas(requests.received || []);
+
+      setCurrentFriends(friends.length);
     } catch (error) {
       console.error("Error cargando los datos:", error);
     }
@@ -62,7 +62,6 @@ export default function Amigo() {
   const handleAddFriend = async () => {
     if (!newFriendCode.trim()) return;
     try {
-      console.log(newFriendCode)
       await sendFriendRequest(newFriendCode);
       setSolicitudesEnviadas([
         ...solicitudesEnviadas,
@@ -103,11 +102,10 @@ export default function Amigo() {
 
   const handleDeleteFriend = async () => {
     try {
-      if (!friendToDelete) return; 
-      await deleteFriend(friendToDelete.id);
-      setAmigos(amigos.filter((amigo) => amigo.id !== friendToDelete.id));
+      await deleteFriend(deleteItem.id);
+      setAmigos(amigos.filter((amigo) => amigo.id !== deleteItem.id));
       setCurrentFriends(currentFriends - 1);
-      setShowDeleteConfirmation(false); 
+      setShowDeleteDialog(false);
       fetchData();
     } catch (error) {
       console.error("Error al eliminar amigo:", error);
@@ -135,22 +133,22 @@ export default function Amigo() {
         </div>
 
         {tab === "amigos" && (
-          <div className="flex space-x-3">
-            <FaExchangeAlt
-              className="text-white cursor-pointer hover:text-yellow-500"
-              onClick={() => {
-                socketService.requestExchange(item.id, user.data.username);
-                navigate("/esperando", { state: { jugador: item } });
-              }}
-            />
-            <FaTrash
-              className="text-white cursor-pointer hover:text-red-500"
-              onClick={() => {
-                setFriendToDelete(item); 
-                setShowDeleteConfirmation(true); 
-              }}
-            />
-          </div>
+          <FaTrash
+            className="text-white cursor-pointer hover:text-red-500"
+            onClick={() => {
+              setDeleteItem(item);
+              setShowDeleteDialog(true);
+            }}
+          />
+        )}
+
+        {tab === "enviadas" && (
+          <button
+            onClick={() => handleRejectRequest(item)}
+            className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-500 transition"
+          >
+            Cancelar solicitud
+          </button>
         )}
 
         {tab === "recibidas" && (
@@ -192,17 +190,12 @@ export default function Amigo() {
       </div>
 
       <div className="bg-black/50 mt-6 w-[600px] rounded-lg p-4 flex flex-col items-center max-h-[500px] overflow-y-auto">
-        {(currentTab === "amigos" && (amigos == null || amigos.length === 0)) && (
-          <p className="text-white">Aún no tienes amigos.</p>
-        )}
         {currentTab === "amigos" &&
-          amigos?.map((amigo) => renderRow(amigo, "amigos"))}
-       
-        {currentTab === "recibidas" && (solicitudesRecibidas == null || solicitudesRecibidas.length === 0) && (
-          <p className="text-white">No tienes solicitudes de amistad.</p>
-        )}
+          amigos.map((amigo) => renderRow(amigo, "amigos"))}
+        {currentTab === "enviadas" &&
+          solicitudesEnviadas.map((sol) => renderRow(sol, "enviadas"))}
         {currentTab === "recibidas" &&
-          solicitudesRecibidas?.map((sol) => renderRow(sol.sender, "recibidas", sol.id))}
+          solicitudesRecibidas.map((sol) => renderRow(sol, "recibidas"))}
       </div>
 
       <div className="flex space-x-8 mt-6">
@@ -214,7 +207,7 @@ export default function Amigo() {
         >
           Amigos
         </button>
-          
+
         <button
           onClick={() => setCurrentTab("recibidas")}
           className={`px-4 py-2 rounded-md ${
