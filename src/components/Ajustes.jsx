@@ -30,10 +30,11 @@ const Ajustes = () => {
   const handleLogout = async () => {
     try {
       // Hacer una solicitud POST al endpoint de cierre de sesión
-      const response = await fetch('/api/signout', {
+      const response = await fetch('/auth/sign-out', {
         method: 'POST',
         credentials: 'include', // Incluir cookies en la solicitud
       });
+      console.log(response)
 
       if (!response.ok) {
         throw new Error('Error al cerrar sesión');

@@ -1,6 +1,5 @@
 const API_URL = "http://54.37.50.18:3000/api/v1/auth";
 
-// Funciones para manejar el token en localStorage
 const setToken = (token) => localStorage.setItem("auth_token", token);
 export const getToken = () => localStorage.getItem("auth_token");
 const removeToken = () => localStorage.removeItem("auth_token");
@@ -69,5 +68,4 @@ export const validateToken = async () => {
 // Función para cerrar sesión y eliminar el token
 export const logout = () => {
   removeToken();
-  window.location.href = "/sign-in"; // Redirigir al login
 };

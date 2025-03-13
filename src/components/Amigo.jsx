@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { FaExchangeAlt, FaPlus, FaTrash, FaTimes, FaCheck } from "react-icons/fa";
 import background from "../assets/background.png";
 import BackButton from "../components/layout/game/BackButton";
+import { socketService } from "../services/websocket/socketService";
 import { useNavigate } from "react-router-dom";
 import {
   getFriends,
@@ -9,19 +10,20 @@ import {
   sendFriendRequest,
   acceptFriendRequest,
   declineFriendRequest,
-  deleteFriend,
+  deleteFriend, 
 } from "../services/api/friendApi";
+import {
+  getProfile, 
+} from "../services/api/profileApi"
 
-export default function Amigo({ onBack }) {
+export default function Amigo() {
   const [currentTab, setCurrentTab] = useState("amigos");
   const [amigos, setAmigos] = useState([]);
+  const [user, setUser] = useState([]);
   const [solicitudesEnviadas, setSolicitudesEnviadas] = useState([]);
   const [solicitudesRecibidas, setSolicitudesRecibidas] = useState([]);
   const [currentFriends, setCurrentFriends] = useState(0);
   const maxFriends = 99;
-
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [deleteItem, setDeleteItem] = useState(null);
 
   const [showAddFriendModal, setShowAddFriendModal] = useState(false);
   const [newFriendCode, setNewFriendCode] = useState("");
@@ -39,6 +41,8 @@ export default function Amigo({ onBack }) {
     try {
       const friends = await getFriends();
       const requests = await getFriendRequests();
+      const user = await getProfile();
+      setUser(user);
       setAmigos(friends);
       setSolicitudesRecibidas(requests || []);
     } catch (error) {
@@ -135,7 +139,8 @@ export default function Amigo({ onBack }) {
             <FaExchangeAlt
               className="text-white cursor-pointer hover:text-yellow-500"
               onClick={() => {
-                console.log("Intercambio con:", item);
+                socketService.requestExchange(item.id, user.data.username);
+                navigate("/esperando", { state: { jugador: item } });
               }}
             />
             <FaTrash

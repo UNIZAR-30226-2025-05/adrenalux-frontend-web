@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_URL = "http://54.37.50.18:3000/api/v1/profile";
 
-const getAuthHeaders = () => {
+export const getAuthHeaders = () => {
   const token = localStorage.getItem("auth_token");
   if (!token) throw new Error("Token not found");
   return {

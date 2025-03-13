@@ -1,29 +1,32 @@
 import { useEffect, useState } from "react";
-import exchangeSocketService from "../../../services/websocket/socketService";
+import socketService from "../../../services/websocket/socketService";
 
 export default function NotificacionIntercambio() {
   const [notification, setNotification] = useState(null);
 
   useEffect(() => {
-    exchangeSocketService.setOnNotification((data) => {
-      setNotification(data);
+    socketService.setOnIncomingRequest((data) => {
+      setNotification({
+        solicitanteUsername: data.solicitanteUsername,
+        exchangeId: data.exchangeId,
+      });
     });
   }, []);
 
   const handleAccept = () => {
     setNotification(null);
-    exchangeSocketService.acceptExchange(notification.exchangeId);
+    socketService.acceptExchangeRequest(notification.exchangeId);
   };
 
   const handleReject = () => {
     setNotification(null);
-    exchangeSocketService.cancelExchange(notification.exchangeId);
+    socketService.cancelExchangeRequest(notification.exchangeId);
   };
 
   if (!notification) return null;
 
   return (
-    <div className="fixed top-4 right-4 bg-black bg-opacity-80 text-white p-4 rounded-xl shadow-lg z-50">
+    <div className="fixed top-4 right-4 bg-black bg-opacity-80 text-white p-4 rounded-xl shadow-lg z-50 animate-fade-in">
       <p className="text-lg font-semibold mb-2">
         {notification.solicitanteUsername} te ha invitado a un intercambio
       </p>
