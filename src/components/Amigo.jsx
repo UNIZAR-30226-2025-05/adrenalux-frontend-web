@@ -139,7 +139,7 @@ export default function Amigo() {
             <FaExchangeAlt
               className="text-white cursor-pointer hover:text-yellow-500"
               onClick={() => {
-                socketService.requestExchange(item.id, user.data.username);
+                socketService.sendExchangeRequest(item['id'], user.data.username);
                 navigate("/esperando", { state: { jugador: item } });
               }}
             />

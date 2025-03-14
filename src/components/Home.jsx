@@ -15,7 +15,7 @@ const Home = () => {
     useEffect(() => {
         const initializeSocket = async () => {
             if (!socketService.socket) { // Solo inicializa si no hay socket
-                const token = await getToken();
+                const token = getToken();
                 const profile = await getProfile();
                 socketService.initialize(token, profile.data.username);
             }

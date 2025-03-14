@@ -20,6 +20,10 @@ class SocketService {
   }
 
   async connect(token, username) {
+    if (this.socket) {
+      console.log("Socket ya está conectado.");
+      return;
+    }
     try {
       this.socket = io('http://54.37.50.18:3000', {
         transports: ['websocket'],
@@ -135,7 +139,7 @@ class SocketService {
   }
 
   requestExchange(id, username){
-    console.log("Id: ", String(id), "Username ", username);
+    
     this.socket.emit('request_exchange', { id, username });
   }
 }
