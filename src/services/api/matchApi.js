@@ -1,6 +1,6 @@
 import { getToken } from "./authApi";
 
-const API_URL = "http://54.37.50.18:3000/api/v1";
+const API_URL = "https://adrenalux.duckdns.org:3000/api/v1";
 
 export const matchmaking = async () => {
     const token = getToken();

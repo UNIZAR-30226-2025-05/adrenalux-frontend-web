@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://54.37.50.18:3000/api/v1/mercado";
+const API_BASE_URL = "https://adrenalux.duckdns.org:3000/api/v1/mercado";
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("auth_token");

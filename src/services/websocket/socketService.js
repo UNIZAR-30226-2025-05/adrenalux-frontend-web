@@ -28,7 +28,7 @@ class SocketService {
       return;
     }
     try {
-      this.socket = io('http://54.37.50.18:3000', {
+      this.socket = io('https://adrenalux.duckdns.org:3000', {
         transports: ['websocket'],
         query: { username },
         auth: { token },

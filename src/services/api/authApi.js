@@ -1,4 +1,4 @@
-const API_URL = "http://54.37.50.18:3000/api/v1/auth";
+const API_URL = "https://adrenalux.duckdns.org:3000/api/v1/auth";
 
 const setToken = (token) => localStorage.setItem("auth_token", token);
 export const getToken = () => localStorage.getItem("auth_token");
