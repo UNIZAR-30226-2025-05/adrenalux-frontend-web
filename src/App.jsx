@@ -37,7 +37,7 @@ function App() {
         <Route path="/alineacionesEditar" element={<AlineacionEditar />} />
         <Route path="/buscandoPartida" element={<BuscandoJugador />} />
         <Route path="/logros" element={<Logros />} />
-        <Route path="/intercambio" element={<Intercambios />} />
+        <Route path="/intercambio/:exchangeId" element={<Intercambios />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/ajustes" element={<Ajustes />} />
         <Route path="/cards-for-sale" element={<CardsForSale />} />

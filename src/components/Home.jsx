@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // Importar useNavigate
 import { socketService } from '../services/websocket/socketService';
 import { getToken } from '../services/api/authApi';
 import { getProfile } from '../services/api/profileApi';
-import NavBarGame from './layout/game/NavbarGame'; 
-import background from '../assets/background.png'; 
+import NavBarGame from './layout/game/NavbarGame';
+import background from '../assets/background.png';
 import TournamentButton from './layout/game/TournamentButton';
 import ClassificationButton from './layout/game/ClassificationButton';
 import StoreButton from './layout/game/StoreButton';
@@ -12,17 +13,19 @@ import PlayButton from './layout/game/PlayButton';
 import CardsMenu from './layout/game/CardsMenu';
 
 const Home = () => {
+    const navigate = useNavigate(); // Obtener la función navigate
+
     useEffect(() => {
         const initializeSocket = async () => {
             if (!socketService.socket) { // Solo inicializa si no hay socket
                 const token = getToken();
                 const profile = await getProfile();
-                socketService.initialize(token, profile.data.username);
+                socketService.initialize(token, profile.data.username, navigate); // Pasar navigate aquí
             }
         };
 
         initializeSocket();
-    }, []);
+    }, [navigate]); // Añadir navigate como dependencia
 
     return (
       <div className="fixed inset-0 flex justify-center items-center bg-cover bg-center" style={{ backgroundImage: `url(${background})` }}>

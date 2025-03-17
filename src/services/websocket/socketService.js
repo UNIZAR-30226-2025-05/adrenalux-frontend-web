@@ -3,19 +3,22 @@ import io from 'socket.io-client';
 class SocketService {
   constructor() {
     this.socket = null;
-    this.onOpponentCardSelected = null;
+    this.onOpponentCardSelected = null; // Callback para notificar la selección de carta
     this.onConfirmationsUpdated = null;
+    this.navigate = null;
   }
 
   static getInstance() {
     if (!SocketService.instance) {
       SocketService.instance = new SocketService();
+      console.log("No estaba conectado");
     }
     return SocketService.instance;
   }
 
   // Función para inicializar el socket
-  initialize(token, username) {
+  initialize(token, username, navigate) {
+    this.navigate = navigate;
     this.connect(token, username);
   }
 
@@ -50,13 +53,27 @@ class SocketService {
     this.socket.on('exchange_accepted', (data) => this.handleExchangeAccepted(data));
     this.socket.on('exchange_declined', (data) => this.handleExchangeRejected(data));
     this.socket.on('error', (data) => this.handleExchangeError(data));
-    this.socket.on('cards_selected', (data) => this.handleCardsSelected(data));
+    this.socket.on('cards_selected', (data) => this.handleCardsSelected(data)); // Escuchar cards_selected
     this.socket.on('confirmation_updated', (data) => this.handleConfirmationUpdate(data));
     this.socket.on('exchange_completed', (data) => this.handleExchangeCompleted(data));
     this.socket.on('exchange_cancelled', (data) => this.handleExchangeCancelled(data));
   }
 
-  // Funciones para manejar los mensajes entrantes
+  // Función para manejar la selección de cartas del oponente
+  handleCardsSelected(data) {
+    console.log("Carta seleccionada por el oponente:", data);
+    const { card, userId } = data; // Obtener la carta y el userId del que seleccionó la carta
+    if (this.onOpponentCardSelected) {
+      this.onOpponentCardSelected({ card, userId }); // Llamar al callback para notificar al componente
+    }
+  }
+
+  // Función para registrar un callback cuando el oponente selecciona una carta
+  setOnOpponentCardSelected(callback) {
+    this.onOpponentCardSelected = callback;
+  }
+
+  // Resto de las funciones de SocketService...
   handleExchangeCompleted(data) {
     console.log(data);
   }
@@ -72,44 +89,71 @@ class SocketService {
     }
   }
 
-  handleCardsSelected(data) {
-    const userId = data['userId'];
-    const card = data['card']; // Asumiendo que card es un objeto que ya tienes definido en algún lugar
-    if (userId !== 'currentUserId') {
-      if (this.onOpponentCardSelected) {
-        this.onOpponentCardSelected(card);
-      }
-    }
-  }
-
   handleNotification(data) {
     console.log(data);
-
   }
 
   handleIncomingRequest(data) {
-    console.log(data);
-    console.log("hola");
+    const { solicitanteUsername, exchangeId } = data;
+    const notificationDiv = document.createElement('div');
+    notificationDiv.innerHTML = `
+      <div id="exchange-notification" style="
+        position: fixed; 
+        top: 20px; 
+        right: -300px; 
+        width: 250px; 
+        background:rgb(48, 43, 43); 
+        padding: 15px; 
+        border-radius: 10px; 
+        box-shadow: 0 0 10px rgba(0,0,0,0.3); 
+        z-index: 1000; 
+        opacity: 0; 
+        transition: right 0.5s ease-out, opacity 0.5s ease-out;
+      ">
+        <p style="margin-bottom: 15px; text-align: center;"><strong>${solicitanteUsername}</strong> quiere realizar un intercambio</p>
+        <div style="display: flex; justify-content: center; gap: 10px;">
+          <button id="accept-btn" style="padding: 5px 10px; background: #4caf50; color: white; border: none; border-radius: 5px; cursor: pointer;">Aceptar</button>
+          <button id="decline-btn" style="padding: 5px 10px; background: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer;">Rechazar</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(notificationDiv);
+
+    const notificationElement = document.getElementById('exchange-notification');
+    setTimeout(() => {
+      notificationElement.style.right = '20px';
+      notificationElement.style.opacity = '1';
+    }, 100);
+
+    document.getElementById('accept-btn').addEventListener('click', () => {
+      this.socket.emit('accept_exchange', exchangeId);
+      console.log('Intercambio aceptado', exchangeId);
+      this.navigate(`/intercambio/${encodeURIComponent(exchangeId)}`);
+      document.body.removeChild(notificationDiv);
+    });
+
+    document.getElementById('decline-btn').addEventListener('click', () => {
+      this.socket.emit('accept_exchange', { exchangeId });
+      this.navigate('/home');
+      document.body.removeChild(notificationDiv);
+    });
   }
 
   handleExchangeAccepted(data) {
-    const myUsername = 'currentUserName'; // Esto deberías obtenerlo de algún estado global o contexto
-    const { solicitanteUsername, receptorUsername } = data;
-    const username = myUsername === solicitanteUsername ? receptorUsername : solicitanteUsername;
-
-    console.log('Intercambio aceptado', data, username);
-    // Navegar a la pantalla de intercambio
+    console.log('Intercambio aceptado', data);
+    this.navigate(`/intercambio/${encodeURIComponent(data.exchangeId)}`);
   }
 
   handleExchangeRejected(data) {
-    console.log(data);
+    console.log('Intercambio rechazado', data);
+    this.navigate('/amigo');
   }
 
   handleExchangeError(error) {
     console.log(error);
   }
 
-  // Funciones para emitir eventos por socket
   confirmExchange(exchangeId) {
     this.socket.emit('confirm_exchange', exchangeId);
   }
@@ -123,6 +167,10 @@ class SocketService {
   }
 
   selectCard(exchangeId, cardId) {
+    console.log(cardId);
+    if (this.socket == null) {
+      console.log("Socket desconectado");
+    }
     this.socket.emit('select_cards', { exchangeId, cardId });
   }
 
@@ -138,8 +186,7 @@ class SocketService {
     this.socket.emit('decline_exchange', exchangeId);
   }
 
-  requestExchange(id, username){
-    
+  requestExchange(id, username) {
     this.socket.emit('request_exchange', { id, username });
   }
 }
