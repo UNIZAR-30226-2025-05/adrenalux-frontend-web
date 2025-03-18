@@ -20,6 +20,7 @@ const Intercambio = () => {
   const [opponentCard, setOpponentCard] = useState(null); // Carta seleccionada por el otro usuario
   const [currentUserId, setCurrentUserId] = useState(null); // ID del usuario actual
   const [opponentUsername, setOpponentUsername] = useState("Oponente"); // Nombre del oponente
+  const [isConfirmed, setIsConfirmed] = useState(false); // Estado para controlar si se ha confirmado el intercambio
 
   // Cargar la colección de cartas y el perfil del usuario al montar el componente
   useEffect(() => {
@@ -79,6 +80,7 @@ const Intercambio = () => {
 
   const handleConfirmExit = () => {
     setShowAlert(false);
+    setIsConfirmed(false); // Restablecer el estado de confirmación
     window.location.href = "/home";
   };
 
@@ -92,6 +94,7 @@ const Intercambio = () => {
       setConfirmedCard(selectedCard);
       socketService.selectCard(exchangeId, cardId); // Notificar la selección de la carta
       setSelectedCard(null);
+      setIsConfirmed(true); // Establecer el estado de confirmación a true
     }
   };
 
@@ -122,7 +125,9 @@ const Intercambio = () => {
                     className="w-40 h-[225px] shadow-lg opacity-50"
                   />
                 )}
-                <p className="text-white mt-2">Tú</p> {/* "Tú" siempre visible */}
+                <p className={`text-white mt-2 ${isConfirmed ? "text-green-500" : ""}`}>
+                  Tú
+                </p> {/* "Tú" en verde si está confirmado, en blanco si no */}
               </div>
               <div className="flex flex-col items-center">
                 {opponentCard ? (
