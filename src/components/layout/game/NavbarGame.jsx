@@ -72,18 +72,21 @@ export default function NavbarGame() {
       console.log(cartas);
       setOpenedCards(cartas);
       navigate("/opening", {
-        state: { openedCards: cartas, selectedCard: "Sobre Energia Lux" },
+        state: { openedCards: openedCards, selectedCard: "Sobre Energia Lux" },
       });
     } catch (error) {
       console.error("Error al abrir el sobre gratis:", error);
     }
   };
 
+  const handleProfileClick = () => {
+    navigate("/profile");
+  };
+
   const handleAmigosClick = () => {
     navigate("/amigo");
   };
-
-  // Función para manejar el clic en el botón de ajustes
+  
   const handleAjustesClick = () => {
     navigate("/ajustes");
   };
@@ -97,7 +100,10 @@ export default function NavbarGame() {
 
       {/* Sección de usuario y barra de progreso */}
       <div className="flex items-center justify-between w-full">
-        <div className="flex items-center bg-[#1E1E1E] text-white px-3 py-1 mr-4 border-4 border-black rounded-lg">
+        <button
+          onClick={handleProfileClick}
+          className="flex items-center bg-[#1E1E1E] text-white px-3 py-1 mr-4 border-4 border-black rounded-lg hover:bg-[#292929] transition"
+        >
           {avatar && (
             <img
               src={avatar}
@@ -106,7 +112,7 @@ export default function NavbarGame() {
             />
           )}
           <span>{username}</span>
-        </div>
+        </button>
 
         <div className="flex items-center">
           <span className="text-blue-400 mr-2">LVL{level}</span>
@@ -163,7 +169,7 @@ export default function NavbarGame() {
           </button>
           <button
             className="bg-[#1E1E1E] border-4 border-black w-18 h-14 flex justify-center items-center rounded"
-            onClick={handleAjustesClick} // Añadir la función de navegación
+            onClick={handleAjustesClick}
           >
             <FaCog className="text-white text-4xl" />
           </button>
