@@ -1,1 +1,1 @@
-const API_URL = "https://adrenalux.duckdns.org:3000/api/";
+const API_URL = "https://adrenalux.duckdns.org/api/";

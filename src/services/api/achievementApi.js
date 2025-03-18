@@ -1,6 +1,6 @@
 import { getToken } from "../api/authApi";
 
-const API_URL = "https://adrenalux.duckdns.org:3000/api/v1";
+const API_URL = "https://adrenalux.duckdns.org/api/v1";
 
 export const generateAchievements = async (quantity, type, increment, rewardType, rewardAmount) => {
     const token = getToken();

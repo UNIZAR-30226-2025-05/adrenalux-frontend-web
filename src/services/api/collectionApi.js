@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://adrenalux.duckdns.org:3000/api/v1/coleccion";
+const API_URL = "https://adrenalux.duckdns.org/api/v1/coleccion";
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("auth_token");

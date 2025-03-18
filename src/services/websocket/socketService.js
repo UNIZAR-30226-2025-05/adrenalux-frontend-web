@@ -28,10 +28,16 @@ class SocketService {
       return;
     }
     try {
-      this.socket = io('https://adrenalux.duckdns.org:3000', {
+      this.socket = io('wss://adrenalux.duckdns.org', {
+        path: '/socket.io',
         transports: ['websocket'],
         query: { username },
         auth: { token },
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 3000,
+        secure: true,
+        withCredentials: true
       });
 
       this.socket.on('connect', () => {
