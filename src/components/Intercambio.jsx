@@ -7,28 +7,34 @@ import background from "../assets/background.png";
 import Card from "../assets/cartaNormal.png";
 import { getCollection } from "../services/api/collectionApi";
 import { socketService } from "../services/websocket/socketService";
-import { getProfile } from "../services/api/profileApi"; // Para obtener el perfil del usuario actual
+import { getProfile } from "../services/api/profileApi";
 
 const Intercambio = () => {
-  const { exchangeId } = useParams(); // Capturamos el exchangeId de la URL
+  const { exchangeId } = useParams();
   const [showAlert, setShowAlert] = useState(false);
   const [allCards, setAllCards] = useState([]);
   const [cards, setCards] = useState([]);
   const [search, setSearch] = useState("");
   const [selectedCard, setSelectedCard] = useState(null);
-  const [confirmedCard, setConfirmedCard] = useState(null); // Carta confirmada para el intercambio
-  const [opponentCard, setOpponentCard] = useState(null); // Carta seleccionada por el otro usuario
-  const [currentUserId, setCurrentUserId] = useState(null); // ID del usuario actual
-  const [opponentUsername, setOpponentUsername] = useState("Oponente"); // Nombre del oponente
-  const [isConfirmed, setIsConfirmed] = useState(false); // Estado para controlar si se ha confirmado el intercambio
+  const [confirmedCard, setConfirmedCard] = useState(null);
+  const [confirmedExchange, setConfirmedExchange] = useState(null);
+  const [opponentConfirmedExchange, setOpponentConfirmedExchange] = useState(null);
+  const [opponentCard, setOpponentCard] = useState(null);
+  const [opponentId, setOpponentId] = useState(null);
+  const [currentUserId, setCurrentUserId] = useState(null);
+  const [opponentUsername, setOpponentUsername] = useState("Oponente");
 
   // Cargar la colección de cartas y el perfil del usuario al montar el componente
   useEffect(() => {
     const fetchCollection = async () => {
       try {
         const data = await getCollection();
-        setAllCards(data);
-        setCards(data);
+        console.log(data);
+
+        // Filtrar las cartas disponibles
+        const availableCards = data.filter(card => card.disponible === true);
+        setAllCards(availableCards); // Guardar solo las cartas disponibles
+        setCards(availableCards); // Mostrar solo las cartas disponibles
       } catch (error) {
         console.error("Error al cargar la colección:", error);
       }
@@ -37,7 +43,7 @@ const Intercambio = () => {
     const fetchProfile = async () => {
       try {
         const profile = await getProfile();
-        setCurrentUserId(profile.data.id); // Guardar el ID del usuario actual
+        setCurrentUserId(profile.data.id);
       } catch (error) {
         console.error("Error al cargar el perfil:", error);
       }
@@ -50,22 +56,25 @@ const Intercambio = () => {
   // Registrar el callback para recibir la carta seleccionada por el oponente
   useEffect(() => {
     const handleOpponentCardSelected = ({ card, userId }) => {
-      if (userId !== String(currentUserId)) { // Solo actualizar si la carta es del oponente
+      if (userId !== String(currentUserId)) {
+        setOpponentId(userId);
         setOpponentCard(card);
-        console.log(userId);
-        console.log(currentUserId);
-        setOpponentUsername("Oponente"); // Aquí puedes obtener el nombre del oponente si lo tienes
+        setOpponentUsername("Oponente");
       }
     };
 
-    // Registrar el callback en SocketService
-    socketService.setOnOpponentCardSelected(handleOpponentCardSelected);
+    const handleConfirmNotification = ({ confirmations }) => {
+      setOpponentConfirmedExchange(confirmations[opponentId]);
+    };
 
-    // Limpiar el callback cuando el componente se desmonte
+    socketService.setOnOpponentCardSelected(handleOpponentCardSelected);
+    socketService.setOnConfirmationUpdate(handleConfirmNotification);
+
     return () => {
       socketService.setOnOpponentCardSelected(null);
+      socketService.setOnConfirmationUpdate(null);
     };
-  }, [currentUserId]);
+  }, [currentUserId, opponentId]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -80,11 +89,11 @@ const Intercambio = () => {
 
   const handleConfirmExit = () => {
     setShowAlert(false);
-    setIsConfirmed(false); // Restablecer el estado de confirmación
+    socketService.cancelExchange(exchangeId);
     window.location.href = "/home";
   };
 
-  const handleConfirmExchange = () => {
+  const handleSelectCard = () => {
     if (selectedCard) {
       if (!socketService.socket || !socketService.socket.connected) {
         console.error("Socket no conectado.");
@@ -92,9 +101,23 @@ const Intercambio = () => {
       }
       const cardId = `${selectedCard.id}`;
       setConfirmedCard(selectedCard);
-      socketService.selectCard(exchangeId, cardId); // Notificar la selección de la carta
+      setConfirmedExchange(false);
+      socketService.selectCard(exchangeId, cardId);
       setSelectedCard(null);
-      setIsConfirmed(true); // Establecer el estado de confirmación a true
+    }
+  };
+
+  const handleConfirmCard = () => {
+    if (confirmedCard) {
+      setConfirmedExchange(true);
+      socketService.confirmExchange(exchangeId);
+    }
+  };
+
+  const handleCancelCard = () => {
+    if (confirmedCard) {
+      setConfirmedExchange(false);
+      socketService.cancelConfirmation(exchangeId);
     }
   };
 
@@ -125,13 +148,13 @@ const Intercambio = () => {
                     className="w-40 h-[225px] shadow-lg opacity-50"
                   />
                 )}
-                <p className={`text-white mt-2 ${isConfirmed ? "text-green-500" : ""}`}>
+                <p className={`mt-2 ${confirmedExchange ? "text-green-500" : "text-white"}`}>
                   Tú
-                </p> {/* "Tú" en verde si está confirmado, en blanco si no */}
+                </p>
               </div>
               <div className="flex flex-col items-center">
                 {opponentCard ? (
-                  <CartaMediana jugador={opponentCard} className="w-40 h-[225px]" />
+                  <CartaMediana jugador={opponentCard} />
                 ) : (
                   <img
                     src={Card}
@@ -139,20 +162,22 @@ const Intercambio = () => {
                     className="w-40 h-[220px] shadow-lg opacity-50"
                   />
                 )}
-                <p className="text-white mt-2">{opponentUsername}</p> {/* Nombre del oponente siempre visible */}
+                <p className={`mt-2 ${opponentConfirmedExchange ? "text-green-500" : "text-white"}`}>
+                  {opponentUsername}
+                </p>
               </div>
             </div>
 
             {/* Botones de Confirmar y Cancelar */}
             <div className="flex gap-4">
               <button
-                onClick={handleConfirmExchange}
+                onClick={handleConfirmCard}
                 className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
               >
                 Confirmar
               </button>
               <button
-                onClick={handleConfirmExit}
+                onClick={handleCancelCard}
                 className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
               >
                 Cancelar
@@ -231,7 +256,7 @@ const Intercambio = () => {
             <CartaGrande jugador={selectedCard} />
             <div className="mt-4 flex justify-center space-x-4">
               <button
-                onClick={handleConfirmExchange}
+                onClick={handleSelectCard}
                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
               >
                 Intercambiar

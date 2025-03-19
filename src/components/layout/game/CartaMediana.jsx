@@ -5,7 +5,7 @@ import FondoCartaLuxury from "../../../assets/card_luxury.png";
 import FondoCartaLuxuryXI from "../../../assets/card_luxuryxi.png";
 import FondoCartaMegaLuxury from "../../../assets/card_megaluxury.png";
 
-function CartaMediana({ jugador, className }) {
+function CartaMediana({ jugador, className, width = "10rem", height = "12.5rem" }) {
   const {
     alias,
     ataque,
@@ -40,22 +40,35 @@ function CartaMediana({ jugador, className }) {
 
   return (
     <div
-      className={`relative w-40 h-[200px] bg-cover rounded-lg overflow-hidden ${className}`}
-      style={{ backgroundImage: `url(${getFondo()})`, backgroundSize: "cover" }}
+      className={`relative rounded-lg overflow-hidden ${className}`}
+      style={{
+        width: width,
+        height: height,
+        backgroundImage: `url(${getFondo()})`,
+        backgroundSize: "cover", // Ajusta el fondo para cubrir el contenedor
+        backgroundPosition: "center", // Centra el fondo
+        backgroundRepeat: "no-repeat", // Evita que el fondo se repita
+      }}
     >
-      {/* Cambio de distancias a porcentajes */}
-      <div className="absolute left-[55%] transform -translate-x-1/2 bottom-[46%]">
-        <img src={photo} alt={alias} className="w-15 h-[70px] object-cover" />
+      {/* Foto del jugador */}
+      <div className="absolute left-[48%] transform -translate-x-1/2 bottom-[46%]">
+        <img
+          src={photo}
+          alt={alias}
+          className="w-[100%] h-auto object-cover" // Tamaño relativo al contenedor
+        />
       </div>
 
+      {/* Escudo del equipo */}
       <img
         src={escudo}
         alt={equipo}
-        className="absolute top-[10%] right-[5%] w-8 h-8"
+        className="absolute top-[10%] right-[12%] w-[20%] h-auto" // Tamaño relativo al contenedor
       />
 
-      <div className="absolute bottom-[37%] left-[20%] text-white font-semibold">
-        <p className="text-xs">{alias}</p>
+      {/* Alias del jugador */}
+      <div className="absolute bottom-[35%] left-[15%] text-white font-semibold">
+        <p className="text-[0.8em]">{alias}</p> {/* Tamaño de texto relativo */}
       </div>
     </div>
   );
@@ -77,6 +90,8 @@ CartaMediana.propTypes = {
     posicion: PropTypes.string.isRequired,
   }).isRequired,
   className: PropTypes.string,
+  width: PropTypes.string, // Ancho personalizable
+  height: PropTypes.string, // Alto personalizable
 };
 
 export default CartaMediana;

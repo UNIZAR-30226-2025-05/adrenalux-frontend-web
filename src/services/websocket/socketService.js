@@ -3,7 +3,7 @@ import io from 'socket.io-client';
 class SocketService {
   constructor() {
     this.socket = null;
-    this.onOpponentCardSelected = null; // Callback para notificar la selección de carta
+    this.onOpponentCardSelected = null; 
     this.onConfirmationsUpdated = null;
     this.navigate = null;
   }
@@ -79,19 +79,26 @@ class SocketService {
     this.onOpponentCardSelected = callback;
   }
 
+  setOnConfirmationUpdate(callback) {
+    this.onConfirmationsUpdated = callback;
+  }
+
   // Resto de las funciones de SocketService...
   handleExchangeCompleted(data) {
     console.log(data);
+    this.navigate('/home');
   }
 
   handleExchangeCancelled(data) {
     console.log(data);
+    this.navigate('/home');
   }
 
   handleConfirmationUpdate(data) {
     const confirmations = data['confirmations'];
+    console.log(confirmations);
     if (this.onConfirmationsUpdated) {
-      this.onConfirmationsUpdated(confirmations);
+      this.onConfirmationsUpdated({confirmations});
     }
   }
 
