@@ -66,6 +66,29 @@ export const validateToken = async () => {
 };
 
 // Función para cerrar sesión y eliminar el token
-export const logout = () => {
-  removeToken();
+export const logout = async () => {
+  try {
+    const token = getToken(); // Obtener el token almacenado
+    if (!token) return false; // Si no hay token, no hay sesión activa
+
+    const response = await fetch(`${API_URL}/sign-out`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      credentials: "include",
+    });
+
+    if (response.ok) {
+      removeToken(); // Eliminar el token localmente
+      return true;
+    } else {
+      console.error("Error en el servidor al cerrar sesión");
+      return false;
+    }
+  } catch (error) {
+    console.error("Error cerrando sesión:", error);
+    return false;
+  }
 };
