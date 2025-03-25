@@ -1,7 +1,8 @@
-import NavBarGame from "./layout/game/NavbarGame";
+import React from "react";
+import NavBarGame from "./layout/game/NavbarGame"; // Asegúrate de importar correctamente los componentes
 import background from "../assets/background.png";
 import BackButton from "./layout/game/BackButton";
-import AchievementList from "./layout/game/AchievementList";
+import AchievementList from "./layout/game/AchievementList"; // Importamos AchievementList
 
 const Logros = () => {
   return (
@@ -19,7 +20,7 @@ const Logros = () => {
 
         {/* Lista de logros */}
         <div className="mx-auto">
-          <AchievementList />
+          <AchievementList /> {/* Aquí se muestra la lista de logros */}
         </div>
       </div>
     </div>
