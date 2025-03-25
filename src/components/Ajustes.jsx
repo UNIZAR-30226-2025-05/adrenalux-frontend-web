@@ -41,12 +41,14 @@ const Ajustes = () => {
       style={{ backgroundImage: `url(${background})` }}
     >
       <NavBarGame />
-      <div className="relative h-screen w-full flex items-center px-64">
-        <div className="absolute left-10 top-10 mt-16">
+      <div className="relative w-full h-screen mt-32">
+        {/* Botón de retroceso ajustado a la esquina */}
+        <div className="absolute left-4 top-4 z-10">
           <BackButton onClick={handleBackClick} />
         </div>
 
-        <div className="mx-auto bg-gray-900 bg-opacity-90 p-8 rounded-lg w-11/12 max-w-4xl mt-16">
+        {/* Contenedor principal de la tabla de ajustes con margen superior */}
+        <div className="mx-auto bg-gray-900 bg-opacity-90 p-8 rounded-lg w-[90%] sm:w-[70%] md:w-[60%] lg:w-[50%] max-w-4xl mt-16">
           <h1 className="text-white text-4xl font-bold mb-8 text-center">Ajustes</h1>
 
           {/* Ajustes de sonido */}
@@ -95,10 +97,16 @@ const Ajustes = () => {
 
           {/* Cerrar sesión y Acerca de nosotros */}
           <div className="flex justify-between">
-            <button className="text-white bg-red-600 hover:bg-red-700 py-2 px-4 rounded" onClick={handleLogout}>
+            <button
+              className="text-white bg-red-600 hover:bg-red-700 py-2 px-4 rounded"
+              onClick={handleLogout}
+            >
               Cerrar Sesión
             </button>
-            <button className="text-white bg-blue-600 hover:bg-blue-700 py-2 px-4 rounded" onClick={() => setShowAboutUs(true)}>
+            <button
+              className="text-white bg-blue-600 hover:bg-blue-700 py-2 px-4 rounded"
+              onClick={() => setShowAboutUs(true)}
+            >
               Acerca de nosotros
             </button>
           </div>
@@ -109,10 +117,17 @@ const Ajustes = () => {
       {showAboutUs && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-gray-900 p-6 rounded-lg w-11/12 max-w-md">
-            <h2 className="text-center text-white text-2xl font-bold mb-4">Acerca de nosotros</h2>
-            <p className="text-white mb-6">Información sobre la aplicación y el equipo de desarrollo.</p>
+            <h2 className="text-center text-white text-2xl font-bold mb-4">
+              Acerca de nosotros
+            </h2>
+            <p className="text-white mb-6">
+              Información sobre la aplicación y el equipo de desarrollo.
+            </p>
             <div className="flex justify-center">
-              <button className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded" onClick={() => setShowAboutUs(false)}>
+              <button
+                className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded"
+                onClick={() => setShowAboutUs(false)}
+              >
                 Cerrar
               </button>
             </div>
