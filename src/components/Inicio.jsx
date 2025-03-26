@@ -1,82 +1,87 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FaInstagram, FaLinkedin, FaYoutube } from 'react-icons/fa';
 import logo from '../assets/logo.png';
-import pantallaPrincipal from '../assets/pantalla_principal.png';
+import pantallaPrincipal from '../assets/SobreComun.png';
 
 const Inicio = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Establece el fondo blanco y quita márgenes
-    document.body.style.backgroundColor = "white";
-    document.body.style.margin = "0";
-    document.body.style.padding = "0";
+    document.body.style.background = 'linear-gradient(to bottom, #1a1a1a, #111111)';
+    document.body.style.margin = '0';
+    document.body.style.padding = '0';
   }, []);
 
-  const handleLoginClick = () => {
-    navigate("/login");
-  };
-
-  const handleSignUpClick = () => {
-    navigate("/register");
-  };
+  const handleLoginClick = () => navigate('/login');
+  const handleSignUpClick = () => navigate('/register');
+  const handleDiscoverClick = () => navigate('/register');
 
   return (
-    <div className="min-h-screen w-full bg-white flex flex-col">
-      {/* Encabezado con logo y botones */}
-      <header className="fixed top-0 left-0 w-full bg-white shadow-md z-10">
-        <div className="flex justify-between items-center px-8 py-4 w-full">
-          <img src={logo} alt="Logo" className="max-w-[50px] ml-2" />
-          <nav>
-            <button 
-              className="text-gray-600 bg-white border border-transparent rounded-md px-4 py-2 ml-4 transition duration-300 hover:text-blue-500 hover:bg-gray-100 hover:border-blue-500"
-              onClick={handleLoginClick}>
-              Iniciar sesión
-            </button>
-            <button 
-              className="text-gray-600 bg-white border border-transparent rounded-md px-4 py-2 ml-4 transition duration-300 hover:text-blue-500 hover:bg-gray-100 hover:border-blue-500"
-              onClick={handleSignUpClick}>
-              Registrarse
-            </button>
-          </nav>
-        </div>
+    <div className='min-h-screen flex flex-col text-white'>
+      {/* NAVBAR */}
+      <header className='fixed top-0 left-0 w-full px-4 py-4 md:px-8 md:py-6 flex justify-between items-center z-20 bg-transparent'>
+        <img 
+          src={logo} 
+          alt='Logo' 
+          className='w-16 md:w-24 cursor-pointer filter invert' 
+          onClick={() => navigate('/')} 
+        />
+        <nav className='flex gap-4 md:gap-6'>
+          <button onClick={handleLoginClick} className='text-black hover:text-gray-400 text-sm md:text-base'>Inicio sesión</button>
+          <button onClick={handleSignUpClick} className='text-black hover:text-gray-400 text-sm md:text-base'>Registrarse</button>        
+        </nav>
       </header>
 
-      {/* Sección principal */}
-      <main className="flex justify-center items-center flex-1 w-full pt-24 overflow-x-hidden pl-5">
-        <div className="flex flex-wrap items-center justify-between w-full px-8 gap-10">
-          {/* Sección del texto a la izquierda */}
-          <section className="flex-1 text-left flex flex-col justify-center gap-5 min-w-[300px]">
-            <h2 className="text-3xl font-bold text-gray-800">¡Bienvenido a AdrenaLux!</h2>
-            <p className="text-lg text-gray-600">Colecciona, juega y gana</p>
-            <div className="w-full h-[1px] bg-black"></div>
-            <p className="text-gray-600">Sumergete en este TCG de La Liga en el que podrás encontrar a tus jugadores favoritos.</p>
-            <p className="text-gray-600">¿Serás capaz de completar la colección?</p>
-            <a href="#" className="bg-gray-700 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300 opacity-80 w-fit min-w-[120px]">
-              Descúbrelo
-            </a>
-          </section>
+      {/* MAIN */}
+      <main className='flex flex-1 justify-between items-center w-full px-4 pt-20 md:px-10 md:pt-28'>
+        {/* TEXT CONTENT */}
+        <section className='max-w-[90%] mb-20 md:mb-40'>
+          <h2 className='text-4xl md:text-6xl font-bold whitespace-nowrap mb-4 md:mb-8'>¡Bienvenido a AdrenaLux!</h2>
+          <p className='text-lg md:text-xl mb-6 whitespace-nowrap'>Sumérgete en este TCG de La Liga y colecciona a tus jugadores favoritos.</p>
+          <button onClick={handleDiscoverClick} className='bg-white text-black font-bold py-3 px-6 rounded-md hover:bg-gray-300 mb-8 md:mb-16'>Descúbrelo</button>
 
-          {/* Sección de la imagen a la derecha */}
-          <section className="flex-1 flex justify-center items-center overflow-hidden min-w-[300px]">
-            <img src={pantallaPrincipal} alt="Imagen secundaria" className="max-w-full w-full h-auto object-contain" />
-          </section>
-        </div>
+          {/* SOCIAL MEDIA */}
+          <div className='flex flex-col gap-2 mt-8 md:mt-16'>
+            <span className='text-white text-lg font-semibold'>Síguenos:</span>
+            <div className='flex gap-4'>
+              <FaInstagram className='text-xl md:text-2xl text-white cursor-pointer' />
+              <FaLinkedin className='text-xl md:text-2xl text-white cursor-pointer' />
+              <FaYoutube className='text-xl md:text-2xl text-white cursor-pointer' />
+            </div>
+          </div>
+        </section>
+
+        {/* CARDS */}
+        <section className='relative flex justify-start w-full h-[400px] md:h-[500px]' style={{ transform: 'translateX(400px)' }}>
+          {[0, 1, 2, 3, 4].map((index) => (
+            <img
+              key={index}
+              src={pantallaPrincipal}
+              alt='Carta TCG'
+              className={`absolute w-[1200px] md:w-[1600px] h-auto object-contain transition-all`}  
+              style={{
+                transform: `rotate(${index % 2 === 0 ? index * 5 : -index * 5}deg)`,
+                top: `${index * 2}px`,
+                right: `${index * 2}px`,
+                zIndex: index,
+              }}
+            />
+          ))}
+        </section>
       </main>
 
-      {/* Pie de página con botones */}
-      <footer className="bg-gray-700 text-white py-4 text-center opacity-80 w-screen">
-
-        <div className="flex justify-center gap-4 flex-wrap">
-          <a href="#" className="hover:bg-blue-100 transition duration-300 py-2 px-4 rounded-md">Política de Privacidad</a>
-          <a href="#" className="hover:bg-blue-100 transition duration-300 py-2 px-4 rounded-md">Términos de Uso</a>
-          <a href="#" className="hover:bg-blue-100 transition duration-300 py-2 px-4 rounded-md">FAQ</a>
-          <a href="#" className="hover:bg-blue-100 transition duration-300 py-2 px-4 rounded-md">Estado</a>
+      {/* FOOTER */}
+      <footer className='bg-black text-white text-center py-8 md:py-12 fixed bottom-0 w-full border-t border-gray-700'>
+        <div className='flex justify-center gap-8 md:gap-20'>
+          <a href='#' className='hover:text-gray-400 text-sm md:text-base'>Política de Privacidad</a>
+          <a href='#' className='hover:text-gray-400 text-sm md:text-base'>Términos de Uso</a>
+          <a href='#' className='hover:text-gray-400 text-sm md:text-base'>FAQ</a>
+          <a href='#' className='hover:text-gray-400 text-sm md:text-base'>Estado</a>
         </div>
       </footer>
     </div>
   );
-};
+}
 
 export default Inicio;
-
