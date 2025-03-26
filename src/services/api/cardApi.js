@@ -1,11 +1,12 @@
 import axios from "axios";
+import { getToken } from "../api/authApi";
 
 const API_BASE_URL = "https://adrenalux.duckdns.org/api/v1/cartas";
 
-const getToken = () => localStorage.getItem("auth_token");
-
 export const abrirSobre = async (tipo) => {
   try {
+    const token = getToken();
+    console.log(token);
     const response = await axios.get(`${API_BASE_URL}/abrirSobre/${tipo}`, {
       headers: {
         Authorization: `Bearer ${getToken()}`,

@@ -1,59 +1,91 @@
 import PropTypes from "prop-types";
-import Card from "../../../assets/cartaNormal.png"; // Imagen de la carta
+import Card from "../../../assets/cartaNormal.png";
 
-const Formacion4_3_3 = ({ jugadores }) => {
-  // Función para verificar si una posición está libre
+const Formacion4_3_3 = ({ jugadores, onJugadorClick, plantillaId }) => {
   const getOpacity = (posicion) => {
     const jugadorEnPosicion = jugadores.find((jugador) => jugador.posicion === posicion);
-    return jugadorEnPosicion ? "opacity-100" : "opacity-50"; // 100 si hay jugador, 50 si está vacío
+    return jugadorEnPosicion ? "opacity-100" : "opacity-50";
+  };
+
+  const handleClick = (posicion) => {
+    if (onJugadorClick) {
+      const jugador = jugadores.find((j) => j.posicion === posicion);
+      onJugadorClick({
+        plantillaId,
+        posicion,
+        jugadorId: jugador?.id || null,
+        estaOcupado: !!jugador,
+      });
+    }
   };
 
   return (
-    <div className="formacion-4-3-3 grid grid-rows-10 gap-1">
-      {/* Fila 1: Delanteros */}
-      <div className="flex justify-between mb-2">
-        {["dc", "dc", "dc"].map((pos, index) => (
-          <div key={index} className={`relative ${getOpacity(pos)}`}>
-            <img src={Card} alt="Carta Jugador" className="w-20 h-32" /> {/* Ajustado el tamaño de las cartas */}
-            <p className="absolute inset-0 text-center text-white">
-              {jugadores.find((jugador) => jugador.posicion === pos)?.nombre || "Vacío"}
+    <div className="formacion-4-3-3 w-full max-w-md mx-auto space-y-2">
+      {/* Fila 1: Forwards (3 jugadores) */}
+      <div className="flex justify-around">
+        {["forward", "forward", "forward"].map((pos, index) => (
+          <button
+            key={`${pos}-${index}`}
+            className={`relative ${getOpacity(pos)} bg-transparent border-none p-0 cursor-pointer`}
+            onClick={() => handleClick(pos)}
+            aria-label={`Posición ${pos} ${index + 1}`}
+          >
+            <img src={Card} alt="" className="w-20 h-32" />
+            <p className="absolute inset-0 flex items-center justify-center text-white text-xs font-bold">
+              {jugadores.find((j) => j.posicion === pos)?.nombre || "Vacío"}
             </p>
-          </div>
+          </button>
         ))}
       </div>
 
-      {/* Fila 2: Centrocampistas */}
-      <div className="flex justify-between mb-1">
-        {["mc", "mc", "mc"].map((pos, index) => (
-          <div key={index} className={`relative ${getOpacity(pos)}`}>
-            <img src={Card} alt="Carta Jugador" className="w-20 h-32" /> {/* Ajustado el tamaño de las cartas */}
-            <p className="absolute inset-0 text-center text-white">
-              {jugadores.find((jugador) => jugador.posicion === pos)?.nombre || "Vacío"}
+      {/* Fila 2: Midfielders (3 jugadores) */}
+      <div className="flex justify-center gap-4">
+        {["midfielder", "midfielder", "midfielder"].map((pos, index) => (
+          <button
+            key={`${pos}-${index}`}
+            className={`relative ${getOpacity(pos)} bg-transparent border-none p-0 cursor-pointer ${
+              index === 1 ? "mx-12" : ""
+            }`}
+            onClick={() => handleClick(pos)}
+            aria-label={`Posición ${pos} ${index + 1}`}
+          >
+            <img src={Card} alt="" className="w-20 h-32" />
+            <p className="absolute inset-0 flex items-center justify-center text-white text-xs font-bold">
+              {jugadores.find((j) => j.posicion === pos)?.nombre || "Vacío"}
             </p>
-          </div>
+          </button>
         ))}
       </div>
 
-      {/* Fila 3: Defensores centrales */}
-      <div className="flex justify-between mb-1">
-        {["dfc", "dfc", "dfc", "dfc"].map((pos, index) => (
-          <div key={index} className={`relative ${getOpacity(pos)}`}>
-            <img src={Card} alt="Carta Jugador" className="w-20 h-32" /> {/* Ajustado el tamaño de las cartas */}
-            <p className="absolute inset-0 text-center text-white">
-              {jugadores.find((jugador) => jugador.posicion === pos)?.nombre || "Vacío"}
+      {/* Fila 3: Defenders (4 jugadores) */}
+      <div className="flex justify-evenly gap-8">
+        {["defender", "defender", "defender", "defender"].map((pos, index) => (
+          <button
+            key={`${pos}-${index}`}
+            className={`relative ${getOpacity(pos)} bg-transparent border-none p-0 cursor-pointer`}
+            onClick={() => handleClick(pos)}
+            aria-label={`Posición ${pos} ${index + 1}`}
+          >
+            <img src={Card} alt="" className="w-20 h-32" />
+            <p className="absolute inset-0 flex items-center justify-center text-white text-xs font-bold">
+              {jugadores.find((j) => j.posicion === pos)?.nombre || "Vacío"}
             </p>
-          </div>
+          </button>
         ))}
       </div>
 
-      {/* Fila 4: Portero */}
-      <div className="flex justify-center mb-1">
-        <div className={`relative ${getOpacity("por")}`}>
-          <img src={Card} alt="Carta Jugador" className="w-20 h-32" /> {/* Ajustado el tamaño de las cartas */}
-          <p className="absolute inset-0 text-center text-white">
-            {jugadores.find((jugador) => jugador.posicion === "por")?.nombre || "Vacío"}
+      {/* Fila 4: Goalkeeper */}
+      <div className="flex justify-center">
+        <button
+          className={`relative ${getOpacity("goalkeeper")} bg-transparent border-none p-0 cursor-pointer`}
+          onClick={() => handleClick("goalkeeper")}
+          aria-label="Goalkeeper"
+        >
+          <img src={Card} alt="" className="w-20 h-32" />
+          <p className="absolute inset-0 flex items-center justify-center text-white text-xs font-bold">
+            {jugadores.find((j) => j.posicion === "goalkeeper")?.nombre || "Vacío"}
           </p>
-        </div>
+        </button>
       </div>
     </div>
   );
@@ -62,12 +94,13 @@ const Formacion4_3_3 = ({ jugadores }) => {
 Formacion4_3_3.propTypes = {
   jugadores: PropTypes.arrayOf(
     PropTypes.shape({
+      id: PropTypes.string.isRequired,
       nombre: PropTypes.string.isRequired,
-      posicion: PropTypes.oneOf([
-        "dc", "mc", "dfc", "por"
-      ]).isRequired
+      posicion: PropTypes.oneOf(["forward", "midfielder", "defender", "goalkeeper"]).isRequired,
     })
-  ).isRequired
+  ).isRequired,
+  onJugadorClick: PropTypes.func.isRequired,
+  plantillaId: PropTypes.string.isRequired,
 };
 
 export default Formacion4_3_3;

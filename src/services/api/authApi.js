@@ -17,7 +17,9 @@ export const login = async (email, password) => {
 
     const data = await response.json();
     if (response.status === 200) {
+      console.log(data.data.token)
       setToken(data.data.token); // Guardar el token
+      console.log("token")
     }
     return { status: response.status, data };
   } catch (error) {
@@ -36,7 +38,6 @@ export const register = async (email, username, lastname, name, password) => {
       },
       body: JSON.stringify({ email, username, lastname, name, password }),
     });
-
     return response.json();
   } catch (error) {
     console.error("Error en register:", error);

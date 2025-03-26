@@ -19,6 +19,7 @@ const Home = () => {
         const initializeSocket = async () => {
             if (!socketService.socket) { // Solo inicializa si no hay socket
                 const token = getToken();
+                console.log(token)
                 const profile = await getProfile();
                 socketService.initialize(token, profile.data.username, navigate); // Pasar navigate aquí
             }

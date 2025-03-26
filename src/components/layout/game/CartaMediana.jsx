@@ -42,20 +42,33 @@ function CartaMediana({ jugador, className, width = "10rem", height = "12.5rem" 
     <div
       className={`relative rounded-lg overflow-hidden ${className}`}
       style={{
-        width: width,
-        height: height,
+        width: width, // Ancho personalizable
+        height: height, // Alto personalizable
         backgroundImage: `url(${getFondo()})`,
         backgroundSize: "cover", // Ajusta el fondo para cubrir el contenedor
         backgroundPosition: "center", // Centra el fondo
-        backgroundRepeat: "no-repeat", // Evita que el fondo se repita
+        backgroundRepeat: "no-repeat",
       }}
     >
       {/* Foto del jugador */}
-      <div className="absolute left-[48%] transform -translate-x-1/2 bottom-[46%]">
+      <div
+        className="absolute"
+        style={{
+          bottom: "46%", // Posición desde la parte inferior
+          left: "50%", // Centrado horizontalmente
+          transform: "translateX(-50%)", // Ajuste fino para centrar
+          width: "50%", // Ancho relativo al tamaño de la carta
+          height: "40%", // Altura relativa al tamaño de la carta
+        }}
+      >
         <img
           src={photo}
           alt={alias}
-          className="w-[100%] h-auto object-cover" // Tamaño relativo al contenedor
+          className="w-full h-full object-cover" // Escala la imagen proporcionalmente
+          style={{
+            maxWidth: "100%", // Asegura que no se desborde
+            maxHeight: "100%", // Asegura que no se desborde
+          }}
         />
       </div>
 
@@ -63,12 +76,26 @@ function CartaMediana({ jugador, className, width = "10rem", height = "12.5rem" 
       <img
         src={escudo}
         alt={equipo}
-        className="absolute top-[10%] right-[12%] w-[20%] h-auto" // Tamaño relativo al contenedor
+        className="absolute"
+        style={{
+          top: "10%", // Posición desde la parte superior
+          right: "14%", // Posición desde la derecha
+          width: "20%", // Ancho relativo al tamaño de la carta
+          height: "auto", // Altura automática para mantener la relación de aspecto
+        }}
       />
 
       {/* Alias del jugador */}
-      <div className="absolute bottom-[35%] left-[15%] text-white font-semibold">
-        <p className="text-[0.8em]">{alias}</p> {/* Tamaño de texto relativo */}
+      <div
+        className="absolute text-white font-semibold"
+        style={{
+          bottom: "35%", // Posición desde la parte inferior
+          left: "14%", // Posición desde la izquierda
+          fontSize: "clamp(0.7em, 0.6vw, 0.9em)"
+ // Tamaño de texto responsive
+        }}
+      >
+        <p>{alias}</p>
       </div>
     </div>
   );

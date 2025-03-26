@@ -133,80 +133,95 @@ const Intercambio = () => {
       {/* Contenedor de dos columnas */}
       <div className="flex w-full max-w-6xl space-x-6">
         {/* Columna izquierda */}
-        <div className="w-[45%] flex flex-col space-y-6">
-          {/* Caja de intercambio */}
-          <div className="w-full h-[50vh] bg-black/70 rounded-2xl flex flex-col items-center justify-center gap-6 p-6">
-            {/* Cartas de intercambio */}
-            <div className="flex items-center gap-[60px]">
-              <div className="flex flex-col items-center">
-                {confirmedCard ? (
-                  <CartaMediana jugador={confirmedCard} className="w-40 h-[225px]" />
-                ) : (
-                  <img
-                    src={Card}
-                    alt="Carta izquierda"
-                    className="w-40 h-[225px] shadow-lg opacity-50"
-                  />
-                )}
-                <p className={`mt-2 ${confirmedExchange ? "text-green-500" : "text-white"}`}>
-                  Tú
-                </p>
-              </div>
-              <div className="flex flex-col items-center">
-                {opponentCard ? (
-                  <CartaMediana jugador={opponentCard} />
-                ) : (
-                  <img
-                    src={Card}
-                    alt="Carta derecha"
-                    className="w-40 h-[220px] shadow-lg opacity-50"
-                  />
-                )}
-                <p className={`mt-2 ${opponentConfirmedExchange ? "text-green-500" : "text-white"}`}>
-                  {opponentUsername}
-                </p>
-              </div>
-            </div>
-
-            {/* Botones de Confirmar y Cancelar */}
-            <div className="flex gap-4">
-              <button
-                onClick={handleConfirmCard}
-                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-              >
-                Confirmar
-              </button>
-              <button
-                onClick={handleCancelCard}
-                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-              >
-                Cancelar
-              </button>
-            </div>
+<div className="w-[45%] flex flex-col space-y-6">
+  {/* Caja de intercambio */}
+  <div className="w-full h-[50vh] bg-black/70 rounded-2xl flex flex-col items-center justify-center gap-6 p-6">
+    {/* Cartas de intercambio */}
+    <div className="flex items-center justify-center gap-[60px]">
+      {/* Carta izquierda */}
+      <div className="flex flex-col items-center">
+        {confirmedCard ? (
+          <div className="w-40 h-[225px] shadow-lg"> {/* Contenedor con tamaño fijo */}
+            <CartaMediana
+              jugador={confirmedCard}
+              width="100%" // Ocupa el 100% del contenedor
+              height="100%" // Ocupa el 100% del contenedor
+            />
           </div>
+        ) : (
+          <img
+            src={Card}
+            alt="Carta izquierda"
+            className="w-40 h-[225px] shadow-lg opacity-50"
+          />
+        )}
+        <p className={`mt-2 ${confirmedExchange ? "text-green-500" : "text-white"}`}>
+          Tú
+        </p>
+      </div>
 
-          {/* Buscador */}
-          <div className="w-full bg-black/70 rounded-2xl p-6 flex flex-col items-center">
-            <p className="text-white text-lg font-semibold mb-4">
-              Buscar jugadores
-            </p>
-            <form onSubmit={handleSearch} className="w-full flex space-x-2">
-              <input
-                type="text"
-                placeholder="Buscar..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="flex-grow p-2 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-              <button
-                type="submit"
-                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-              >
-                Buscar
-              </button>
-            </form>
+      {/* Carta derecha */}
+      <div className="flex flex-col items-center">
+        {opponentCard ? (
+          <div className="w-40 h-[220px] shadow-lg"> {/* Contenedor con tamaño fijo */}
+            <CartaMediana
+              jugador={opponentCard}
+              width="100%" // Ocupa el 100% del contenedor
+              height="100%" // Ocupa el 100% del contenedor
+            />
           </div>
-        </div>
+        ) : (
+          <img
+            src={Card}
+            alt="Carta derecha"
+            className="w-40 h-[220px] shadow-lg opacity-50"
+          />
+        )}
+        <p className={`mt-2 ${opponentConfirmedExchange ? "text-green-500" : "text-white"}`}>
+          {opponentUsername}
+        </p>
+      </div>
+    </div>
+
+    {/* Botones de Confirmar y Cancelar */}
+    <div className="flex gap-4">
+      <button
+        onClick={handleConfirmCard}
+        className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+      >
+        Confirmar
+      </button>
+      <button
+        onClick={handleCancelCard}
+        className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+      >
+        Cancelar
+      </button>
+    </div>
+  </div>
+
+  {/* Buscador */}
+  <div className="w-full bg-black/70 rounded-2xl p-6 flex flex-col items-center">
+    <p className="text-white text-lg font-semibold mb-4">
+      Buscar jugadores
+    </p>
+    <form onSubmit={handleSearch} className="w-full flex space-x-2">
+      <input
+        type="text"
+        placeholder="Buscar..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="flex-grow p-2 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+      />
+      <button
+        type="submit"
+        className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+      >
+        Buscar
+      </button>
+    </form>
+  </div>
+</div>
 
         {/* Columna derecha (Colección de cartas con scroll) */}
         <div className="w-[80%] bg-black/70 rounded-2xl p-4 overflow-y-auto max-h-[75vh]">

@@ -1,15 +1,15 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import FondoAlineacion from "../../../assets/backgroundAlineacion.png";
 import { FaTrash, FaHeart } from "react-icons/fa";
 
-export default function AlineacionMenu({ nombre, favorito }) {
+export default function AlineacionMenu({ nombre, favorito, onDelete, id }) {
   const [showAlert, setShowAlert] = useState(false);
   const navigate = useNavigate();
 
   const handleConfirm = () => {
-    console.log(`Alineación ${nombre} eliminada.`);
+    onDelete(); 
     setShowAlert(false);
   };
 
@@ -18,7 +18,7 @@ export default function AlineacionMenu({ nombre, favorito }) {
   };
 
   const handleEdit = () => {
-    navigate("/alineacionesEditar");
+    navigate("/alineacionesEditar", { state: { id, nombre } });
   };
 
   return (
@@ -94,4 +94,6 @@ export default function AlineacionMenu({ nombre, favorito }) {
 AlineacionMenu.propTypes = {
   nombre: PropTypes.string.isRequired,
   favorito: PropTypes.number.isRequired,
+  onDelete: PropTypes.func.isRequired, 
+  id: PropTypes.number.isRequired,
 };
