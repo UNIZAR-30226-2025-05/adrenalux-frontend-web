@@ -164,8 +164,8 @@ export default function Shop() {
       <div className="absolute top-5 left-5">
         <BackButton onClick={handleBackClick} />
       </div>
-      <div className="absolute top-5 right-5 flex items-center bg-black px-6 py-3 rounded-lg shadow-md">
-        <span className="text-2xl font-semibold mr-2">{adrenacoins}</span>
+      <div className="absolute top-5 right-5 flex items-center bg-white dark:bg-black px-6 py-3 rounded-lg shadow-md">
+        <span className="text-black dark:text-white text-2xl font-semibold mr-2">{adrenacoins}</span>
         <FaCoins className="text-yellow-400 text-2xl" />
         <FaPlusCircle className="text-green-500 ml-3 text-2xl cursor-pointer hover:text-green-400 transition" />
       </div>
@@ -242,16 +242,16 @@ export default function Shop() {
 
       {showDialog && selectedCard && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-black p-6 rounded-lg shadow-lg text-center max-w-sm mx-auto">
+          <div className="bg-white dark:bg-black p-6 rounded-lg shadow-lg text-center max-w-sm mx-auto">
             <div className="flex justify-center mb-4">
               <Carta2 jugador={selectedCard} />
             </div>
-            <div className="mb-4">
+            <div className="text-black dark:text-white mb-4">
               <p className="text-xl font-semibold">{selectedCard.nombre}</p>
               <p className="text-lg">{selectedCard.tipo_carta}</p>
               <p className="text-lg">{selectedCard.posicion}</p>
             </div>
-            <p className="text-lg my-4">¿Deseas comprar esta carta?</p>
+            <p className="text-black dark:text-white text-lg my-4">¿Deseas comprar esta carta?</p>
             <div className="flex justify-center space-x-6">
               <button
                 onClick={handleBuyCard}

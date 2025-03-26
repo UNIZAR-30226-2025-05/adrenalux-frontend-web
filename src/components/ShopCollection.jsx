@@ -116,8 +116,8 @@ export default function ShopCollection({
       {/* Diálogo  */}
       {showDialog && selectedCard && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-black p-6 rounded-lg shadow-lg text-center max-w-sm mx-auto">
-            <p className="text-lg mb-6">
+          <div className="bg-white dark:bg-black p-6 rounded-lg shadow-lg text-center max-w-sm mx-auto">
+            <p className="text-black dark:text-white text-lg mb-6">
               ¿Quieres comprar la carta de <b>{selectedCard.name}</b>?
             </p>
             <div className="flex justify-center space-x-6">

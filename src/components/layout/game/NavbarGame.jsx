@@ -92,8 +92,8 @@ export default function NavbarGame() {
   };
 
   return (
-    <div className="fixed top-0 left-0 w-full h-16 bg-gradient-to-r from-[#0E2415] to-[#656D68] shadow-md z-50 flex items-center">
-      {/* Logo */}
+    <div className="fixed top-0 left-0 w-full h-16 bg-gradient-to-r from-[#A5B3A2] to-[#D1D8D1] dark:bg-gradient-to-r dark:from-[#0E2415] dark:to-[#656D68] shadow-md z-50 flex items-center">
+    {/* Logo */}
       <div className="flex items-center justify-center mr-4 bg-gradient-to-b from-[#EFF6EF] to-[#4F5A4F] h-full w-[150px]">
         <img src={logo} alt="Logo" className="h-full w-auto object-contain" />
       </div>
@@ -102,7 +102,7 @@ export default function NavbarGame() {
       <div className="flex items-center justify-between w-full">
         <button
           onClick={handleProfileClick}
-          className="flex items-center bg-[#1E1E1E] text-white px-3 py-1 mr-4 border-4 border-black rounded-lg hover:bg-[#292929] transition"
+          className="flex items-center bg-white dark:bg-[#1E1E1E] text-white px-3 py-1 mr-4 border-4 border-black rounded-lg hover:bg-[#292929] transition"
         >
           {avatar && (
             <img
@@ -111,7 +111,7 @@ export default function NavbarGame() {
               className="w-10 h-10 rounded-full border-2 border-white object-cover mr-2"
             />
           )}
-          <span>{username}</span>
+          <span className="text-black dark:text-white">{username}</span>
         </button>
 
         <div className="flex items-center">
@@ -127,7 +127,7 @@ export default function NavbarGame() {
         {/* Contador de "Sobre Gratis" */}
         {countdown > 0 ? (
           <div className="flex items-center mr-4">
-            <span className="text-white">{formatTime(countdown)}</span>
+            <span className="text-black dark:text-white">{formatTime(countdown)}</span>
             <img
               src={SobreComun}
               alt="Sobre Comun"
@@ -151,8 +151,8 @@ export default function NavbarGame() {
         )}
 
         {/* Adrenacoins */}
-        <div className="flex items-center bg-black text-white rounded px-2 py-1 mr-4">
-          <span>{adrenacoins}</span>
+        <div className="flex items-center bg-white dark:bg-black text-white rounded px-2 py-1 mr-4">
+          <span className="text-black dark:text-white">{adrenacoins}</span>
           <span className="text-yellow-400">🪙</span>
           <FaPlusCircle className="text-green-500 ml-2" />
         </div>
@@ -162,16 +162,16 @@ export default function NavbarGame() {
       <div className="flex items-center space-x-7 ml-7 mr-[30px]">
         <div className="flex items-center space-x-4">
           <button
-            className="bg-[#1E1E1E] border-4 border-black w-18 h-14 flex justify-center items-center rounded"
+            className="bg-white dark:bg-[#1E1E1E] border-2 border-black w-18 h-14 flex justify-center items-center rounded"
             onClick={handleAmigosClick}
           >
-            <FaUsers className="text-white text-4xl" />
+            <FaUsers className="text-black dark:text-white text-4xl" />
           </button>
           <button
-            className="bg-[#1E1E1E] border-4 border-black w-18 h-14 flex justify-center items-center rounded"
+            className="bg-white dark:bg-[#1E1E1E] border-2 border-black w-18 h-14 flex justify-center items-center rounded"
             onClick={handleAjustesClick}
           >
-            <FaCog className="text-white text-4xl" />
+            <FaCog className="text-black dark:text-white text-4xl" />
           </button>
         </div>
       </div>

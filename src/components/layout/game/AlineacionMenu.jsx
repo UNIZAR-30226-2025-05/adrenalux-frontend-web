@@ -24,9 +24,9 @@ export default function AlineacionMenu({ nombre, favorito, onDelete, id }) {
   return (
     <div>
       {/* Alineación Menu */}
-      <div className="w-64 h-32 bg-black rounded-lg opacity-80 flex justify-between p-4">
+      <div className="w-64 h-32 bg-white dark:bg-black rounded-lg opacity-80 flex justify-between p-4">
         <div className="flex flex-col justify-start w-full">
-          <p className="text-white">{nombre}</p>
+          <p className="text-black dark:text-white">{nombre}</p>
 
           {/* Botón invisible que contiene la imagen */}
           <button
@@ -66,8 +66,8 @@ export default function AlineacionMenu({ nombre, favorito, onDelete, id }) {
       {/* Alerta de Confirmación */}
       {showAlert && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-20">
-          <div className="bg-[#1C1A1A] p-6 rounded-lg shadow-lg text-center text-white">
-            <p className="mb-4 text-lg">
+          <div className="bg-white dark:bg-[#1C1A1A] p-6 rounded-lg shadow-lg text-center text-white">
+            <p className="text-black dark:text-white mb-4 text-lg">
               ¿Quieres eliminar la alineación <strong>{nombre}</strong>?
             </p>
             <div className="flex justify-center gap-4">

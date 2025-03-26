@@ -268,8 +268,8 @@ export default function AlineacionEditar() {
       {/* Alerta de confirmación al salir */}
       {showAlert && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-20">
-          <div className="bg-[#1C1A1A] p-6 rounded-lg shadow-lg text-center text-white">
-            <p className="mb-4 text-lg">¿Quieres guardar los cambios antes de salir?</p>
+          <div className="bg-white dark:bg-[#1C1A1A] p-6 rounded-lg shadow-lg text-center text-white">
+            <p className="text-black dark:text-white mb-4 text-lg">¿Quieres guardar los cambios antes de salir?</p>
             <div className="flex justify-center gap-4">
               <button
                 className="px-4 py-2 rounded-lg text-white bg-[#44FE23] hover:opacity-90"

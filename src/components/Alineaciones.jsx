@@ -139,11 +139,11 @@ export default function Alineaciones() {
 
         {/* Botón para añadir nueva alineación */}
         <button
-          className="w-64 h-32 bg-black rounded-lg opacity-80 flex justify-between p-4"
+          className="w-64 h-32 bg-white dark:bg-black rounded-lg opacity-80 flex justify-between p-4"
           onClick={handleOpenAddModal}
         >
           <div className="flex flex-col justify-start w-full">
-            <p className="text-white">Añadir nueva alineación</p>
+            <p className="text-black dark:text-white">Añadir nueva alineación</p>
             <img
               src={FondoAlineacion}
               alt="Fondo"
