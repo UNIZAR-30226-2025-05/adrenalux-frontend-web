@@ -18,6 +18,7 @@ import Ajustes from "./components/Ajustes";
 import Profile from "./components/Profile";
 import CardsForSale from "./components/CardsForSale";
 import EsperandoJugador from "./components/EsperandoJugador";
+import Clasificacion from "./components/Clasificacion";
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
         <Route path="/ajustes" element={<Ajustes />} />
         <Route path="/cards-for-sale" element={<CardsForSale />} />
         <Route path="/esperando" element={<EsperandoJugador />} />
+        <Route path="/clasificacion" element={<Clasificacion />} />
       </Routes>
     </Router>
   );
