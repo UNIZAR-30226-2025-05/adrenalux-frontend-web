@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { getToken } from "../api/authApi";
 
-
 const API_URL = "https://adrenalux.duckdns.org/api/v1/clasificacion";
 
 export const obtenerClasificacionTotal = async () => {
