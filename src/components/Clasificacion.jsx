@@ -105,11 +105,10 @@ const ClasificacionJugadores = () => {
                 <tr className="bg-blue-600">
                   <th className="p-2">Posición</th>
                   <th className="p-2">Nombre</th>
-                  <th className="p-2">1º</th>
-                  <th className="p-2">2º</th>
                   <th className="p-2">Ganados</th>
-                  <th className="p-2">Empatados</th>
+                  <th className="p-2">Jugados</th>
                   <th className="p-2">Perdidos</th>
+                  <th className="p-2">Puntos</th>
                 </tr>
               </thead>
               <tbody>
@@ -122,11 +121,10 @@ const ClasificacionJugadores = () => {
                   >
                     <td className="p-2">{player.position}</td>
                     <td className="p-2">{player.name}</td>
-                    <td className="p-2">{player.first}</td>
-                    <td className="p-2">{player.second}</td>
                     <td className="p-2">{player.won}</td>
-                    <td className="p-2">{player.tied}</td>
+                    <td className="p-2">{player.played}</td>
                     <td className="p-2">{player.lost}</td>
+                    <td className="p-2">{player.puntos}</td>
                   </tr>
                 ))}
               </tbody>

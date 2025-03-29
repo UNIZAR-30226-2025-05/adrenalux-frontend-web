@@ -1,11 +1,13 @@
 import axios from 'axios';
+import { getToken } from "../api/authApi";
+
 
 const API_URL = "https://adrenalux.duckdns.org/api/v1/clasificacion";
 
 export const obtenerClasificacionTotal = async () => {
   console.log('[API] Iniciando obtención de clasificación total');
   try {
-    const token = localStorage.getItem('token');
+    const token = getToken();
     console.log('[API] Token encontrado:', token ? 'Sí' : 'No');
 
     const response = await axios.get(`${API_URL}/total`, {
@@ -15,18 +17,18 @@ export const obtenerClasificacionTotal = async () => {
     console.log('[API] Respuesta de /total - Status:', response.status);
     console.log('[API] Datos recibidos:', response.data);
 
-    // Transformación de datos segura
     const datosTransformados = Array.isArray(response.data?.data) 
-      ? response.data.data.map((user, index) => ({
-          position: index + 1,
-          name: user.name || user.username || 'Jugador',
-          first: user.estadisticas?.primerosLugares || 0,
-          second: user.estadisticas?.segundosLugares || 0,
-          won: user.estadisticas?.partidasGanadas || 0,
-          tied: user.estadisticas?.partidasEmpatadas || 0,
-          lost: user.estadisticas?.partidasPerdidas || 0,
-          userid: user.userid || user.id
-        }))
+      ? response.data.data
+          .sort((a, b) => b.clasificacion - a.clasificacion) 
+          .map((user, index) => ({
+            position: index + 1,
+            name: user.name || user.username || 'Jugador',
+            won: user.estadisticas?.partidasGanadas || 0,
+            played: user.estadisticas?.partidasJugadas || 0,
+            lost: user.estadisticas?.partidasPerdidas || 0,
+            userid: user.userid || user.id,
+            puntos: user.clasificacion || 0,
+          }))
       : [];
 
     console.log('[API] Datos transformados:', datosTransformados);
@@ -45,7 +47,7 @@ export const obtenerClasificacionTotal = async () => {
 export const obtenerClasificacionUsuario = async () => {
   console.log('[API] Iniciando obtención de clasificación de usuario');
   try {
-    const token = localStorage.getItem('token');
+    const token = getToken();
     if (!token) {
       console.warn('[API] No se encontró token');
       return null;
