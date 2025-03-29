@@ -1,30 +1,91 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import NavBarGame from "./layout/game/NavbarGame";
 import BackButton from "./layout/game/BackButton";
 import background from "../assets/background.png";
-
-const playersRanking = [
-  { position: 1, name: "Lionel Messi", first: 113, second: 27, won: 666, tied: 32, lost: 128 },
-  { position: 2, name: "Lamine Yamal", first: 105, second: 30, won: 621, tied: 14, lost: 134 },
-  { position: 3, name: "Cristiano Ronaldo", first: 101, second: 30, won: 605, tied: 27, lost: 134 },
-  { position: 4, name: "Marcos Gomá", first: 100, second: 33, won: 589, tied: 40, lost: 140 },
-  { position: 5, name: "Ivan Azón", first: 97, second: 40, won: 540, tied: 60, lost: 160 },
-  { position: 6, name: "Francho Serrano", first: 96, second: 42, won: 534, tied: 57, lost: 159 },
-  { position: 7, name: "Jesus Vallejo", first: 93, second: 42, won: 534, tied: 55, lost: 164 },
-  { position: 8, name: "Pablo Villa", first: 91, second: 46, won: 530, tied: 51, lost: 169 },
-  { position: 9, name: "Ibai Llanos", first: 85, second: 49, won: 512, tied: 40, lost: 230 },
-  { position: 10, name: "Fernando Naranjo", first: 84, second: 49, won: 501, tied: 12, lost: 250 },
-];
-
-const userRanking = { position: 768, name: "Darío Hueso", first: 24, second: 89, won: 126, tied: 10, lost: 202 };
+import { obtenerClasificacionTotal, obtenerClasificacionUsuario } from "../services/api/clasificacionApi";
 
 const ClasificacionJugadores = () => {
   const navigate = useNavigate();
+  const [playersRanking, setPlayersRanking] = useState([]);
+  const [userRanking, setUserRanking] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const handleBackClick = () => {
-    navigate("/home");
-  };
+  useEffect(() => {
+    console.log('[UI] Iniciando carga de datos de clasificación');
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        console.log('[UI] Obteniendo datos en paralelo...');
+        const [ranking, user] = await Promise.all([
+          obtenerClasificacionTotal(),
+          obtenerClasificacionUsuario()
+        ]);
+        
+        console.log('[UI] Resultados obtenidos:', {
+          jugadores: ranking?.length || 0,
+          usuario: user ? 'Encontrado' : 'No encontrado'
+        });
+
+        setPlayersRanking(ranking || []);
+        setUserRanking(user || null);
+
+      } catch (err) {
+        console.error('[UI] Error al cargar datos:', {
+          message: err.message,
+          stack: err.stack
+        });
+        setError("No se pudieron cargar los datos de clasificación");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleBackClick = () => navigate("/home");
+  const handleRetry = () => window.location.reload();
+
+  if (loading) {
+    console.log('[UI] Mostrando estado de carga');
+    return (
+      <div className="fixed inset-0 flex justify-center items-center bg-cover bg-center" style={{ backgroundImage: `url(${background})` }}>
+        <div className="text-white text-2xl">Cargando clasificación...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    console.log('[UI] Mostrando estado de error');
+    return (
+      <div className="fixed inset-0 flex justify-center items-center bg-cover bg-center" style={{ backgroundImage: `url(${background})` }}>
+        <div className="text-white text-center">
+          <p className="text-xl mb-4">{error}</p>
+          <button 
+            onClick={handleBackClick}
+            className="px-4 py-2 bg-gray-600 rounded-lg mr-2"
+          >
+            Volver
+          </button>
+          <button 
+            onClick={handleRetry}
+            className="px-4 py-2 bg-blue-600 rounded-lg"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  console.log('[UI] Renderizando tabla con datos:', {
+    jugadores: playersRanking.length,
+    usuario: userRanking ? 'Resaltado' : 'No resaltado'
+  });
 
   return (
     <div className="fixed inset-0 flex justify-center items-center bg-cover bg-center" style={{ backgroundImage: `url(${background})` }}>
@@ -35,41 +96,42 @@ const ClasificacionJugadores = () => {
         </div>
         <div className="mx-auto bg-gray-900 bg-opacity-90 p-8 rounded-lg w-[90%] sm:w-[70%] md:w-[60%] lg:w-[50%] max-w-4xl mt-16">
           <h1 className="text-white text-4xl font-bold mb-8 text-center">Ranking de Jugadores</h1>
-          <table className="w-full text-white text-center border-collapse">
-            <thead>
-              <tr className="bg-blue-600">
-                <th className="p-2">Posición</th>
-                <th className="p-2">Nombre</th>
-                <th className="p-2">1º</th>
-                <th className="p-2">2º</th>
-                <th className="p-2">Ganados</th>
-                <th className="p-2">Empatados</th>
-                <th className="p-2">Perdidos</th>
-              </tr>
-            </thead>
-            <tbody>
-              {playersRanking.map((player) => (
-                <tr key={player.position} className="border-b border-gray-700">
-                  <td className="p-2">{player.position}</td>
-                  <td className="p-2">{player.name}</td>
-                  <td className="p-2">{player.first}</td>
-                  <td className="p-2">{player.second}</td>
-                  <td className="p-2">{player.won}</td>
-                  <td className="p-2">{player.tied}</td>
-                  <td className="p-2">{player.lost}</td>
+          
+          {playersRanking.length === 0 ? (
+            <p className="text-white text-center">No hay datos de clasificación disponibles</p>
+          ) : (
+            <table className="w-full text-white text-center border-collapse">
+              <thead>
+                <tr className="bg-blue-600">
+                  <th className="p-2">Posición</th>
+                  <th className="p-2">Nombre</th>
+                  <th className="p-2">1º</th>
+                  <th className="p-2">2º</th>
+                  <th className="p-2">Ganados</th>
+                  <th className="p-2">Empatados</th>
+                  <th className="p-2">Perdidos</th>
                 </tr>
-              ))}
-              <tr className="border-b border-gray-700 bg-red-700">
-                <td className="p-2 font-bold">{userRanking.position}</td>
-                <td className="p-2 font-bold">{userRanking.name}</td>
-                <td className="p-2 font-bold">{userRanking.first}</td>
-                <td className="p-2 font-bold">{userRanking.second}</td>
-                <td className="p-2 font-bold">{userRanking.won}</td>
-                <td className="p-2 font-bold">{userRanking.tied}</td>
-                <td className="p-2 font-bold">{userRanking.lost}</td>
-              </tr>
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {playersRanking.map((player) => (
+                  <tr 
+                    key={`${player.userid}-${player.position}`}
+                    className={`border-b border-gray-700 ${
+                      userRanking?.userid === player.userid ? 'bg-red-700 font-bold' : ''
+                    }`}
+                  >
+                    <td className="p-2">{player.position}</td>
+                    <td className="p-2">{player.name}</td>
+                    <td className="p-2">{player.first}</td>
+                    <td className="p-2">{player.second}</td>
+                    <td className="p-2">{player.won}</td>
+                    <td className="p-2">{player.tied}</td>
+                    <td className="p-2">{player.lost}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>
