@@ -28,7 +28,7 @@ const Logros = () => {
 
       <div className="relative w-full flex items-center px-4 md:px-8 lg:px-16">
         {/* Botón de volver */}
-        <div className="absolute left-10 top-10 mt-16">
+        <div className="absolute left-10 top-10">
           <BackButton onClick={handleBackClick} />
         </div>
 

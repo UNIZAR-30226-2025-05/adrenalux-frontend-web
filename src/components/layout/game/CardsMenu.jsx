@@ -122,8 +122,8 @@ export default function CardsMenu() {
 
       {showAlert && currentCard && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-20">
-          <div className="bg-[#1C1A1A] p-6 rounded-lg shadow-lg text-center text-white">
-            <p className="mb-4 text-lg">
+          <div className="bg-white dark:bg-[#1C1A1A] p-6 rounded-lg shadow-lg text-center text-white">
+            <p className="text-black dark:text-white mb-4 text-lg">
               ¿Quieres comprar el sobre <strong>{currentCard.nombre}</strong> por{" "}
               <strong>{currentCard.precio}</strong> monedas?
             </p>

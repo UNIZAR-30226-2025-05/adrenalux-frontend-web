@@ -44,15 +44,15 @@ const Login = () => {
 
   return (
     <div className="fixed inset-0 flex justify-center items-center bg-cover bg-center" style={{ backgroundImage: `url(${background})` }}>
-      <div className="bg-gray-900 p-8 w-full max-w-lg text-white">
+      <div className="bg-gray-300 dark:bg-gray-900 p-8 w-full max-w-lg text-white">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">Inicio de sesión</h2>
+          <h2 className="text-black dark:text-white text-2xl font-bold">Inicio de sesión</h2>
           <button className="flex items-center bg-gray-800 hover:bg-gray-700 border border-white rounded px-3 py-2">
             <img src={googleLogo} alt="Google" className="w-5 mr-2" />
             Continuar con Google
           </button>
         </div>
-        <p className="text-sm mb-4">Inicia sesión con tu cuenta</p>
+        <p className="text-black dark:text-white text-sm mb-4">Inicia sesión con tu cuenta</p>
 
         {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 

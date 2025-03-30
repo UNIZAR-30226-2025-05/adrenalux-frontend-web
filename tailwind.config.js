@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: "class", // Permite cambiar el tema con clases CSS
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
