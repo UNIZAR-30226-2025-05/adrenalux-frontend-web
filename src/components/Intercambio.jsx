@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import BackButton from "../components/layout/game/BackButton";
 import CartaMediana from "../components/layout/game/CartaMediana";
 import CartaGrande from "../components/layout/game/CartaGrande";
@@ -8,6 +9,7 @@ import Card from "../assets/cartaNormal.png";
 import { getCollection } from "../services/api/collectionApi";
 import { socketService } from "../services/websocket/socketService";
 import { getProfile } from "../services/api/profileApi";
+import { getToken } from '../services/api/authApi';
 
 const Intercambio = () => {
   const { exchangeId } = useParams();
@@ -23,9 +25,16 @@ const Intercambio = () => {
   const [opponentId, setOpponentId] = useState(null);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [opponentUsername, setOpponentUsername] = useState("Oponente");
+  const token = getToken();
+  const navigate = useNavigate();
 
   // Cargar la colección de cartas y el perfil del usuario al montar el componente
   useEffect(() => {
+    if (!token) {
+      navigate("/");
+      return;
+    }
+    
     const fetchCollection = async () => {
       try {
         const data = await getCollection();
@@ -38,7 +47,7 @@ const Intercambio = () => {
       } catch (error) {
         console.error("Error al cargar la colección:", error);
       }
-    };
+    }
 
     const fetchProfile = async () => {
       try {
@@ -51,7 +60,7 @@ const Intercambio = () => {
 
     fetchCollection();
     fetchProfile();
-  }, [exchangeId]);
+  }, [exchangeId, token, navigate]);
 
   // Registrar el callback para recibir la carta seleccionada por el oponente
   useEffect(() => {

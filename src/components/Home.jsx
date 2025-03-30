@@ -14,6 +14,7 @@ import CardsMenu from './layout/game/CardsMenu';
 
 const Home = () => {
     const navigate = useNavigate(); // Obtener la función navigate
+    const token = getToken();
 
     useEffect(() => {
         const initializeSocket = async () => {
@@ -25,8 +26,12 @@ const Home = () => {
             }
         };
 
+        if (!token) {
+          navigate("/");
+        }
+
         initializeSocket();
-    }, [navigate]); // Añadir navigate como dependencia
+    }, [navigate, token]); // Añadir navigate como dependencia
 
     return (
       <div className="fixed inset-0 flex justify-center items-center bg-cover bg-center" style={{ backgroundImage: `url(${background})` }}>

@@ -5,7 +5,7 @@ import BackButton from "../components/layout/game/BackButton";
 import Formacion433 from "../components/layout/game/Formacion_4_3_3";
 import CartaMediana from "../components/layout/game/CartaMediana";
 import { FaPen } from "react-icons/fa";
-import { actualizarPlantilla, obtenerCartasDePlantilla } from "../services/api/alineacionesApi";
+import { actualizarPlantilla, obtenerCartasDePlantilla, agregarCartasPlantilla } from "../services/api/alineacionesApi";
 import { getToken } from "../services/api/authApi";
 import { getCollection } from "../services/api/collectionApi";
 
@@ -25,48 +25,67 @@ export default function AlineacionEditar() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showCardSelector, setShowCardSelector] = useState(false);
-  const [selectedPosition, setSelectedPosition] = useState(null);
+  const [selectedPosition, setSelectedPosition] = useState({ id: null, type: null });
   const [filteredCards, setFilteredCards] = useState([]);
-  const [cartasIds, setCartasIds] = useState([]); // Array de IDs de cartas
-  const [posiciones, setPosiciones] = useState([]); // Array de posiciones
 
   useEffect(() => {
+    if (!token) {
+      navigate("/");
+      return;
+    }
+  
     const fetchData = async () => {
       try {
-        if (!id || !token) return;
-        
+        if (!id) return;
+  
         const [cartasPlantilla, coleccionUsuario] = await Promise.all([
           obtenerCartasDePlantilla(id, token),
-          getCollection(token)
+          getCollection(token),
         ]);
-        
-        const procesarColeccion = (coleccion) => {
-          return Array.isArray(coleccion?.data) 
-            ? coleccion.data.filter(card => card.disponible === true) 
+  
+        const procesarColeccion = (coleccion) =>
+          Array.isArray(coleccion?.data)
+            ? coleccion.data.filter((card) => card.disponible === true)
             : [];
-        };
-
-        const jugadoresPlantilla = Array.isArray(cartasPlantilla?.data) ? cartasPlantilla.data : [];
-        
-        // Inicializar arrays separados
-        const initialIds = jugadoresPlantilla.map(j => j.id);
-        const initialPositions = jugadoresPlantilla.map(j => j.posicion);
-        
-        setCartasIds(initialIds);
-        setPosiciones(initialPositions);
+  
+        const jugadoresPlantilla = Array.isArray(cartasPlantilla?.data)
+          ? cartasPlantilla.data.map((jugador, index) => {
+              let posicionEspecifica;
+              switch (jugador.posicion) {
+                case "forward":
+                  posicionEspecifica = `forward${(index % 3) + 1}`;
+                  break;
+                case "midfielder":
+                  posicionEspecifica = `midfielder${(index % 3) + 1}`;
+                  break;
+                case "defender":
+                  posicionEspecifica = `defender${(index % 4) + 1}`;
+                  break;
+                default:
+                  posicionEspecifica = "goalkeeper1";
+              }
+  
+              return {
+                ...jugador,
+                posicion: jugador.posicion,
+                posicionType: posicionEspecifica,
+              };
+            })
+          : [];
+  
         setJugadores(jugadoresPlantilla);
         setJugadoresUsuario(procesarColeccion(coleccionUsuario));
-        
       } catch (err) {
         if (err.response?.status === 404) {
           console.log("No se encontraron cartas, mostrando formación vacía");
           setJugadores([]);
-          setCartasIds([]);
-          setPosiciones([]);
           try {
             const coleccion = await getCollection(token);
-            const jugadoresUser = coleccion.filter(card => card.disponible === true);
-            setJugadoresUsuario(jugadoresUser);
+            const userPlayers = Array.isArray(coleccion?.data)
+              ? coleccion.data.filter((card) => card.disponible === true)
+              : [];
+  
+            setJugadoresUsuario(userPlayers);
           } catch (error) {
             console.error("Error al obtener colección:", error);
             setJugadoresUsuario([]);
@@ -80,64 +99,74 @@ export default function AlineacionEditar() {
         setLoading(false);
       }
     };
-
+  
     fetchData();
-  }, [id, token]);
+  }, [id, token, navigate]);  
 
-  const handleJugadorClick = ({ posicion }) => {
-    setSelectedPosition(posicion);
+  const handleJugadorClick = ({ posicionId, posicion, jugador }) => {
+    setSelectedPosition({
+      id: posicionId,    // Ej: "forward1" (posición específica)
+      type: posicion // Ej: "forward" (tipo genérico)
+    });
     
+    // Filtrar cartas por tipo genérico (forward, midfielder, etc.)
+    console.log(posicion)
     const cartasFiltradas = Array.isArray(jugadoresUsuario) 
-      ? jugadoresUsuario.filter(carta => carta?.posicion === posicion)
+      ? jugadoresUsuario.filter(carta => {
+          return carta.posicion === posicion && // Filtramos por tipo genérico
+                 (!jugador || carta.id !== jugador.id); // Excluimos la carta actual si existe
+        })
       : [];
     
+      console.log(cartasFiltradas)
     setFilteredCards(cartasFiltradas);
     setShowCardSelector(true);
   };
 
   const handleSelectCard = (carta) => {
-    // Actualizar los arrays de cartasIds y posiciones
-    const posIndex = posiciones.indexOf(selectedPosition);
-    
-    if (posIndex !== -1) {
-      // Reemplazar la carta existente
-      const newCartasIds = [...cartasIds];
-      newCartasIds[posIndex] = carta.id;
-      setCartasIds(newCartasIds);
-    } else {
-      // Añadir nueva carta
-      setCartasIds([...cartasIds, carta.id]);
-      setPosiciones([...posiciones, selectedPosition]);
-    }
-
-    // Actualizar la vista de jugadores
-    const updatedPlayer = {
-      id: carta.id,
-      nombre: carta.nombre,
-      posicion: selectedPosition,
-      imagen: carta.imagen,
+    // Asignar la carta a la posición específica (forward1, midfielder2, etc.)
+    const jugadorActualizado = {
+      ...carta,
+      posicion: selectedPosition.id, // Posición específica
+      posicionType: selectedPosition.type // Tipo genérico
     };
 
     setJugadores(prev => {
-      const existingIndex = prev.findIndex(j => j.posicion === selectedPosition);
-      if (existingIndex !== -1) {
-        const newPlayers = [...prev];
-        newPlayers[existingIndex] = updatedPlayer;
-        return newPlayers;
-      }
-      return [...prev, updatedPlayer];
+      // Eliminar cualquier jugador en esta posición específica
+      const filtered = prev.filter(j => j.posicion !== selectedPosition.id);
+      // Añadir el nuevo jugador
+      return [...filtered, jugadorActualizado];
     });
 
     setShowCardSelector(false);
   };
 
-  const handleBackClick = () => {
-    setShowAlert(true);
+  const handleConfirm = async () => {
+    try {
+      // Convertir a formato para API (usando tipo genérico)
+      console.log(jugadores)
+      const jugadoresParaAPI = jugadores.map(jugador => ({
+        id: jugador.id,
+      }));
+
+      const posicionesParaAPI = jugadores.map(jugador => ({
+        posicion: jugador.posicionType // Usamos el tipo genérico guardado
+      }));
+      console.log(jugadoresParaAPI)
+      console.log(posicionesParaAPI)
+
+      await agregarCartasPlantilla(id, jugadoresParaAPI, posicionesParaAPI, token);
+      
+      setShowAlert(false);
+      navigate("/alineaciones");
+    } catch (error) {
+      console.error("Error al guardar:", error);
+      setError("Error al guardar los cambios");
+    }
   };
 
-  const handleConfirm = () => {
-    setShowAlert(false);
-    navigate("/alineaciones");
+  const handleBackClick = () => {
+    setShowAlert(true);
   };
 
   const handleCancel = () => {
@@ -151,6 +180,7 @@ export default function AlineacionEditar() {
 
   const handleSaveName = () => {
     setNombrePlantilla(newName);
+    actualizarPlantilla(id ,newName, token);
     setShowNameEdit(false);
   };
 
@@ -210,21 +240,20 @@ export default function AlineacionEditar() {
         )}
       </div>
 
-      {/* Renderización de la formación 4-3-3 */}
+      {/* Formación 4-3-3 */}
       <div className="absolute top-[100px] left-1/2 transform -translate-x-1/2 text-white">
         <Formacion433 
           jugadores={jugadores} 
           onJugadorClick={handleJugadorClick}
-          plantillaId={id}
         />
       </div>
 
-      {/* Selector de cartas - 4 por fila con scroll después de 2 filas */}
+      {/* Selector de cartas */}
       {showCardSelector && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-30">
           <div className="bg-[#1C1A1A] p-6 rounded-lg shadow-lg w-full max-w-[80vh] max-h-[80vh] flex flex-col">
             <h3 className="text-white text-xl mb-4 text-center">
-              Selecciona una carta para {selectedPosition}
+              Selecciona un jugador para {selectedPosition.type}
             </h3>
             
             <div className="grid grid-cols-4 gap-4 overflow-y-auto" style={{
@@ -265,7 +294,7 @@ export default function AlineacionEditar() {
         </div>
       )}
 
-      {/* Alerta de confirmación al salir */}
+      {/* Alerta de confirmación */}
       {showAlert && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-20">
           <div className="bg-[#1C1A1A] p-6 rounded-lg shadow-lg text-center text-white">

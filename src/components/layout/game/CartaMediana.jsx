@@ -89,11 +89,11 @@ function CartaMediana({ jugador, className, width = "10rem", height = "12.5rem" 
       <div
         className="absolute text-white font-semibold"
         style={{
-          bottom: "35%", // Posición desde la parte inferior
-          left: "14%", // Posición desde la izquierda
-          fontSize: "clamp(0.7em, 0.6vw, 0.9em)"
- // Tamaño de texto responsive
+          bottom: "35%",
+          left: "15%",
+          fontSize: "0.7em" // Escala con el tamaño del contenedor
         }}
+        
       >
         <p>{alias}</p>
       </div>

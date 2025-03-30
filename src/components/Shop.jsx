@@ -6,6 +6,7 @@ import SearchTab from "./layout/game/SearchTab";
 import BackButton from "../components/layout/game/BackButton";
 import MarqueeText from "./layout/MarqueesText";
 import Card3D from "./layout/game/Card3D";
+import { getToken } from "../services/api/authApi";
 import {
   obtenerCartasEnVenta,
   obtenerCartasDiarias,
@@ -28,10 +29,15 @@ export default function Shop() {
   const [infoUser, setInfoUser] = useState(null);
   const [visibleCount, setVisibleCount] = useState(4);
   const [loading, setLoading] = useState(true);
+  const token = getToken();
 
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!token) {
+      navigate("/");
+    }
+
     const obtenerInfo = async () => {
       try {
         const data = await getProfile();
@@ -41,7 +47,7 @@ export default function Shop() {
       }
     };
     obtenerInfo();
-  }, []);
+  }, [token, navigate]);
 
   const adrenacoins = infoUser?.data?.adrenacoins || 0;
 

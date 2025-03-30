@@ -1,8 +1,9 @@
-import React, { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import BackButton from "../components/layout/game/BackButton";
 import background from "../assets/background.png";
 import Card from "./layout/game/Card";
+import { getToken } from "../services/api/authApi";
 // Simulación de datos obtenidos del backend.
 
 export default function ShopCollection({
@@ -15,8 +16,16 @@ export default function ShopCollection({
   const [showDialog, setShowDialog] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
   const navigate = useNavigate();
+  const token = getToken();
 
   const cardsPerPage = 8;
+
+  useEffect(() => {
+    if (!token) {
+      navigate("/");
+    }
+  }, [token, navigate]);
+  
 
   const filteredCards = useMemo(() => {
     return cardData.filter((card) => {

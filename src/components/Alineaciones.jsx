@@ -8,6 +8,7 @@ import { obtenerPlantillas, crearPlantilla, eliminarPlantilla } from "../service
 import { getToken } from "../services/api/authApi";
 
 export default function Alineaciones() {
+  const token = getToken();
   const navigate = useNavigate();
   const [alineaciones, setAlineaciones] = useState([]);
   const [error, setError] = useState(null);
@@ -18,6 +19,11 @@ export default function Alineaciones() {
 
   // Obtener las alineaciones del usuario al cargar el componente
   useEffect(() => {
+    if (!token) {
+      navigate("/");
+      return;
+    }
+
     const fetchAlineaciones = async () => {
       try {
         const token = getToken();
@@ -34,7 +40,7 @@ export default function Alineaciones() {
     };
 
     fetchAlineaciones();
-  }, []);
+  }, [token, navigate]);
 
   const handleBackClick = () => {
     navigate("/home");

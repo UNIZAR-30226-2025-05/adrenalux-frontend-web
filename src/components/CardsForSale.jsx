@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { FaChevronLeft, FaChevronRight, FaCoins } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import background from "../assets/background.png";
+import { getToken } from "../services/api/authApi";
 
 import {
   obtenerCartasEnVenta,
@@ -20,6 +21,7 @@ export default function CardsForSaleAlbum() {
   const [selectedCard, setSelectedCard] = useState(null);
   const [infoUser, setInfoUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const token = getToken();
 
   const cardsPerPage = 18;
   const navigate = useNavigate();
@@ -34,7 +36,10 @@ export default function CardsForSaleAlbum() {
       }
     };
     obtenerInfo();
-  }, []);
+    if (!token) {
+      navigate("/");
+    }
+  }, [token, navigate]);
 
   useEffect(() => {
     const fetchCards = async () => {

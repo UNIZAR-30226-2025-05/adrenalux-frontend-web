@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import background from "../assets/background.png";
@@ -8,6 +8,8 @@ import Carta3 from "./layout/game/CartaNoDisponible";
 import { getCollection, filterCards } from "../services/api/collectionApi";
 import { publicarCarta, retirarCarta } from "../services/api/shopApi";
 import BackButton from "../components/layout/game/BackButton";
+import { getToken } from "../services/api/authApi";
+import PropTypes from "prop-types";
 import {
   getEquipos,
   getRaridades,
@@ -28,12 +30,16 @@ export default function Collection({ onBack }) {
 
   const [currentPage, setCurrentPage] = useState(1);
   const cardsPerPage = 18;
+  const token = getToken();
 
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchCollection();
-  }, []);
+    if (!token) {
+      navigate("/");
+    }
+  }, [token, navigate]);
 
   const fetchCollection = async () => {
     setLoading(true);
@@ -447,3 +453,7 @@ export default function Collection({ onBack }) {
     </div>
   );
 }
+
+Collection.propTypes = {
+  onBack: PropTypes.func.isRequired,
+};

@@ -4,6 +4,7 @@ import background from "../assets/background.png";
 import BackButton from "../components/layout/game/BackButton";
 import { socketService } from "../services/websocket/socketService";
 import { useNavigate } from "react-router-dom";
+import { getToken } from "../services/api/authApi";
 import {
   getFriends,
   getFriendRequests,
@@ -24,6 +25,7 @@ export default function Amigo() {
   const [solicitudesRecibidas, setSolicitudesRecibidas] = useState([]);
   const [currentFriends, setCurrentFriends] = useState(0);
   const maxFriends = 99;
+  const token = getToken();
 
   const [showAddFriendModal, setShowAddFriendModal] = useState(false);
   const [newFriendCode, setNewFriendCode] = useState("");
@@ -35,7 +37,11 @@ export default function Amigo() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+
+    if (!token) {
+      navigate("/");
+    }
+  }, [token, navigate]);
 
   const fetchData = async () => {
     try {

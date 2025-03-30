@@ -1,11 +1,19 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useEffect } from "react-router-dom";
 import background from '../assets/background.png';
 import Carta from './layout/game/CartaMediana';
+import { getToken } from "../services/api/authApi";
 
 const GridOpenedCards = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const token = getToken();
 
+  useEffect(() => {
+    if (!token) {
+      navigate("/");
+    }
+  }, [token, navigate]);
+  
   const { openedCards } = location.state;
 
   return (

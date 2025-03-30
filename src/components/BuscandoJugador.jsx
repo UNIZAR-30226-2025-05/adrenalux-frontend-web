@@ -3,14 +3,19 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FaSpinner } from "react-icons/fa";
 import background from "../assets/background.png";
+import { getToken } from "../services/api/authApi";
 
 export default function BuscandoJugador() {
   const navigate = useNavigate();
+  const token = getToken();
   const [showScreen, setShowScreen] = useState(false);
 
   useEffect(() => {
     setTimeout(() => setShowScreen(true), 800);
-  }, []);
+    if (!token) {
+      navigate("/");
+    }
+  }, [token, navigate]);
 
   return (
     <motion.div

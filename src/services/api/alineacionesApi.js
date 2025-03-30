@@ -67,11 +67,16 @@ export const eliminarPlantilla = async (plantillaId, token) => {
 // Función para agregar cartas a una plantilla
 export const agregarCartasPlantilla = async (plantillaId, cartasid, posiciones, token) => {
     try {
-        const response = await axios.post(`${API_URL}/agregarCartasPlantilla`, { plantillaId, cartasid, posiciones }, {
-            headers: {
-                Authorization: `Bearer ${token}`
+        console.log(plantillaId, cartasid, posiciones)
+        const response = await axios.post(`${API_URL}/plantillas/agregarCartasPlantilla`, 
+            { plantillaId, cartasid, posiciones }, 
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
             }
-        });
+        );
+        console.log(response.data)
         return response.data;
     } catch (error) {
         console.error('Error al agregar cartas a la plantilla:', error);

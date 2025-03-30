@@ -1,12 +1,19 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useEffect } from "react-router-dom";
 import NavBarGame from "./layout/game/NavbarGame";
 import background from "../assets/background.png";
 import BackButton from "./layout/game/BackButton";
 import AchievementList from "./layout/game/AchievementList"; 
+import { getToken } from "../services/api/authApi";
 
 const Logros = () => {
   const navigate = useNavigate();
+  const token = getToken();
+
+  useEffect(() => {
+    if (!token) {
+      navigate("/");
+    }
+  }, [token, navigate]);  
 
   const handleBackClick = () => {
     navigate("/home");

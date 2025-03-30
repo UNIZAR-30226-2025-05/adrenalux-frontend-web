@@ -6,10 +6,12 @@ import SobreComun from "../assets/SobreComun.png";
 import SobreRaro from "../assets/SobreRaro.png";
 import background from "../assets/background.png";
 import Carta from './layout/game/CartaGrande';
+import { getToken } from "../services/api/authApi";
 
 const Opening = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const token = getToken();
   const { openedCards, selectedCard } = location.state;
 
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
@@ -18,6 +20,10 @@ const Opening = () => {
   const [showContinue, setShowContinue] = useState(false);
 
   useEffect(() => {
+    if (!token) {
+      navigate("/");
+    }
+
     if (["Megaluxury", "Luxury XI"].includes(openedCards[currentCardIndex]?.tipo_carta)) {
       if (animationStep < 3) {
         const timer = setTimeout(() => setAnimationStep(prev => prev + 1), 1000);
@@ -28,7 +34,7 @@ const Opening = () => {
     } else {
       setShowContinue(true);
     }
-  }, [animationStep, currentCardIndex, openedCards]);
+  }, [animationStep, currentCardIndex, openedCards, token, navigate]);
 
   const handleNextCard = () => {
     if (currentCardIndex < openedCards.length - 1) {

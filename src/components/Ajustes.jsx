@@ -1,15 +1,23 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../services/api/authApi"; // Importar la función logout
 import NavBarGame from './layout/game/NavbarGame';
 import BackButton from './layout/game/BackButton';
 import background from '../assets/background.png';
+import { getToken } from "../services/api/authApi";
 
 const Ajustes = () => {
+  const token = getToken();
   const navigate = useNavigate();
   const [generalVolume, setGeneralVolume] = useState(80);
   const [sfxVolume, setSfxVolume] = useState(40);
   const [showAboutUs, setShowAboutUs] = useState(false);
+
+  useEffect(() => {
+    if (!token) {
+      navigate("/");
+    }
+  }, [token, navigate]);  
 
   const handleBackClick = () => {
     navigate("/home");

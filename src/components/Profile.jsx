@@ -5,8 +5,10 @@ import background from "../assets/background.png";
 import { FaTimes, FaCheck, FaPen } from "react-icons/fa";
 import { FiCopy } from "react-icons/fi";
 import { getProfile, updateProfile } from "../services/api/profileApi";
+import { getToken } from "../services/api/authApi";
 
 const Profile = () => {
+  const token = getToken();
   const [infoUser, setInfoUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -17,6 +19,10 @@ const Profile = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!token) {
+      navigate("/");
+    }
+    
     const fetchProfile = async () => {
       try {
         const data = await getProfile();
@@ -32,7 +38,7 @@ const Profile = () => {
     };
 
     fetchProfile();
-  }, []);
+  }, [token, navigate]);
 
   const avatar = infoUser?.data?.avatar || "";
   const username = infoUser?.data?.username || "Cargando...";
