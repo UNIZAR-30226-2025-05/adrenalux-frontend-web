@@ -81,9 +81,7 @@ export default function AlineacionEditar() {
           setJugadores([]);
           try {
             const coleccion = await getCollection(token);
-            const userPlayers = Array.isArray(coleccion?.data)
-              ? coleccion.data.filter((card) => card.disponible === true)
-              : [];
+            const userPlayers = coleccion.filter((card) => card.disponible === true);
   
             setJugadoresUsuario(userPlayers);
           } catch (error) {
@@ -149,9 +147,8 @@ export default function AlineacionEditar() {
         id: jugador.id,
       }));
 
-      const posicionesParaAPI = jugadores.map(jugador => ({
-        posicion: jugador.posicionType // Usamos el tipo genérico guardado
-      }));
+      const posicionesParaAPI = jugadores.map(jugador => jugador.posicionType);
+
       console.log(jugadoresParaAPI)
       console.log(posicionesParaAPI)
 

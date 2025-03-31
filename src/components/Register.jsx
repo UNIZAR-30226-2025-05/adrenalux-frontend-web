@@ -22,12 +22,35 @@ const Register = () => {
       ...formData,
       [e.target.name]: e.target.value
     });
-    setErrors({ ...errors, [e.target.name]: "" }); // Limpiar el error al escribir
+    setErrors({ ...errors, [e.target.name]: "" }); // Limpiar error al escribir
+  };
+
+  const validateForm = () => {
+    let newErrors = {};
+    if (!formData.email.trim()) {
+      newErrors.email = "El correo es obligatorio.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "El correo no es válido.";
+    }
+
+    if (!formData.name.trim()) newErrors.name = "El nombre es obligatorio.";
+    if (!formData.lastname.trim()) newErrors.lastname = "El apellido es obligatorio.";
+    if (!formData.username.trim()) newErrors.username = "El nombre de usuario es obligatorio.";
+    
+    if (!formData.password.trim()) {
+      newErrors.password = "La contraseña es obligatoria.";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "La contraseña debe tener al menos 6 caracteres.";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0; // Retorna true si no hay errores
   };
 
   const handleSignUpClick = async (e) => {
     e.preventDefault();
-    setErrors({});
+    if (!validateForm()) return; // Detener si hay errores
+
     try {
       const { status, data } = await register(
         formData.email,
@@ -80,6 +103,7 @@ const Register = () => {
         <p className="text-black dark:text-white text-sm mb-4">Crear una nueva cuenta</p>
 
         <form onSubmit={handleSignUpClick} className="space-y-4">
+          {/** Email */}
           <input 
             type="text" 
             name="email" 
@@ -89,25 +113,30 @@ const Register = () => {
             onChange={handleChange}
           />
           {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
-          
+
+          {/** Nombre */}
           <input 
             type="text" 
             name="name" 
             placeholder="Nombre" 
-            className="w-full bg-gray-800 border border-gray-700 focus:border-gray-600 rounded px-4 py-2 text-white focus:outline-none"
+            className={`w-full bg-gray-800 border ${errors.name ? 'border-red-500' : 'border-gray-700'} focus:border-gray-600 rounded px-4 py-2 text-white focus:outline-none`}
             value={formData.name}
             onChange={handleChange}
           />
-          
+          {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+
+          {/** Apellido */}
           <input 
             type="text" 
             name="lastname" 
             placeholder="Apellido" 
-            className="w-full bg-gray-800 border border-gray-700 focus:border-gray-600 rounded px-4 py-2 text-white focus:outline-none"
+            className={`w-full bg-gray-800 border ${errors.lastname ? 'border-red-500' : 'border-gray-700'} focus:border-gray-600 rounded px-4 py-2 text-white focus:outline-none`}
             value={formData.lastname}
             onChange={handleChange}
           />
-          
+          {errors.lastname && <p className="text-red-500 text-sm">{errors.lastname}</p>}
+
+          {/** Nombre de usuario */}
           <input 
             type="text" 
             name="username" 
@@ -117,7 +146,8 @@ const Register = () => {
             onChange={handleChange}
           />
           {errors.username && <p className="text-red-500 text-sm">{errors.username}</p>}
-          
+
+          {/** Contraseña */}
           <input 
             type="password" 
             name="password" 
@@ -127,7 +157,8 @@ const Register = () => {
             onChange={handleChange}
           />
           {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
-          
+
+          {/** Botón de registro */}
           <button className="w-full bg-blue-600 hover:bg-blue-500 text-white rounded py-2 transition duration-300">
             Registrarse
           </button>

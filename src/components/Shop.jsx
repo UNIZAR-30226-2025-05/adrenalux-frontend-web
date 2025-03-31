@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { FaPlusCircle, FaCoins } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import background from "../assets/background.png";
-import SearchTab from "./layout/game/SearchTab";
+import MarqueeText from "./layout/MarqueeText"
 import BackButton from "../components/layout/game/BackButton";
-import MarqueeText from "./layout/MarqueesText";
 import Card3D from "./layout/game/Card3D";
 import { getToken } from "../services/api/authApi";
 import {
