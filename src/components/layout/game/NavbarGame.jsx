@@ -94,7 +94,10 @@ export default function NavbarGame() {
   return (
     <div className="fixed top-0 left-0 w-full h-16 bg-gradient-to-r from-[#A5B3A2] to-[#D1D8D1] dark:bg-gradient-to-r dark:from-[#0E2415] dark:to-[#656D68] shadow-md z-50 flex items-center">
     {/* Logo */}
-      <div className="flex items-center justify-center mr-4 bg-gradient-to-b from-[#EFF6EF] to-[#4F5A4F] h-full w-[150px]">
+      <div 
+        className="flex items-center justify-center mr-4 bg-gradient-to-b from-[#EFF6EF] to-[#4F5A4F] h-full w-[150px] cursor-pointer"
+        onClick={() => navigate("/home")}
+        >
         <img src={logo} alt="Logo" className="h-full w-auto object-contain" />
       </div>
 

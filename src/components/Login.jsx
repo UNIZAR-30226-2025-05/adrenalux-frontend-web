@@ -164,9 +164,7 @@ const Login = () => {
               No tengo cuenta
             </button>
           </div>
-
         </form>
-
       </div>
     </div>
   );

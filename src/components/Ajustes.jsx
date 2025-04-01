@@ -93,7 +93,7 @@ const Ajustes = () => {
 
   return (
     <div
-      className="fixed inset-0 flex justify-center items-center bg-cover bg-center"
+      className="absolute inset-0 flex justify-center items-center bg-cover bg-center"
       style={{ backgroundImage: `url(${background})` }}
     >
       <NavBarGame />

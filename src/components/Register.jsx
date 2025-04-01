@@ -162,6 +162,17 @@ const Register = () => {
           <button className="w-full bg-blue-600 hover:bg-blue-500 text-white rounded py-2 transition duration-300">
             Registrarse
           </button>
+
+          {/* Botón "No tengo cuenta" debajo */}
+          <div className="flex justify-center mt-4">
+            <button
+              className="text-blue-600 bg-gray-900 hover:text-blue-200 transition duration-300"
+              type="button"
+              onClick={() => navigate('/login')}
+            >
+              Ya tengo cuenta
+            </button>
+          </div>
         </form>
       </div>
     </div>
