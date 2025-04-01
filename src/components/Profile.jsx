@@ -22,7 +22,7 @@ const Profile = () => {
     if (!token) {
       navigate("/");
     }
-    
+
     const fetchProfile = async () => {
       try {
         const data = await getProfile();
@@ -53,7 +53,10 @@ const Profile = () => {
   const winCount = partidas.filter((p) => p.isWin).length;
   const lossCount = partidas.filter((p) => !p.isWin).length;
 
-  const avatars = Array.from({ length: 8 }, (_, i) => `/assets/profile_${i + 1}.png`);
+  const avatars = Array.from(
+    { length: 8 },
+    (_, i) => `/assets/profile_${i + 1}.png`
+  );
 
   const handleEditClick = () => {
     setNewUsername(username);
@@ -107,7 +110,7 @@ const Profile = () => {
   };
 
   const handleLogrosClick = () => {
-    navigate("/logros"); 
+    navigate("/logros");
   };
 
   return (
@@ -168,7 +171,12 @@ const Profile = () => {
           <div className="flex items-center space-x-2 mt-2">
             <span className="text-sm">ID:</span>
             <span className="text-xs font-light">{friendCode}</span>
-            <button className="text-lg hover:text-gray-300 transition">
+            <button
+              className="text-lg hover:text-gray-300 transition"
+              onClick={() => {
+                navigator.clipboard.writeText(friendCode);
+              }}
+            >
               <FiCopy />
             </button>
           </div>
