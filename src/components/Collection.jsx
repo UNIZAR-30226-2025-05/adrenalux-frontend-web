@@ -51,7 +51,7 @@ export default function Collection({ onBack }) {
         control: card.control ?? 0,
         medio: card.medio ?? 0,
         defensa: card.defensa ?? 0,
-        equipo: card.club || "Sin club",
+        equipo: card.equipo || card.club || "Sin club",
         escudo: card.escudo || "default_escudo.png",
         photo: card.photo || "default.png",
         tipo_carta: card.tipo_carta || "Normal",
@@ -88,6 +88,7 @@ export default function Collection({ onBack }) {
   };
 
   const handleTeamClick = async (team) => {
+    console.log("Filtering by team:", team.id);
     try {
       const filtered = await filterCards({ equipo: team.nombre });
       updateCollection(filtered);
@@ -100,6 +101,7 @@ export default function Collection({ onBack }) {
   const handleRarityClick = async (rarityKey) => {
     try {
       const filtered = await filterCards({ rareza: rarityKey });
+      console.log("Filtered cards for rarity", rarityKey, ":", filtered);
       updateCollection(filtered);
       setShowIndexModal(false);
     } catch (error) {
@@ -118,7 +120,8 @@ export default function Collection({ onBack }) {
   };
 
   const updateCollection = (data) => {
-    const mappedData = data.map((card) => ({
+    const cardsData = data || [];
+    const mappedData = cardsData.map((card) => ({
       alias: card.nombreCompleto || card.nombre || "Sin nombre",
       ataque: card.ataque ?? 0,
       control: card.control ?? 0,
@@ -375,71 +378,109 @@ export default function Collection({ onBack }) {
             {/* Sección Equipos */}
             <h3 className="text-xl font-semibold mb-2">Equipos</h3>
             <div className="grid grid-cols-6 gap-4 mb-6">
-              {teams.map((team) => (
-                <div
-                  key={team.id}
-                  className="flex flex-col items-center cursor-pointer bg-black/20 hover:bg-black/40 rounded p-2"
-                  onClick={() => handleTeamClick(team)}
-                >
-                  <img
-                    src={`http://54.37.50.18:3000/api/v1/cartas/getEquipos?team=${encodeURIComponent(
-                      team.nombre
-                    )}`}
-                    alt={team.nombre}
-                    className="w-12 h-12 object-contain mb-2"
-                    onError={(e) => {
-                      e.target.src = "/src/assets/default_escudo.png";
-                    }}
-                  />
-                  <p className="text-sm text-center">{team.nombre}</p>
-                </div>
-              ))}
+              {teams.map((team, index) => {
+                const key =
+                  team.id && team.nombre ? `${team.id}-${team.nombre}` : index;
+                return (
+                  <div
+                    key={key}
+                    className="flex flex-col items-center cursor-pointer bg-black/20 hover:bg-black/40 rounded p-2"
+                    onClick={() => handleTeamClick(team)}
+                  >
+                    <img
+                      src={team.escudo}
+                      alt={team.nombre}
+                      className="w-12 h-12 object-contain mb-2"
+                      onError={(e) => {
+                        e.target.src = "/src/assets/default_escudo.png";
+                      }}
+                    />
+                    <p className="text-sm text-center">{team.nombre}</p>
+                  </div>
+                );
+              })}
             </div>
+
             {/* Sección Rarezas */}
             <h3 className="text-xl font-semibold mb-2">Rarezas</h3>
             <div className="grid grid-cols-4 gap-4 mb-6">
-              {Object.keys(rarities).map((rarityKey) => (
-                <div
-                  key={rarityKey}
-                  className="flex flex-col items-center cursor-pointer bg-black/20 hover:bg-black/40 rounded p-2"
-                  onClick={() => handleRarityClick(rarityKey)}
-                >
-                  <img
-                    src={`http://54.37.50.18:3000/api/v1/cartas/getRarezascartas?rareza=${rarityKey}`}
-                    alt={rarityKey}
-                    className="w-12 h-12 object-contain mb-2"
-                    onError={(e) => {
-                      e.target.src = "/src/assets/default_escudo.png";
-                    }}
-                  />
-                  <p className="text-sm text-center">
-                    {rarities[rarityKey]?.nombre || rarityKey}
-                  </p>
-                </div>
-              ))}
+              {Object.keys(rarities).map((rarityKey) => {
+                console.log(
+                  "Rarity key:",
+                  rarityKey,
+                  "Valor:",
+                  rarities[rarityKey]
+                );
+
+                const validRarezas = ["MEGALUXURY", "LUXURYXI", "LUXURY"]; // Ajusta según tus nombres
+                const imageSrc = validRarezas.includes(rarityKey)
+                  ? `/src/assets/card_${rarityKey}.png`
+                  : `/src/assets/cartaNormal.png`;
+
+                return (
+                  <div
+                    key={rarityKey}
+                    className="flex flex-col items-center cursor-pointer bg-black/20 hover:bg-black/40 rounded p-2"
+                    onClick={() => handleRarityClick(rarityKey)}
+                  >
+                    <img
+                      src={imageSrc}
+                      className="w-12 h-12"
+                      alt={`Rareza ${rarityKey}`}
+                    />
+                    <p className="text-sm text-center">
+                      {rarities[rarityKey]?.nombre || rarityKey}
+                    </p>
+                  </div>
+                );
+              })}
             </div>
+
             {/* Sección Posiciones */}
             <h3 className="text-xl font-semibold mb-2">Posiciones</h3>
             <div className="grid grid-cols-4 gap-4">
-              {positions.map((pos) => (
-                <div
-                  key={pos.id}
-                  className="flex flex-col items-center cursor-pointer bg-black/20 hover:bg-black/40 rounded p-2"
-                  onClick={() => handlePositionClick(pos)}
-                >
-                  <img
-                    src={`http://54.37.50.18:3000/api/v1/cartas/getPosiciones?position=${encodeURIComponent(
-                      pos.nombre
-                    )}`}
-                    alt={pos.nombre}
-                    className="w-12 h-12 object-contain mb-2"
-                    onError={(e) => {
-                      e.target.src = "/src/assets/default_escudo.png";
-                    }}
-                  />
-                  <p className="text-sm text-center">{pos.nombre}</p>
-                </div>
-              ))}
+              {positions.map((pos) => {
+                // Función para obtener la abreviatura según la posición
+                const getAbbreviation = (positionName) => {
+                  switch (positionName.toLowerCase()) {
+                    case "forward":
+                      return "ST";
+                    case "defender":
+                      return "DEF";
+                    case "goalkeeper":
+                      return "GK";
+                    case "midfielder":
+                      return "MD";
+                    default:
+                      return positionName;
+                  }
+                };
+
+                return (
+                  <div
+                    key={pos.id}
+                    className="flex flex-col items-center cursor-pointer bg-black/20 hover:bg-black/40 rounded p-2"
+                    onClick={() => handlePositionClick(pos)}
+                  >
+                    {/* Contenedor relativo para la imagen */}
+                    <div className="relative w-12 h-12 mb-2">
+                      <img
+                        src={`/src/assets/circle.png`}
+                        alt={pos.nombre}
+                        className="w-12 h-12 object-contain"
+                        onError={(e) => {
+                          e.target.src = "/src/assets/default_escudo.png";
+                        }}
+                      />
+                      {/* Texto superpuesto */}
+                      <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-sm">
+                        {getAbbreviation(pos.nombre)}
+                      </span>
+                    </div>
+                    {/*<p className="text-sm text-center">{pos.nombre}</p>*/}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

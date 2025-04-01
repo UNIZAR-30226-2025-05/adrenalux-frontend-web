@@ -21,12 +21,17 @@ export const getCollection = async () => {
 
 export const filterCards = async (params) => {
   try {
+    if (params.rareza) {
+      params.rareza =
+        params.rareza.charAt(0).toUpperCase() +
+        params.rareza.slice(1).toLowerCase();
+    }
     const response = await axios.get(`${API_URL}/filtrarCartas`, {
       headers: getAuthHeaders(),
       params,
     });
-    console.log(response);
-    return response.data.data;
+    console.log("Respuesta de filterCards:", response.data);
+    return response.data.data || [];
   } catch (error) {
     console.error("❌ Error al filtrar las cartas:", error);
     throw error;

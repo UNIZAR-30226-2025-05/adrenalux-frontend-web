@@ -8,10 +8,42 @@ const getAuthHeaders = () => {
 };
 
 export const getEquipos = async () => {
-  const response = await axios.get(`${API_URL}/getEquipos`, {
-    headers: getAuthHeaders(),
-  });
-  return response.data.data.equipos;
+  try {
+    const response = await axios.get(`${API_URL}/getEquipos`, {
+      headers: getAuthHeaders(),
+    });
+    console.log("Equipos API response:", response.data);
+
+    const equipos = response?.data?.data?.equipo || [];
+    console.log("Parsed equipos array:", equipos);
+
+    const equiposFormatted = equipos.map((team) => {
+      let escudo;
+      if (team.escudo) {
+        if (team.escudo.startsWith("http")) {
+          escudo = team.escudo;
+        } else {
+          escudo = `http://54.37.50.18:3000/${team.escudo.replace(
+            /^public\//,
+            ""
+          )}`;
+        }
+      } else {
+        escudo = "/src/assets/default_escudo.png";
+      }
+
+      return {
+        id: team.equipo,
+        nombre: team.equipo,
+        escudo,
+      };
+    });
+
+    return equiposFormatted;
+  } catch (error) {
+    console.error("Error en getEquipos:", error);
+    throw new Error("Error al obtener los equipos");
+  }
 };
 
 export const getRaridades = async () => {
