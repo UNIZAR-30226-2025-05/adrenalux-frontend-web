@@ -89,15 +89,15 @@ export const agregarCartasPlantilla = async (plantillaId, cartasid, posiciones, 
     }
 };
 
-
 // Función para obtener las cartas de una plantilla
 export const obtenerCartasDePlantilla = async (plantillaId, token) => {
     try {
-        const response = await axios.get(`${API_URL}/getCartasporPlantilla/${plantillaId}`, {
+        const response = await axios.get(`${API_URL}/plantillas/getCartasporPlantilla/${plantillaId}`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
         });
+        console.log(response.data)
         return response.data;
     } catch (error) {
         console.error('Error al obtener cartas de la plantilla:', error);

@@ -4,7 +4,7 @@ import background from "../assets/backgroundAlineacion.png";
 import BackButton from "../components/layout/game/BackButton";
 import Formacion433 from "../components/layout/game/Formacion_4_3_3";
 import CartaMediana from "../components/layout/game/CartaMediana";
-import { FaPen } from "react-icons/fa";
+import { FaPen, FaSave } from "react-icons/fa";
 import { actualizarPlantilla, obtenerCartasDePlantilla, agregarCartasPlantilla } from "../services/api/alineacionesApi";
 import { getToken } from "../services/api/authApi";
 import { getCollection } from "../services/api/collectionApi";
@@ -27,6 +27,7 @@ export default function AlineacionEditar() {
   const [showCardSelector, setShowCardSelector] = useState(false);
   const [selectedPosition, setSelectedPosition] = useState({ id: null, type: null });
   const [filteredCards, setFilteredCards] = useState([]);
+  const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
     if (!token) {
@@ -44,39 +45,56 @@ export default function AlineacionEditar() {
         ]);
   
         const procesarColeccion = (coleccion) =>
-          Array.isArray(coleccion?.data)
-            ? coleccion.data.filter((card) => card.disponible === true)
+          Array.isArray(coleccion)
+            ? coleccion.filter((card) => card.disponible === true)
             : [];
   
-        const jugadoresPlantilla = Array.isArray(cartasPlantilla?.data)
-          ? cartasPlantilla.data.map((jugador, index) => {
-              let posicionEspecifica;
-              switch (jugador.posicion) {
-                case "forward":
-                  posicionEspecifica = `forward${(index % 3) + 1}`;
-                  break;
-                case "midfielder":
-                  posicionEspecifica = `midfielder${(index % 3) + 1}`;
-                  break;
-                case "defender":
-                  posicionEspecifica = `defender${(index % 4) + 1}`;
-                  break;
-                default:
-                  posicionEspecifica = "goalkeeper1";
-              }
-  
-              return {
-                ...jugador,
-                posicion: jugador.posicion,
-                posicionType: posicionEspecifica,
-              };
-            })
-          : [];
+            const jugadoresPlantilla = Array.isArray(cartasPlantilla?.data)
+            ? (() => {
+                // Contadores separados
+                const counters = {
+                  forward: 0,
+                  midfielder: 0,
+                  defender: 0,
+                  goalkeeper: 0
+                };
+          
+                return cartasPlantilla.data.map(jugador => {
+                  let posicionEspecifica;
+                  
+                  switch (jugador.posicion) {
+                    case "forward":
+                      counters.forward++;
+                      posicionEspecifica = `forward${counters.forward}`;
+                      break;
+                    case "midfielder":
+                      counters.midfielder++;
+                      posicionEspecifica = `midfielder${counters.midfielder}`;
+                      break;
+                    case "defender":
+                      counters.defender++;
+                      posicionEspecifica = `defender${counters.defender}`;
+                      break;
+                    default:
+                      counters.goalkeeper++;
+                      posicionEspecifica = "goalkeeper1";
+                  }
+          
+                  return {
+                    ...jugador,
+                    posicion: posicionEspecifica,
+                    posicionType: jugador.posicion
+                  };
+                });
+              })()
+            : [];
+
+          console.log(jugadoresPlantilla)
   
         setJugadores(jugadoresPlantilla);
         setJugadoresUsuario(procesarColeccion(coleccionUsuario));
       } catch (err) {
-        if (err.response?.status === 404) {
+        if (err.response?.status === 400) {
           console.log("No se encontraron cartas, mostrando formación vacía");
           setJugadores([]);
           try {
@@ -103,58 +121,58 @@ export default function AlineacionEditar() {
 
   const handleJugadorClick = ({ posicionId, posicion, jugador }) => {
     setSelectedPosition({
-      id: posicionId,    // Ej: "forward1" (posición específica)
-      type: posicion // Ej: "forward" (tipo genérico)
+      id: posicionId,
+      type: posicion
     });
     
-    // Filtrar cartas por tipo genérico (forward, midfielder, etc.)
-    console.log(posicion)
-    const cartasFiltradas = Array.isArray(jugadoresUsuario) 
-      ? jugadoresUsuario.filter(carta => {
-          return carta.posicion === posicion && // Filtramos por tipo genérico
-                 (!jugador || carta.id !== jugador.id); // Excluimos la carta actual si existe
-        })
-      : [];
+    // Obtener IDs de jugadores ya asignados (excepto el actual si estamos reemplazando)
+    const idsAsignados = jugadores
+      .filter(j => !jugador || j.id !== jugador.id)
+      .map(j => j.id);
+
+    // Filtrar cartas por tipo genérico y que no estén ya asignadas
+    const cartasFiltradas = jugadoresUsuario.filter(carta => {
+      return carta.posicion === posicion && 
+             !idsAsignados.includes(carta.id);
+    });
     
-      console.log(cartasFiltradas)
     setFilteredCards(cartasFiltradas);
     setShowCardSelector(true);
   };
 
   const handleSelectCard = (carta) => {
-    // Asignar la carta a la posición específica (forward1, midfielder2, etc.)
     const jugadorActualizado = {
       ...carta,
-      posicion: selectedPosition.id, // Posición específica
-      posicionType: selectedPosition.type // Tipo genérico
+      posicion: selectedPosition.id,
+      posicionType: selectedPosition.type
     };
 
     setJugadores(prev => {
-      // Eliminar cualquier jugador en esta posición específica
-      const filtered = prev.filter(j => j.posicion !== selectedPosition.id);
-      // Añadir el nuevo jugador
+      // Eliminar jugador de su posición anterior si existe
+      const filtered = prev.filter(j => 
+        j.posicion !== selectedPosition.id && 
+        j.id !== carta.id
+      );
+      console.log(jugadorActualizado)
       return [...filtered, jugadorActualizado];
     });
 
+    setHasChanges(true);
     setShowCardSelector(false);
   };
 
   const handleConfirm = async () => {
     try {
-      // Convertir a formato para API (usando tipo genérico)
-      console.log(jugadores)
       const jugadoresParaAPI = jugadores.map(jugador => ({
         id: jugador.id,
       }));
 
       const posicionesParaAPI = jugadores.map(jugador => jugador.posicionType);
 
-      console.log(jugadoresParaAPI)
-      console.log(posicionesParaAPI)
-
       await agregarCartasPlantilla(id, jugadoresParaAPI, posicionesParaAPI, token);
       
       setShowAlert(false);
+      setHasChanges(false);
       navigate("/alineaciones");
     } catch (error) {
       console.error("Error al guardar:", error);
@@ -162,8 +180,24 @@ export default function AlineacionEditar() {
     }
   };
 
+  const handleSave = async () => {
+    const jugadoresParaAPI = jugadores.map(jugador => ({
+      id: jugador.id,
+    }));
+
+    const posicionesParaAPI = jugadores.map(jugador => jugador.posicionType);
+
+    await agregarCartasPlantilla(id, jugadoresParaAPI, posicionesParaAPI, token);
+
+    setHasChanges(false);
+  };
+
   const handleBackClick = () => {
-    setShowAlert(true);
+    if (hasChanges) {
+      setShowAlert(true);
+    } else {
+      navigate("/alineaciones");
+    }
   };
 
   const handleCancel = () => {
@@ -175,10 +209,11 @@ export default function AlineacionEditar() {
     navigate("/alineaciones");
   };
 
-  const handleSaveName = () => {
+  const handleSaveName = async () => {
     setNombrePlantilla(newName);
-    actualizarPlantilla(id ,newName, token);
+    await actualizarPlantilla(id, newName, token);
     setShowNameEdit(false);
+    setHasChanges(true);
   };
 
   const handleCancelNameEdit = () => {
@@ -196,12 +231,25 @@ export default function AlineacionEditar() {
 
   return (
     <div className="fixed inset-0 flex justify-center items-start bg-cover bg-center" style={{ backgroundImage: `url(${background})` }}>
-      <div className="absolute top-5 left-5">
+      {/* Botón Atrás (funcionará correctamente) */}
+      <div className="absolute top-5 left-5 z-20">
         <BackButton onClick={handleBackClick} />
       </div>
-
-      {/* Encabezado con nombre de plantilla */}
-      <div className="fixed top-0 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 px-4 py-2 rounded-lg shadow-lg flex items-center">
+  
+      {/* Botón Guardar (funcionará correctamente) */}
+      {hasChanges && (
+        <div className="absolute top-5 right-5 z-20">
+          <button
+            onClick={handleSave}
+            className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            <FaSave /> Guardar
+          </button>
+        </div>
+      )}
+  
+      {/* Header de nombre de plantilla */}
+      <div className="fixed top-0 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 px-4 py-2 rounded-lg shadow-lg flex items-center z-10">
         {!showNameEdit ? (
           <>
             <h2 className="text-white text-xl mr-2">{nombrePlantilla}</h2>
@@ -236,21 +284,30 @@ export default function AlineacionEditar() {
           </div>
         )}
       </div>
-
-      {/* Formación 4-3-3 */}
-      <div className="absolute top-[100px] left-1/2 transform -translate-x-1/2 text-white">
-        <Formacion433 
-          jugadores={jugadores} 
-          onJugadorClick={handleJugadorClick}
-        />
+  
+      {/* Contenedor de la formación */}
+      <div className="absolute inset-0 flex items-center justify-center pt-[4.5rem] pb-4 px-4">
+        <div 
+          className="relative w-full max-w-[1800px] mx-auto overflow-auto"
+          style={{
+            height: 'calc(100vh - 4.5rem - 1rem)',
+            maxHeight: '90vh',
+            minHeight: '500px',
+            aspectRatio: '16/10'
+          }}
+        >
+          <Formacion433 
+            jugadores={jugadores} 
+            onJugadorClick={handleJugadorClick}
+          />
+        </div>
       </div>
 
-      {/* Selector de cartas */}
       {showCardSelector && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-30">
           <div className="bg-[#1C1A1A] p-6 rounded-lg shadow-lg w-full max-w-[80vh] max-h-[80vh] flex flex-col">
             <h3 className="text-white text-xl mb-4 text-center">
-              Selecciona un jugador para {selectedPosition.type}
+              Selecciona un jugador para {selectedPosition.id}
             </h3>
             
             <div className="grid grid-cols-4 gap-4 overflow-y-auto" style={{
@@ -291,26 +348,27 @@ export default function AlineacionEditar() {
         </div>
       )}
 
-      {/* Alerta de confirmación */}
       {showAlert && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-20">
-          <div className="bg-white dark:bg-[#1C1A1A] p-6 rounded-lg shadow-lg text-center text-white">
-            <p className="text-black dark:text-white mb-4 text-lg">¿Quieres guardar los cambios antes de salir?</p>
-            <div className="flex justify-center gap-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-20 p-4">
+          <div className="bg-white dark:bg-[#1C1A1A] p-4 md:p-6 rounded-lg shadow-lg text-center text-white w-full max-w-md mx-4">
+            <p className="text-black dark:text-white mb-4 text-base md:text-lg">
+              ¿Quieres guardar los cambios antes de salir?
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
               <button
-                className="px-4 py-2 rounded-lg text-white bg-[#44FE23] hover:opacity-90"
+                className="px-3 py-1 md:px-4 md:py-2 rounded-lg text-white bg-[#44FE23] hover:opacity-90 text-sm md:text-base"
                 onClick={handleConfirm}
               >
-                Sí
+                Sí, guardar
               </button>
               <button
-                className="px-4 py-2 rounded-lg text-white bg-[#F62C2C] hover:opacity-90"
+                className="px-3 py-1 md:px-4 md:py-2 rounded-lg text-white bg-[#F62C2C] hover:opacity-90 text-sm md:text-base"
                 onClick={handleDiscard}
               >
-                No
+                No, descartar
               </button>
               <button
-                className="px-4 py-2 rounded-lg text-white bg-gray-500 hover:opacity-90"
+                className="px-3 py-1 md:px-4 md:py-2 rounded-lg text-white bg-gray-500 hover:opacity-90 text-sm md:text-base"
                 onClick={handleCancel}
               >
                 Cancelar

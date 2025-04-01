@@ -9,7 +9,6 @@ import { abrirSobreGratis } from "../../../services/api/cardApi";
 export default function NavbarGame() {
   const [infoUser, setInfoUser] = useState(null);
   const [countdown, setCountdown] = useState(0);
-  const [openedCards, setOpenedCards] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,7 +48,9 @@ export default function NavbarGame() {
     }
   }, [infoUser]);
 
-  const avatar = infoUser?.data?.avatar || "";
+  console.log(infoUser)
+
+  const avatar = infoUser?.data?.avatar || "./assets/profile_1.png";
   const username = infoUser?.data?.username || "Cargando...";
   const level = infoUser?.data?.level || 1;
   const experiencia = infoUser?.data?.experience || 0;
@@ -69,10 +70,8 @@ export default function NavbarGame() {
   const handleAbrirSobreGratis = async () => {
     try {
       const cartas = await abrirSobreGratis();
-      console.log(cartas);
-      setOpenedCards(cartas);
       navigate("/opening", {
-        state: { openedCards: openedCards, selectedCard: "Sobre Energia Lux" },
+        state: { openedCards: cartas, selectedCard: "Sobre Energia Lux" },
       });
     } catch (error) {
       console.error("Error al abrir el sobre gratis:", error);

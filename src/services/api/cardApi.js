@@ -73,6 +73,8 @@ export const abrirSobreGratis = async () => {
       },
     });
 
+    console.log(response.data?.data?.responseJson.cartas)
+
     const cartas = response.data?.data?.responseJson.cartas;
 
     if (!Array.isArray(cartas)) {
@@ -90,7 +92,7 @@ export const abrirSobreGratis = async () => {
       ataque: carta.ataque ?? 0,
       control: carta.control ?? 0,
       defensa: carta.defensa ?? 0,
-      tipo_carta: carta.tipo_carta || "Común",
+      tipo_carta: carta.tipo_carta || "Normal",
       posicion: carta.posicion || "N/A",
     }));
   } catch (error) {

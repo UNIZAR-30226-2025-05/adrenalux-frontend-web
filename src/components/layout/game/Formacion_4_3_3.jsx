@@ -2,7 +2,6 @@ import PropTypes from "prop-types";
 import CartaMediana from "../../../components/layout/game/CartaMediana";
 
 const Formacion433 = ({ jugadores, onJugadorClick }) => {
-  // Definición de posiciones con ID específico y tipo genérico
   const posiciones = [
     { id: "forward1", type: "forward" },
     { id: "forward2", type: "forward" },
@@ -25,15 +24,27 @@ const Formacion433 = ({ jugadores, onJugadorClick }) => {
     if (onJugadorClick) {
       const jugador = getJugadorEnPosicion(posicion.id);
       onJugadorClick({
-        posicionId: posicion.id,    // Ej: "forward1" (posición específica)
-        posicion: posicion.type, // Ej: "forward" (tipo genérico)
+        posicionId: posicion.id,
+        posicion: posicion.type,
         jugador: jugador || null
       });
     }
   };
 
+  // Tamaños responsivos para las cartas
+  const cardSize = {
+    width: "clamp(5rem, 10vw, 8rem)",
+    height: "clamp(6rem, 12vw, 9rem)"
+  };
+
+  // Tamaños responsivos para los espacios vacíos
+  const emptySize = {
+    width: "clamp(5rem, 10vw, 6rem)",
+    height: "clamp(6rem, 12vw, 9rem)"
+  };
+
   return (
-    <div className="formacion-4-3-3 w-full max-w-md mx-auto space-y-14">
+    <div className="formacion-4-3-3 w-full max-w-4xl mx-auto space-y-4 md:space-y-8 lg:space-y-14 px-2">
       {/* Delanteros */}
       <div className="flex justify-around">
         {posiciones.slice(0, 3).map((pos) => {
@@ -45,9 +56,16 @@ const Formacion433 = ({ jugadores, onJugadorClick }) => {
               onClick={() => handleClick(pos)}
             >
               {jugador ? (
-                <CartaMediana jugador={jugador} width="8rem" height="9rem"/>
+                <CartaMediana 
+                  jugador={jugador} 
+                  width={cardSize.width}
+                  height={cardSize.height}
+                />
               ) : (
-                <div className="w-24 h-36 bg-gray-700 rounded-lg flex items-center justify-center">
+                <div 
+                  className="bg-gray-700 rounded-lg flex items-center justify-center"
+                  style={{ width: emptySize.width, height: emptySize.height }}
+                >
                   <span className="text-white text-xs">Vacío</span>
                 </div>
               )}
@@ -57,21 +75,28 @@ const Formacion433 = ({ jugadores, onJugadorClick }) => {
       </div>
 
       {/* Mediocampistas */}
-      <div className="flex justify-center gap-4">
+      <div className="flex justify-center gap-2 md:gap-4">
         {posiciones.slice(3, 6).map((pos, index) => {
           const jugador = getJugadorEnPosicion(pos.id);
           return (
             <button
               key={pos.id}
               className={`relative ${jugador ? "opacity-100" : "opacity-50"} bg-transparent border-none p-0 cursor-pointer ${
-                index === 1 ? "mx-12" : ""
+                index === 1 ? "mx-4 md:mx-12" : ""
               }`}
               onClick={() => handleClick(pos)}
             >
               {jugador ? (
-                <CartaMediana jugador={jugador} width="8rem" height="9rem"/>
+                <CartaMediana 
+                  jugador={jugador} 
+                  width={cardSize.width}
+                  height={cardSize.height}
+                />
               ) : (
-                <div className="w-24 h-36 bg-gray-700 rounded-lg flex items-center justify-center">
+                <div 
+                  className="bg-gray-700 rounded-lg flex items-center justify-center"
+                  style={{ width: emptySize.width, height: emptySize.height }}
+                >
                   <span className="text-white text-xs">Vacío</span>
                 </div>
               )}
@@ -81,7 +106,7 @@ const Formacion433 = ({ jugadores, onJugadorClick }) => {
       </div>
 
       {/* Defensas */}
-      <div className="flex justify-center gap-10">
+      <div className="flex justify-center gap-2 sm:gap-4 md:gap-6 lg:gap-10">
         {posiciones.slice(6, 10).map((pos) => {
           const jugador = getJugadorEnPosicion(pos.id);
           return (
@@ -91,9 +116,16 @@ const Formacion433 = ({ jugadores, onJugadorClick }) => {
               onClick={() => handleClick(pos)}
             >
               {jugador ? (
-                <CartaMediana jugador={jugador} width="8rem" height="9rem"/>
+                <CartaMediana 
+                  jugador={jugador} 
+                  width={cardSize.width}
+                  height={cardSize.height}
+                />
               ) : (
-                <div className="w-24 h-36 bg-gray-700 rounded-lg flex items-center justify-center">
+                <div 
+                  className="bg-gray-700 rounded-lg flex items-center justify-center"
+                  style={{ width: emptySize.width, height: emptySize.height }}
+                >
                   <span className="text-white text-xs">Vacío</span>
                 </div>
               )}
@@ -111,10 +143,14 @@ const Formacion433 = ({ jugadores, onJugadorClick }) => {
           {getJugadorEnPosicion(posiciones[10].id) ? (
             <CartaMediana 
               jugador={getJugadorEnPosicion(posiciones[10].id)} 
-              width="8rem" height="9rem" 
+              width={cardSize.width}
+              height={cardSize.height}
             />
           ) : (
-            <div className="w-24 h-36 bg-gray-700 rounded-lg flex items-center justify-center">
+            <div 
+              className="bg-gray-700 rounded-lg flex items-center justify-center"
+              style={{ width: emptySize.width, height: emptySize.height }}
+            >
               <span className="text-white text-xs">Vacío</span>
             </div>
           )}
