@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // Importar useNavigate
+import { useNavigate } from 'react-router-dom';
 import { socketService } from '../services/websocket/socketService';
 import { getToken } from '../services/api/authApi';
 import { getProfile } from '../services/api/profileApi';
@@ -13,54 +13,71 @@ import PlayButton from './layout/game/PlayButton';
 import CardsMenu from './layout/game/CardsMenu';
 
 const Home = () => {
-    const navigate = useNavigate(); // Obtener la función navigate
+    const navigate = useNavigate();
     const token = getToken();
 
     useEffect(() => {
         const initializeSocket = async () => {
-            if (!socketService.socket) { // Solo inicializa si no hay socket
+            if (!socketService.socket) {
                 const token = getToken();
-                console.log(token)
                 const profile = await getProfile();
-                socketService.initialize(token, profile.data.username, navigate); // Pasar navigate aquí
+                socketService.initialize(token, profile.data.username, navigate);
             }
         };
 
         if (!token) {
-          navigate("/");
+            navigate("/");
         }
 
         initializeSocket();
-    }, [navigate, token]); // Añadir navigate como dependencia
+    }, [navigate, token]);
 
     return (
-      <div className="fixed inset-0 flex justify-center items-center bg-cover bg-center" style={{ backgroundImage: `url(${background})` }}>
-        <NavBarGame />
+        <div className="fixed inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${background})` }}>
+            <div className="h-screen w-full backdrop-blur-sm">
+                <NavBarGame />
+                
+                <div className="h-[calc(100vh-80px)] grid grid-cols-3 grid-rows-[1fr_auto] gap-8 p-8">
+                    {/* Left Side - Menu Items */}
+                    <div className="flex flex-col items-start justify-center gap-6 pl-12">
+                        <ClassificationButton 
+                            className="glass-container hover:!bg-indigo-600/50 transition-all"
+                            iconClassName="text-indigo-400 h-8 w-8"
+                        />
+                        <TournamentButton 
+                            className="glass-container hover:!bg-purple-600/50 transition-all"
+                            iconClassName="text-purple-400 h-8 w-8"
+                        />
+                    </div>
 
-        <div className="relative h-screen w-full flex items-center px-[20%]">
-          {/* Left Side */}
-          <div className="absolute left-[10%] top-[25%] flex flex-col space-y-10">
-            <ClassificationButton />
-            <TournamentButton />
-          </div>
+                    {/* Center Area - Cards Menu */}
+                    <div className="flex flex-col items-center justify-center">
+                        <CardsMenu className="transform hover:scale-105 transition-transform duration-300" />
+                    </div>
 
-          {/* Cards Menu in the Center */}
-          <div className="mx-auto">
-            <CardsMenu />
-          </div>
+                    {/* Right Side - Menu Items */}
+                    <div className="flex flex-col items-end justify-center gap-6 pr-12">
+                        <StoreButton 
+                            className="glass-container hover:!bg-emerald-600/50 transition-all"
+                            iconClassName="text-emerald-400 h-8 w-8"
+                        />
+                        <CollectionButton 
+                            className="glass-container hover:!bg-amber-600/50 transition-all"
+                            iconClassName="text-amber-400 h-8 w-8"
+                        />
+                    </div>
 
-          {/* Right Side */}
-          <div className="absolute right-[10%] top-[25%] flex flex-col space-y-10">
-            <StoreButton />
-            <CollectionButton />
-          </div>
-
-          {/* Play Button Centered at Bottom */}
-          <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2">
-            <PlayButton />
-          </div>
+                    {/* Play Button - Bottom Center */}
+                    <div className="col-span-3 flex justify-center pb-8">
+                        <PlayButton 
+                            className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 
+                            px-12 py-4 rounded-2xl shadow-xl hover:shadow-2xl transition-all"
+                            iconClassName="h-10 w-10"
+                        />
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     );
 };
 
