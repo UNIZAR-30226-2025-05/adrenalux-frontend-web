@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BackButton from "../components/layout/game/BackButton";
 import background from "../assets/background.png";
-import AlineacionMenu from "../components/layout/game/alineacionMenu";
+import AlineacionMenu from "../components/layout/game/AlineacionMenu";
 import FondoAlineacion from "../assets/backgroundAlineacion.png";
 import { obtenerPlantillas, crearPlantilla, eliminarPlantilla } from "../services/api/alineacionesApi";
 import { getToken } from "../services/api/authApi";

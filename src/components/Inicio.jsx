@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaInstagram, FaLinkedin, FaYoutube } from 'react-icons/fa';
+import { FaInstagram, FaLinkedin, FaYoutube, FaDiscord } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 import logo from '../assets/adrenalux_logo_white.png';
 import pantallaPrincipal from '../assets/Sobres.png';
 import { getToken } from "../services/api/authApi";
@@ -13,105 +14,172 @@ const Inicio = () => {
     if(token){
       navigate("/home");
     }
-    document.body.style.background = 'linear-gradient(to bottom, #1a1a1a, #111111)';
-    document.body.style.margin = '0';
-    document.body.style.padding = '0';
+    const originalClass = document.body.className;
+    document.body.className = 'bg-gradient-to-b from-gray-900 to-black';
+    
+    return () => {
+      document.body.className = originalClass;
+    };
   }, [token, navigate]);
 
   const handleLoginClick = () => navigate('/login');
   const handleSignUpClick = () => navigate('/register');
   const handleDiscoverClick = () => navigate('/register');
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1, 
+      transition: { 
+        duration: 1,
+        staggerChildren: 0.3
+      } 
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { 
+      y: 0, 
+      opacity: 1,
+      transition: { type: 'spring', stiffness: 100 }
+    },
+  };
+
   return (
-    <div className='min-h-screen flex flex-col text-white relative overflow-hidden'>
-      {/* NAVBAR */}
-      <header className='fixed top-0 left-0 w-full px-4 py-4 md:px-8 md:py-6 flex justify-between items-center z-20 backdrop-blur-md bg-black/30 border-b border-gray-800'>
-        <img 
+    <motion.div 
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+      className="h-screen flex flex-col text-white relative overflow-x-hidden"
+    >
+      {/* Navbar */}
+      <header className="fixed top-0 left-0 w-full px-4 py-4 md:px-8 md:py-6 flex justify-between items-center z-50 backdrop-blur-2xl bg-black/30 border-b border-white/10">
+        <motion.img 
           src={logo} 
-          alt='Logo' 
-          className='w-16 md:w-24 cursor-pointer hover:scale-105 transition-transform 
-                     filter contrast-[1.2] brightness-[0.8]' 
-          onClick={() => navigate('/')} 
+          alt="AdrenaLux Logo" 
+          className="w-16 md:w-24 cursor-pointer transition-all duration-500 hover:scale-105"
+          onClick={() => navigate('/')}
+          whileHover={{ scale: 1.05 }}
+          variants={itemVariants}
         />
-        <nav className='flex gap-4 md:gap-6'>
-          <button 
+        
+        <nav className="flex gap-2 md:gap-4">
+          <motion.button 
             onClick={handleLoginClick} 
-            className='bg-white/10 hover:bg-white/20 text-white px-6 py-2 rounded-full 
-                       transition-all border border-white/20'
+            className="bg-white/5 hover:bg-white/10 px-4 py-2 rounded-xl transition-all duration-300 border border-white/10 backdrop-blur-lg text-sm md:text-base"
+            variants={itemVariants}
           >
-            Inicio sesión
-          </button>
-          <button 
-            onClick={handleSignUpClick} 
-            className='bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full 
-                       transition-all'
+            Iniciar sesión
+          </motion.button>
+          
+          <motion.button 
+            onClick={handleSignUpClick}
+            className="relative bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-400 hover:to-purple-500 px-6 py-2 rounded-xl transition-all duration-300 hover:shadow-[0_0_20px_-5px_rgba(99,102,241,0.5)]"
+            variants={itemVariants}
           >
-            Registrarse
-          </button>        
+            <span className="relative z-10">Registrarse</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/30 to-purple-600/30 rounded-xl opacity-0 hover:opacity-100 transition-opacity duration-300" />
+          </motion.button>
         </nav>
       </header>
+      
+      <main className='flex-1 bg-gradient-to-b from-gray-900 to-black'>
+        <div className="relative px-4 md:px-8 lg:px-16">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-16">
 
-      {/* CONTENIDO PRINCIPAL */}
-      <main className='fixed flex flex-1 flex-col lg:flex-row justify-between items-center w-full 
-                       px-4 pt-32 md:px-10 md:pt-40 pb-24'>
-        {/* TEXTO Y BOTONES */}
-        <section className='max-w-2xl mb-12 lg:mb-0 z-10 transform translate-x-16'>
-          <h2 className='text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-blue-400 
-                         to-purple-400 bg-clip-text text-transparent'>
-            ¡Bienvenido a AdrenaLux!
-          </h2>
-          <p className='text-xl md:text-2xl mb-8 text-gray-300'>
-            Sumérgete en este TCG de La Liga y colecciona a tus jugadores favoritos.
-          </p>
-          <button 
-            onClick={handleDiscoverClick} 
-            className='bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-4 rounded-xl 
-                       transition-all transform hover:scale-105 shadow-lg shadow-blue-600/30'
-          >
-            Descúbrelo ahora →
-          </button>
+            <motion.section 
+              className="flex-1 space-y-8 z-10 max-w-2xl"
+              variants={containerVariants}
+            >
+              <motion.div variants={itemVariants}>
+                <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-blue-400 to-purple-300 bg-clip-text text-transparent">
+                  <span className="block">Colecciona</span>
+                  <span className="block mt-2 text-4xl md:text-6xl font-medium">
+                    Juega. Compite. Gana.
+                  </span>
+                </h1>
+              </motion.div>
 
-          {/* REDES SOCIALES */}
-          <div className='flex flex-col gap-4 mt-12'>
-            <span className='text-gray-400 text-lg'>Síguenos:</span>
-            <div className='flex gap-6'>
-              <FaInstagram className='text-3xl text-white cursor-pointer hover:text-purple-400 
-                                      transition-colors' />
-              <FaLinkedin className='text-3xl text-white cursor-pointer hover:text-blue-400 
-                                   transition-colors' />
-              <FaYoutube className='text-3xl text-white cursor-pointer hover:text-red-500 
-                                   transition-colors' />
-            </div>
+              <motion.p 
+                variants={itemVariants} 
+                className="text-lg md:text-xl text-gray-300/90 leading-relaxed"
+              >
+                AdrenaLux reinventa el TCG tradicional con tecnología en tiempo real. Colecciona cartas dinámicas que evolucionan con el rendimiento de los jugadores en La Liga.
+              </motion.p>
+
+              <motion.div 
+                variants={itemVariants} 
+                className="flex gap-4 flex-wrap items-center"
+              >
+                <button 
+                  onClick={handleDiscoverClick}
+                  className="group relative bg-gradient-to-r from-blue-600 to-purple-700 px-6 py-3 rounded-xl transition-all duration-300 hover:scale-[1.02] flex items-center gap-2"
+                >
+                  <span className="text-lg">Empezar ahora</span>
+                  <span className="group-hover:translate-x-1.5 transition-transform">&rarr;</span>
+                </button>
+                
+                <div className="flex items-center gap-4">
+                  <a href="https://discord.gg" target="_blank" rel="noopener noreferrer" aria-label="Discord">
+                    <FaDiscord className="text-2xl text-indigo-400 hover:text-indigo-300 transition-colors" />
+                  </a>
+                  <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+                    <FaYoutube className="text-2xl text-red-500 hover:text-red-400 transition-colors" />
+                  </a>
+                  <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                    <FaInstagram className="text-2xl text-pink-500 hover:text-pink-400 transition-colors" />
+                  </a>
+                </div>
+              </motion.div>
+            </motion.section>
+
+            {/* Imagen */}
+            <motion.div 
+              className="relative flex-1 max-w-3xl"
+              variants={itemVariants}
+            >
+              <img
+                src={pantallaPrincipal}
+                alt="Sobres de cartas TCG"
+                className="h-auto object-cover"
+                loading="lazy"
+              />
+            </motion.div>
           </div>
-        </section>
-
-        <section className='relative w-full lg:w-1/2 h-[600px] flex items-center justify-end transform -translate-x-16'>
-          <img
-            src={pantallaPrincipal}
-            alt='Sobres de cartas TCG'
-            className='w-full max-w-[700px] h-auto object-contain'
-          />
-        </section>
+        </div>
       </main>
 
-      {/* FOOTER */}
-      <footer className='bg-black text-white text-center py-8 md:py-12 fixed bottom-0 w-full border-t border-gray-700'>
-        <div className='flex justify-center gap-8 md:gap-20 flex-wrap'>
-          <a href='#' className='hover:text-blue-400 text-sm md:text-base transition-colors'>
-            Política de Privacidad
-          </a>
-          <a href='#' className='hover:text-blue-400 text-sm md:text-base transition-colors'>
-            Términos de Uso
-          </a>
-          <a href='#' className='hover:text-blue-400 text-sm md:text-base transition-colors'>
-            FAQ
-          </a>
-          <a href='#' className='hover:text-blue-400 text-sm md:text-base transition-colors'>
-            Estado
-          </a>
+      {/* Footer */}
+      <footer className="w-full border-t border-white/10 bg-black/90 backdrop-blur-lg mt-auto">
+        <div className="px-4 md:px-8 py-8 flex flex-col md:flex-row justify-between items-center gap-6 text-sm">
+          <div className="flex gap-4">
+            <a href="/politica" className="hover:text-blue-400 transition-colors">Política</a>
+            <a href="/terminos" className="hover:text-purple-400 transition-colors">Términos</a>
+            <a href="/soporte" className="hover:text-blue-400 transition-colors">Soporte</a>
+          </div>
+          
+          <div className="flex items-center gap-4 text-gray-400">
+            <span>© 2024 AdrenaLux</span>
+            <div className="h-4 w-px bg-white/20" />
+            <div className="flex gap-3">
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                <FaLinkedin className="hover:text-blue-400 transition-colors" />
+              </a>
+              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+                <FaYoutube className="hover:text-red-500 transition-colors" />
+              </a>
+            </div>
+          </div>
         </div>
       </footer>
-    </div>
+      
+
+      <div className="fixed inset-0 -z-50">
+        <div className="absolute top-20 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-float" />
+        <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-float animation-delay-2000" />
+      </div>
+    </motion.div>
   );
 }
 
