@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://adrenalux.duckdns.org/api/v1/cartas";
+const API_URL = "https://adrenalux.duckdns.org/api/v1/cartas";
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("auth_token");
@@ -23,7 +23,7 @@ export const getEquipos = async () => {
         if (team.escudo.startsWith("http")) {
           escudo = team.escudo;
         } else {
-          escudo = `http://adrenalux.duckdns.org/${team.escudo.replace(
+          escudo = `https://adrenalux.duckdns.org/${team.escudo.replace(
             /^public\//,
             ""
           )}`;

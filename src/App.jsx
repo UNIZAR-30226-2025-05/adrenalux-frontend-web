@@ -19,19 +19,19 @@ import Profile from "./components/Profile";
 import CardsForSale from "./components/CardsForSale";
 import EsperandoJugador from "./components/EsperandoJugador";
 import Clasificacion from "./components/Clasificacion";
+import Partida from "./components/Partida"; // Nuevo componente
 import React, { useState, useEffect } from "react";
 
 function App() {
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
 
-  // Leer el tema desde localStorage al montar el componente y aplicar la clase correspondiente
   useEffect(() => {
     if (theme === "dark") {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
     }
-  }, [theme]); // Cada vez que el tema cambie, se aplica el estilo
+  }, [theme]);
 
   return (
     <Router>
@@ -56,6 +56,7 @@ function App() {
         <Route path="/cards-for-sale" element={<CardsForSale />} />
         <Route path="/esperando" element={<EsperandoJugador />} />
         <Route path="/clasificacion" element={<Clasificacion />} />
+        <Route path="/partida/:matchId" element={<Partida />} /> {/* Nueva ruta */}
       </Routes>
     </Router>
   );

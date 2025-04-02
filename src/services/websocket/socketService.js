@@ -1,4 +1,5 @@
 import io from 'socket.io-client';
+import { getProfile } from '../api/profileApi';
 
 class SocketService {
   constructor() {
@@ -6,6 +7,10 @@ class SocketService {
     this.onOpponentCardSelected = null; 
     this.onConfirmationsUpdated = null;
     this.navigate = null;
+    this.onRoundStart = null;
+    this.onOpponentSelection = null;
+    this.onRoundResult = null;
+    this.onMatchEnd = null;
   }
 
   static getInstance() {
@@ -43,6 +48,7 @@ class SocketService {
       this.socket.on('connect', () => {
         console.log('Conectado al socket');
         this.setupExchangeListeners();
+        this.setupMatchListeners();
       });
 
       this.socket.on('notification', (data) => this.handleNotification(data));
@@ -201,6 +207,179 @@ class SocketService {
 
   requestExchange(id, username) {
     this.socket.emit('request_exchange', { id, username });
+  }
+
+  joinMatchmaking() {
+    if (!this.socket) {
+      console.error("Socket no está conectado");
+      return;
+    }
+    console.log("Buscando partida");
+    this.socket.emit('join_matchmaking');
+  }
+
+  leaveMatchmaking() {
+    if (!this.socket) {
+      console.error("Socket no está conectado");
+      return;
+    }
+    this.socket.emit('leave_matchmaking');
+  }
+
+  selectCardMatch(cartaId, skill) {
+    if (!this.socket) {
+      console.error("Socket no está conectado");
+      return;
+    }
+    this.socket.emit('select_card', { cartaId, skill });
+  }
+
+  selectResponse(cartaId, skill) {
+    if (!this.socket) {
+      console.error("Socket no está conectado");
+      return;
+    }
+    this.socket.emit('select_response', { cartaId, skill });
+  }
+
+  surrender(matchId) {
+    if (!this.socket) {
+      console.error("Socket no está conectado");
+      return;
+    }
+    this.socket.emit('surrender', { matchId });
+  }
+
+  setupMatchListeners() {
+    if (!this.socket) return;
+
+    // Matchmaking
+    this.socket.on('matchmaking_status', (data) => this.handleMatchmakingStatus(data));
+    this.socket.on('match_found', (data) => this.handleMatchFound(data));
+    
+    // Eventos de partida
+    this.socket.on('round_start', (data) => this.handleRoundStart(data));
+    this.socket.on('opponent_selection', (data) => this.handleOpponentSelection(data));
+    this.socket.on('round_result', (data) => this.handleRoundResult(data));
+    this.socket.on('match_ended', (data) => this.handleMatchEnd(data));
+    this.socket.on('match_error', (data) => this.handleMatchError(data));
+  }
+
+  handleMatchmakingStatus(data) {
+    console.log("Estado del matchmaking:", data);
+  }
+
+  handleMatchFound(data) {
+    console.log("Partida encontrada:", data);
+    this.navigate(`/partida/${encodeURIComponent(data.matchId)}`);
+  }
+
+  async handleRoundStart(data) {
+    console.log("Ronda iniciada:", data);
+    
+    try {
+      // Esperar a que getProfile() se complete
+      const profile = await getProfile();
+      console.log("Perfil obtenido:", profile);
+  
+      // Verificar si el perfil y profile.data existen
+      if (!profile || !profile.data) {
+        console.error("Error: Perfil no disponible");
+        return;
+      }
+  
+      // Mostrar notificación de turno
+      const isPlayerTurn = profile.data.id == data.starter;
+      this.showTurnNotification(isPlayerTurn ? "¡TU TURNO!" : "Turno del rival", isPlayerTurn);
+  
+    } catch (error) {
+      console.error("Error en handleRoundStart:", error);
+      // Mostrar notificación de error si es necesario
+      this.showTurnNotification("Error al obtener datos", false);
+    }
+  }
+  
+  // Función auxiliar para mostrar notificaciones
+  showTurnNotification(message, isPlayerTurn) {
+    const notificationDiv = document.createElement('div');
+    notificationDiv.style.position = 'fixed';
+    notificationDiv.style.top = '20px';
+    notificationDiv.style.left = '0';
+    notificationDiv.style.right = '0';
+    notificationDiv.style.margin = '0 auto';
+    notificationDiv.style.width = 'fit-content';
+    notificationDiv.style.padding = '15px 25px';
+    notificationDiv.style.borderRadius = '8px';
+    notificationDiv.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+    notificationDiv.style.zIndex = '1000';
+    notificationDiv.style.opacity = '0';
+    notificationDiv.style.transform = 'translateY(-20px)';
+    notificationDiv.style.transition = 'all 0.3s ease-out';
+    notificationDiv.style.textAlign = 'center';
+    notificationDiv.style.fontWeight = 'bold';
+    notificationDiv.style.fontSize = '16px';
+    notificationDiv.style.color = 'white';
+    notificationDiv.style.backgroundColor = isPlayerTurn ? '#4CAF50' : '#F44336';
+    notificationDiv.textContent = message;
+  
+    document.body.appendChild(notificationDiv);
+  
+    // Animación de entrada
+    setTimeout(() => {
+      notificationDiv.style.opacity = '1';
+      notificationDiv.style.transform = 'translateY(0)';
+    }, 10);
+  
+    // Ocultar después de 2 segundos
+    setTimeout(() => {
+      notificationDiv.style.opacity = '0';
+      notificationDiv.style.transform = 'translateY(-20px)';
+      
+      // Eliminar después de la animación
+      setTimeout(() => {
+        if (notificationDiv.parentNode) {
+          notificationDiv.parentNode.removeChild(notificationDiv);
+        }
+      }, 300);
+    }, 2000);
+  }
+
+  handleOpponentSelection(data) {
+    console.log("El oponente ha seleccionado:", data);
+  }
+
+  handleRoundResult(data) {
+    console.log("Resultado de ronda:", data);
+  }
+
+  handleMatchEnd(data) {
+    console.log("Partida terminada:", data);
+    this.navigate('/home');
+  }
+
+  handleMatchError(data) {
+    console.error("Error en partida:", data);
+  }
+
+  // Callbacks para actualizar la UI
+  setOnMatchFound(callback) {
+    this.onMatchFound = callback;
+  }
+
+  setOnRoundStart(callback) {
+    this.onRoundStart = callback;
+  }
+
+  setOnOpponentSelection(callback) {
+    this.onOpponentSelection = callback;
+  }
+
+  setOnRoundResult(callback) {
+    this.onRoundResult = callback;
+  }
+
+  setOnMatchEnd(callback) {
+    this.onMatchEnd = callback;
   }
 }
 
