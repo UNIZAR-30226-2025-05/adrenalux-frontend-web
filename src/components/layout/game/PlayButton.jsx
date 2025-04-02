@@ -1,6 +1,7 @@
 import { FaBolt } from "react-icons/fa";
 import Alineacion from "../../../assets/alineacion.png";
 import { useNavigate } from "react-router-dom";
+import { socketService } from '../../../services/websocket/socketService';
 
 export default function PlayButton() {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ export default function PlayButton() {
   };
 
   const handleJugarClick = () => {
+    socketService.joinMatchmaking();
     navigate("/buscandoPartida");
   };
 
