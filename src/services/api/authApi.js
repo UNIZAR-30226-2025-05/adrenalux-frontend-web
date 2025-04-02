@@ -12,14 +12,14 @@ export const login = async (email, password) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email, password}),
+      body: JSON.stringify({ email, password }),
     });
 
     const data = await response.json();
     if (response.status === 200) {
-      console.log(data.data.token)
+      console.log(data.data.token);
       setToken(data.data.token); // Guardar el token
-      console.log("token")
+      console.log("token");
     }
     return { status: response.status, data };
   } catch (error) {
@@ -91,5 +91,23 @@ export const logout = async () => {
   } catch (error) {
     console.error("Error cerrando sesión:", error);
     return false;
+  }
+};
+// Función para iniciar sesion con Google.
+export const googleSignIn = async (tokenId) => {
+  try {
+    const response = await fetch(`${API_URL}/google`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tokenId }),
+    });
+    const data = await response.json();
+    if (response.status === 200) {
+      setToken(data.data.token);
+    }
+    return { status: response.status, data };
+  } catch (error) {
+    console.error("Error en googleSignIn:", error);
+    return { status: 500, data: { message: "Error de conexión" } };
   }
 };

@@ -1,30 +1,31 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { login } from '../services/api/authApi';
-import googleLogo from '../assets/googleLogo.png';
-import background from '../assets/background.png';
-
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { login } from "../services/api/authApi";
+import googleLogo from "../assets/googleLogo.png";
+import background from "../assets/background.png";
+import { googleSignIn } from "../services/api/authApi";
+import GoogleSignInButton from "../components/layout/game/GoogleSignInButton";
 const Login = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    email: '',
-    password: ''
+    email: "",
+    password: "",
   });
 
   const [errors, setErrors] = useState({});
 
-  const isDebugMode = import.meta.env.VITE_NODE_ENV === 'development';
+  const isDebugMode = import.meta.env.VITE_NODE_ENV === "development";
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
 
     setErrors({
       ...errors,
-      [e.target.name]: ''
+      [e.target.name]: "",
     });
   };
 
@@ -48,6 +49,16 @@ const Login = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  //Google sign in
+  const handleGoogleSuccess = async (tokenId) => {
+    const { status } = await googleSignIn(tokenId);
+    if (status === 200) {
+      navigate("/Home");
+    } else {
+      alert("Error al iniciar sesión con Google");
+    }
+  };
+
   const handleLoginClick = async (e) => {
     e.preventDefault();
 
@@ -59,12 +70,12 @@ const Login = () => {
       const { status } = await login(formData.email, formData.password);
 
       if (status === 200) {
-        console.log('Inicio de sesión exitoso');
-        navigate('/Home');
+        console.log("Inicio de sesión exitoso");
+        navigate("/Home");
       } else {
         setErrors({
           ...errors,
-          general: 'Error en las credenciales'
+          general: "Error en las credenciales",
         });
       }
     } catch (error) {
@@ -72,7 +83,7 @@ const Login = () => {
         ...errors,
         general: isDebugMode
           ? `Error en la conexión con el servidor: ${error}`
-          : 'Error en la conexión con el servidor'
+          : "Error en la conexión con el servidor",
       });
     }
   };
@@ -83,16 +94,12 @@ const Login = () => {
       style={{ backgroundImage: `url(${background})` }}
     >
       <div className="bg-gray-300 dark:bg-gray-900 p-8 w-full max-w-lg text-white">
-        
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-black dark:text-white text-2xl font-bold">
             Inicio de sesión
           </h2>
 
-          <button className="flex items-center bg-gray-800 hover:bg-gray-700 border border-white rounded px-3 py-2">
-            <img src={googleLogo} alt="Google" className="w-5 mr-2" />
-            Continuar con Google
-          </button>
+          <GoogleSignInButton onSuccess={handleGoogleSuccess} />
         </div>
 
         <p className="text-black dark:text-white text-sm mb-4">
@@ -100,41 +107,38 @@ const Login = () => {
         </p>
 
         {errors.general && (
-          <p className="text-red-500 text-sm mb-4">
-            {errors.general}
-          </p>
+          <p className="text-red-500 text-sm mb-4">{errors.general}</p>
         )}
 
         <form onSubmit={handleLoginClick} className="space-y-4">
-          
           <input
             type="email"
             name="email"
             placeholder="Correo electrónico"
-            className={`w-full bg-gray-800 border ${errors.email ? 'border-red-500' : 'border-gray-700'} rounded px-4 py-2 text-white focus:outline-none`}
+            className={`w-full bg-gray-800 border ${
+              errors.email ? "border-red-500" : "border-gray-700"
+            } rounded px-4 py-2 text-white focus:outline-none`}
             value={formData.email}
             onChange={handleChange}
           />
-          
+
           {errors.email && (
-            <p className="text-red-500 text-sm">
-              {errors.email}
-            </p>
+            <p className="text-red-500 text-sm">{errors.email}</p>
           )}
 
           <input
             type="password"
             name="password"
             placeholder="Contraseña"
-            className={`w-full bg-gray-800 border ${errors.password ? 'border-red-500' : 'border-gray-700'} rounded px-4 py-2 text-white focus:outline-none`}
+            className={`w-full bg-gray-800 border ${
+              errors.password ? "border-red-500" : "border-gray-700"
+            } rounded px-4 py-2 text-white focus:outline-none`}
             value={formData.password}
             onChange={handleChange}
           />
 
           {errors.password && (
-            <p className="text-red-500 text-sm">
-              {errors.password}
-            </p>
+            <p className="text-red-500 text-sm">{errors.password}</p>
           )}
 
           {/* Botones de iniciar sesión y olvidar contraseña */}
@@ -159,7 +163,7 @@ const Login = () => {
             <button
               className="text-blue-600 bg-gray-900 hover:text-blue-200 transition duration-300"
               type="button"
-              onClick={() => navigate('/register')}
+              onClick={() => navigate("/register")}
             >
               No tengo cuenta
             </button>

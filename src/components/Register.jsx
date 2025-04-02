@@ -1,26 +1,36 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import googleLogo from "../assets/googleLogo.png";
 import background from "../assets/background.png";
-import { register, login } from '../services/api/authApi'; 
+import { register, login, googleSignIn } from "../services/api/authApi";
+import GoogleSignInButton from "../components/layout/game/GoogleSignInButton";
 
 const Register = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    email: '',
-    name: '',
-    lastname: '',
-    username: '',
-    password: ''
+    email: "",
+    name: "",
+    lastname: "",
+    username: "",
+    password: "",
   });
 
   const [errors, setErrors] = useState({});
 
+  const handleGoogleSuccess = async (tokenId) => {
+    const { status } = await googleSignIn(tokenId);
+    if (status === 200) {
+      navigate("/Home");
+    } else {
+      alert("Error al iniciar sesión con Google");
+    }
+  };
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
     setErrors({ ...errors, [e.target.name]: "" }); // Limpiar error al escribir
   };
@@ -34,9 +44,11 @@ const Register = () => {
     }
 
     if (!formData.name.trim()) newErrors.name = "El nombre es obligatorio.";
-    if (!formData.lastname.trim()) newErrors.lastname = "El apellido es obligatorio.";
-    if (!formData.username.trim()) newErrors.username = "El nombre de usuario es obligatorio.";
-    
+    if (!formData.lastname.trim())
+      newErrors.lastname = "El apellido es obligatorio.";
+    if (!formData.username.trim())
+      newErrors.username = "El nombre de usuario es obligatorio.";
+
     if (!formData.password.trim()) {
       newErrors.password = "La contraseña es obligatoria.";
     } else if (formData.password.length < 6) {
@@ -59,14 +71,14 @@ const Register = () => {
         formData.name,
         formData.password
       );
-      
+
       if (status.error_message === "") {
         const { status } = await login(formData.email, formData.password);
         if (status === 200) {
-          console.log('Inicio de sesión exitoso');
-          navigate('/Home');
+          console.log("Inicio de sesión exitoso");
+          navigate("/Home");
         } else {
-          console.error('Error al iniciar sesión:', data);
+          console.error("Error al iniciar sesión:", data);
         }
       } else {
         // Manejo de errores específicos
@@ -78,85 +90,107 @@ const Register = () => {
           newErrors.username = "Este nombre de usuario ya está en uso.";
         }
         if (status.error_message.includes("password")) {
-          newErrors.password = "La contraseña debe tener al menos 6 caracteres.";
+          newErrors.password =
+            "La contraseña debe tener al menos 6 caracteres.";
         }
         setErrors(newErrors);
       }
     } catch (error) {
-      console.error('Error en la solicitud:', error);
+      console.error("Error en la solicitud:", error);
     }
   };
 
   return (
-    <div 
-      className="fixed inset-0 flex justify-center items-center bg-cover bg-center" 
+    <div
+      className="fixed inset-0 flex justify-center items-center bg-cover bg-center"
       style={{ backgroundImage: `url(${background})` }}
     >
       <div className="bg-gray-300 dark:bg-gray-900 p-8 w-full max-w-md text-white">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-black dark:text-white text-2xl font-bold">Registrarse</h2>
-          <button className="flex items-center bg-gray-800 hover:bg-gray-700 border border-white rounded px-3 py-2">
-            <img src={googleLogo} alt="Google" className="w-5 mr-2" />
-            Continuar con Google
-          </button>
+          <h2 className="text-black dark:text-white text-2xl font-bold">
+            Registrarse
+          </h2>
+          <div className="flex justify-between items-center mb-4">
+            <GoogleSignInButton onSuccess={handleGoogleSuccess} />
+          </div>
         </div>
-        <p className="text-black dark:text-white text-sm mb-4">Crear una nueva cuenta</p>
+        <p className="text-black dark:text-white text-sm mb-4">
+          Crear una nueva cuenta
+        </p>
 
         <form onSubmit={handleSignUpClick} className="space-y-4">
           {/** Email */}
-          <input 
-            type="text" 
-            name="email" 
-            placeholder="Correo electrónico" 
-            className={`w-full bg-gray-800 border ${errors.email ? 'border-red-500' : 'border-gray-700'} focus:border-gray-600 rounded px-4 py-2 text-white focus:outline-none`}
+          <input
+            type="text"
+            name="email"
+            placeholder="Correo electrónico"
+            className={`w-full bg-gray-800 border ${
+              errors.email ? "border-red-500" : "border-gray-700"
+            } focus:border-gray-600 rounded px-4 py-2 text-white focus:outline-none`}
             value={formData.email}
             onChange={handleChange}
           />
-          {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+          {errors.email && (
+            <p className="text-red-500 text-sm">{errors.email}</p>
+          )}
 
           {/** Nombre */}
-          <input 
-            type="text" 
-            name="name" 
-            placeholder="Nombre" 
-            className={`w-full bg-gray-800 border ${errors.name ? 'border-red-500' : 'border-gray-700'} focus:border-gray-600 rounded px-4 py-2 text-white focus:outline-none`}
+          <input
+            type="text"
+            name="name"
+            placeholder="Nombre"
+            className={`w-full bg-gray-800 border ${
+              errors.name ? "border-red-500" : "border-gray-700"
+            } focus:border-gray-600 rounded px-4 py-2 text-white focus:outline-none`}
             value={formData.name}
             onChange={handleChange}
           />
           {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
 
           {/** Apellido */}
-          <input 
-            type="text" 
-            name="lastname" 
-            placeholder="Apellido" 
-            className={`w-full bg-gray-800 border ${errors.lastname ? 'border-red-500' : 'border-gray-700'} focus:border-gray-600 rounded px-4 py-2 text-white focus:outline-none`}
+          <input
+            type="text"
+            name="lastname"
+            placeholder="Apellido"
+            className={`w-full bg-gray-800 border ${
+              errors.lastname ? "border-red-500" : "border-gray-700"
+            } focus:border-gray-600 rounded px-4 py-2 text-white focus:outline-none`}
             value={formData.lastname}
             onChange={handleChange}
           />
-          {errors.lastname && <p className="text-red-500 text-sm">{errors.lastname}</p>}
+          {errors.lastname && (
+            <p className="text-red-500 text-sm">{errors.lastname}</p>
+          )}
 
           {/** Nombre de usuario */}
-          <input 
-            type="text" 
-            name="username" 
-            placeholder="Nombre de usuario" 
-            className={`w-full bg-gray-800 border ${errors.username ? 'border-red-500' : 'border-gray-700'} focus:border-gray-600 rounded px-4 py-2 text-white focus:outline-none`}
+          <input
+            type="text"
+            name="username"
+            placeholder="Nombre de usuario"
+            className={`w-full bg-gray-800 border ${
+              errors.username ? "border-red-500" : "border-gray-700"
+            } focus:border-gray-600 rounded px-4 py-2 text-white focus:outline-none`}
             value={formData.username}
             onChange={handleChange}
           />
-          {errors.username && <p className="text-red-500 text-sm">{errors.username}</p>}
+          {errors.username && (
+            <p className="text-red-500 text-sm">{errors.username}</p>
+          )}
 
           {/** Contraseña */}
-          <input 
-            type="password" 
-            name="password" 
-            placeholder="Contraseña" 
-            className={`w-full bg-gray-800 border ${errors.password ? 'border-red-500' : 'border-gray-700'} focus:border-gray-600 rounded px-4 py-2 text-white focus:outline-none`}
+          <input
+            type="password"
+            name="password"
+            placeholder="Contraseña"
+            className={`w-full bg-gray-800 border ${
+              errors.password ? "border-red-500" : "border-gray-700"
+            } focus:border-gray-600 rounded px-4 py-2 text-white focus:outline-none`}
             value={formData.password}
             onChange={handleChange}
           />
-          {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
+          {errors.password && (
+            <p className="text-red-500 text-sm">{errors.password}</p>
+          )}
 
           {/** Botón de registro */}
           <button className="w-full bg-blue-600 hover:bg-blue-500 text-white rounded py-2 transition duration-300">
@@ -168,7 +202,7 @@ const Register = () => {
             <button
               className="text-blue-600 bg-gray-900 hover:text-blue-200 transition duration-300"
               type="button"
-              onClick={() => navigate('/login')}
+              onClick={() => navigate("/login")}
             >
               Ya tengo cuenta
             </button>
