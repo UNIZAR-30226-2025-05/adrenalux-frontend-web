@@ -3,15 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import { FaInstagram, FaLinkedin, FaYoutube } from 'react-icons/fa';
 import logo from '../assets/adrenalux_logo_white.png';
 import pantallaPrincipal from '../assets/Sobres.png';
+import { getToken } from "../services/api/authApi";
 
 const Inicio = () => {
   const navigate = useNavigate();
+  const token = getToken();
 
   useEffect(() => {
+    if(token){
+      navigate("/home");
+    }
     document.body.style.background = 'linear-gradient(to bottom, #1a1a1a, #111111)';
     document.body.style.margin = '0';
     document.body.style.padding = '0';
-  }, []);
+  }, [token, navigate]);
 
   const handleLoginClick = () => navigate('/login');
   const handleSignUpClick = () => navigate('/register');
