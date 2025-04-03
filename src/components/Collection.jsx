@@ -395,7 +395,7 @@ export default function Collection({ onBack }) {
                       alt={team.nombre}
                       className="w-12 h-12 object-contain mb-2"
                       onError={(e) => {
-                        e.target.src = "/src/assets/default_escudo.png";
+                        e.target.src = "/assets/default_escudo.png";
                       }}
                     />
                     <p className="text-sm text-center">{team.nombre}</p>
@@ -416,8 +416,8 @@ export default function Collection({ onBack }) {
 
                 const validRarezas = ["MEGALUXURY", "LUXURYXI", "LUXURY"]; // Ajusta según tus nombres
                 const imageSrc = validRarezas.includes(rarityKey)
-                  ? `/src/assets/card_${rarityKey}.png`
-                  : `/src/assets/cartaNormal.png`;
+                  ? `/assets/card_${rarityKey}.png`
+                  : `/assets/cartaNormal.png`;
 
                 return (
                   <div
@@ -466,11 +466,11 @@ export default function Collection({ onBack }) {
                     {/* Contenedor relativo para la imagen */}
                     <div className="relative w-12 h-12 mb-2">
                       <img
-                        src={`/src/assets/circle.png`}
+                        src={`/assets/circle.png`}
                         alt={pos.nombre}
                         className="w-12 h-12 object-contain"
                         onError={(e) => {
-                          e.target.src = "/src/assets/default_escudo.png";
+                          e.target.src = "/assets/default_escudo.png";
                         }}
                       />
                       {/* Texto superpuesto */}

@@ -6,5 +6,14 @@ export default defineConfig({
   plugins: [react()],
   server: {
     cors: true, 
+  },
+  base: '/',
+  build: {
+    assetsDir: 'assets',
+    rollupOptions: {
+      output: {
+        assetFileNames: 'src/assets/[name][extname]'
+      }
+    }
   }
 })
