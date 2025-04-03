@@ -147,14 +147,18 @@ export default function Collection({ onBack }) {
   const totalPages = Math.ceil(cards.length / cardsPerPage);
   const startIndex = (currentPage - 1) * cardsPerPage;
   const visibleCards = cards.slice(startIndex, startIndex + cardsPerPage);
+  
+  const leftCardsCount = visibleCards.slice(0, 9).length;
+  const rightCardsCount = visibleCards.slice(9, 18).length;
+
   const leftRangeStart = startIndex + 1;
-  const leftRangeEnd = leftRangeStart + 8;
+  const leftRangeEnd = startIndex + leftCardsCount;
   const rightRangeStart = leftRangeEnd + 1;
-  const rightRangeEnd = rightRangeStart + 8;
+  const rightRangeEnd = startIndex + leftCardsCount + rightCardsCount;
 
   const handlePrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
   const handleNextPage = () =>
-    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  setCurrentPage((prev) => Math.min(prev + 1, totalPages));
 
   const handleCardClick = (card) => {
     setSelectedCard(card);
@@ -234,7 +238,7 @@ export default function Collection({ onBack }) {
 
       <div className="flex justify-between items-center w-full max-w-5xl px-4 mb-2 text-lg font-semibold">
         <span>{`${leftRangeStart}-${leftRangeEnd}`}</span>
-        <span>{`${rightRangeStart}-${rightRangeEnd}`}</span>
+        {rightCardsCount > 0 && <span>{`${rightRangeStart}-${rightRangeEnd}`}</span>}
       </div>
 
       <div className="relative w-full max-w-5xl">
@@ -366,8 +370,8 @@ export default function Collection({ onBack }) {
       )}
 
       {showIndexModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
-          <div className="bg-[#2B5C94] p-6 rounded-lg shadow-lg max-w-2xl w-full mx-4 relative">
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 overflow-y-auto">
+          <div className="bg-[#2B5C94] p-6 rounded-lg shadow-lg w-11/12 md:max-w-2xl mx-4 my-8 max-h-[90vh] overflow-y-auto relative">
             <h2 className="text-2xl font-bold mb-4 text-center">Índice</h2>
             <button
               onClick={() => setShowIndexModal(false)}
@@ -375,9 +379,8 @@ export default function Collection({ onBack }) {
             >
               Cerrar
             </button>
-            {/* Sección Equipos */}
             <h3 className="text-xl font-semibold mb-2">Equipos</h3>
-            <div className="grid grid-cols-6 gap-4 mb-6">
+            <div className="grid grid-cols-3 md:grid-cols-6 gap-4 mb-6">
               {teams.map((team, index) => {
                 const key =
                   team.id && team.nombre ? `${team.id}-${team.nombre}` : index;
@@ -401,9 +404,8 @@ export default function Collection({ onBack }) {
               })}
             </div>
 
-            {/* Sección Rarezas */}
             <h3 className="text-xl font-semibold mb-2">Rarezas</h3>
-            <div className="grid grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               {Object.keys(rarities).map((rarityKey) => {
                 console.log(
                   "Rarity key:",
@@ -436,9 +438,8 @@ export default function Collection({ onBack }) {
               })}
             </div>
 
-            {/* Sección Posiciones */}
             <h3 className="text-xl font-semibold mb-2">Posiciones</h3>
-            <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {positions.map((pos) => {
                 // Función para obtener la abreviatura según la posición
                 const getAbbreviation = (positionName) => {
@@ -496,5 +497,5 @@ export default function Collection({ onBack }) {
 }
 
 Collection.propTypes = {
-  onBack: PropTypes.func.isRequired,
+  onBack: PropTypes.func,
 };
