@@ -247,7 +247,12 @@ class SocketService {
       console.error("Socket no está conectado");
       return;
     }
-    this.socket.emit('surrender', { matchId });
+    const matchIdInt = parseInt(matchId, 10);
+    if (isNaN(matchIdInt)) {
+      console.error("matchId no es un número válido");
+      return;
+    }
+    this.socket.emit('surrender', { matchId: matchIdInt });
   }
 
   setupMatchListeners() {

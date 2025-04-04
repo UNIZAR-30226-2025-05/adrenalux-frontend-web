@@ -54,7 +54,11 @@ const Partida = () => {
   const handleMatchEnd = (data) => { /* ... */ };
   const handleCardSelect = (cardId, skill) => { /* ... */ };
   const handleConfirmSelection = () => { /* ... */ };
-  const handleSurrender = () => { /* ... */ };
+  
+  const handleSurrender = () => { 
+    socketService.surrender(matchId);
+    navigate("/home");
+  };
 
   // Estilos para el layout
   const containerStyle = {
