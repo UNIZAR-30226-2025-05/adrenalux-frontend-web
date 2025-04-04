@@ -17,13 +17,8 @@ export default function BuscandoJugador() {
       navigate("/");
     }
 
-    // Unirse al matchmaking al montar el componente
     socketService.joinMatchmaking();
-
-    return () => {
-      // Limpiar al desmontar el componente
-      socketService.leaveMatchmaking();
-    };
+    
   }, [token, navigate]);
 
   const handleCancel = () => {

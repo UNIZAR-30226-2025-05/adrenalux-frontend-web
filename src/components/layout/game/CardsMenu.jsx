@@ -10,7 +10,6 @@ export default function CardsMenu() {
   const [sobres, setSobres] = useState([]);
   const [centerCard, setCenterCard] = useState(null);
   const [showAlert, setShowAlert] = useState(false);
-  const [selectedCard, setSelectedCard] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {

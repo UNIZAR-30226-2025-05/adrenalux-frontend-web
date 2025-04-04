@@ -119,3 +119,19 @@ export const actualizarCarta = async (plantillaId, cartaidActual, cartaidNueva, 
         throw error;
     }
 };
+
+export const activarPartida = async (plantillaId, token) => {
+    try {
+        const response = await axios.post(`${API_URL}/plantillas/activarPlantilla`, {
+            plantillaId: plantillaId
+        }, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error al activar partida:', error);
+        throw error;
+    }
+};
