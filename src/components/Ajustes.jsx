@@ -6,16 +6,20 @@ import BackButton from './layout/game/BackButton';
 import background from '../assets/background.png';
 import { getToken } from "../services/api/authApi";
 
+import { loadSound, playMusic, playSound, changeMusicVolume, changeSfxVolume } from '../utils/soundManager';
+import bgMusic from '../assets/sounds/background_music.mp3';
+import testSound from '../assets/sounds/opening_sound.mp3';
+
 const Ajustes = () => {
   const navigate = useNavigate(); // Obtener la función de navegación
   const token = getToken();
 
   // Estados iniciales cargados desde localStorage o valores por defecto
-  const [generalVolume, setGeneralVolume] = useState(
-    parseInt(localStorage.getItem("generalVolume")) || 80
+  const [musicVolume, setMusicVolume] = useState(
+    parseInt(localStorage.getItem("musicVolume")) || 50
   );
   const [sfxVolume, setSfxVolume] = useState(
-    parseInt(localStorage.getItem("sfxVolume")) || 40
+    parseInt(localStorage.getItem("sfxVolume")) || 80
   );
   const [language, setLanguage] = useState(localStorage.getItem("language") || "es");
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
@@ -23,11 +27,13 @@ const Ajustes = () => {
 
   // Efecto para guardar en localStorage cuando los valores cambian
   useEffect(() => {
-    localStorage.setItem("generalVolume", generalVolume);
-  }, [generalVolume]);
+    localStorage.setItem("musicVolume", musicVolume);
+    changeMusicVolume(musicVolume / 100);  // Actualiza el volumen de la música usando Howler.js
+  }, [musicVolume]);
 
   useEffect(() => {
-    localStorage.setItem("sfxVolume", sfxVolume);
+    localStorage.setItem("sfxVolume", sfxVolume)
+    changeSfxVolume(sfxVolume / 100);  // Actualiza el volumen de los efectos de sonido usando Howler.js
   }, [sfxVolume]);
 
   useEffect(() => {
@@ -50,10 +56,16 @@ const Ajustes = () => {
     if (!token) {
       navigate("/");
     }
-  }, [token, navigate]);  
+  }, [token, navigate]);
+
+  useEffect(() => {
+    loadSound('test', testSound);
+    playMusic(bgMusic);
+  }, []);
 
   // Función para manejar el cambio de tema
   const toggleTheme = () => {
+    playSound('test'); // test
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme);
@@ -112,18 +124,7 @@ const Ajustes = () => {
             <h2 className="text-black dark:text-white text-2xl font-semibold mb-4">Cambiar tema</h2>
             <div className="relative">
               <button
-                onClick={() => {
-                  const newTheme = theme === "light" ? "dark" : "light";
-                  setTheme(newTheme);
-                  localStorage.setItem("theme", newTheme); // Guardar en localStorage
-
-                  // Aplicar el tema al body
-                  if (newTheme === "light") {
-                    document.documentElement.classList.remove("dark");
-                  } else {
-                    document.documentElement.classList.add("dark");
-                  }
-                }}
+                onClick={() => toggleTheme()}
                 className="block w-full bg-gray-700 text-white py-3 px-4 rounded leading-tight focus:outline-none focus:bg-gray-600 focus:border-gray-500 flex justify-between items-center"
               >
                 <span>{theme === "light" ? "☀️ Modo Claro" : "🌙 Modo Oscuro"}</span>
@@ -141,17 +142,17 @@ const Ajustes = () => {
             <h2 className="text-black dark:text-white text-2xl font-semibold mb-4">Ajustes de sonido</h2>
             <div className="space-y-4">
               <div>
-                <label className="text-black dark:text-white">General</label>
+                <label className="text-black dark:text-white">Música</label>
                 <input
                   type="range"
                   min="0"
                   max="100"
-                  value={generalVolume}
-                  onChange={(e) => setGeneralVolume(e.target.value)}
-                  style={getSliderStyle(generalVolume)}
+                  value={musicVolume}
+                  onChange={(e) => setMusicVolume(e.target.value)}
+                  style={getSliderStyle(musicVolume)}
                   className="w-full h-2 rounded-full appearance-none cursor-pointer"
                 />
-                <p className="text-black dark:text-white text-sm mt-2">Volumen: {generalVolume}%</p>
+                <p className="text-black dark:text-white text-sm mt-2">Volumen: {musicVolume}%</p>
               </div>
 
               <div>
