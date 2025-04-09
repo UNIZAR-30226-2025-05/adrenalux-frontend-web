@@ -15,6 +15,7 @@ import {
   getRaridades,
   getPosiciones,
 } from "../services/api/teamsApi";
+import circle from "../assets/circle.png";
 
 export default function Collection({ onBack }) {
   const [cards, setCards] = useState([]);
@@ -33,7 +34,13 @@ export default function Collection({ onBack }) {
   const token = getToken();
 
   const navigate = useNavigate();
+  const validRarezas = ["MEGALUXURY", "LUXURYXI", "LUXURY"];
 
+  const images = import.meta.glob("../assets/*.png", { eager: true });
+
+  const getImageSrc = (filename) => {
+    return images[`../assets/${filename}`]?.default;
+  };
   useEffect(() => {
     fetchCollection();
     if (!token) {
@@ -147,7 +154,7 @@ export default function Collection({ onBack }) {
   const totalPages = Math.ceil(cards.length / cardsPerPage);
   const startIndex = (currentPage - 1) * cardsPerPage;
   const visibleCards = cards.slice(startIndex, startIndex + cardsPerPage);
-  
+
   const leftCardsCount = visibleCards.slice(0, 9).length;
   const rightCardsCount = visibleCards.slice(9, 18).length;
 
@@ -158,7 +165,7 @@ export default function Collection({ onBack }) {
 
   const handlePrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
   const handleNextPage = () =>
-  setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
 
   const handleCardClick = (card) => {
     setSelectedCard(card);
@@ -238,7 +245,9 @@ export default function Collection({ onBack }) {
 
       <div className="flex justify-between items-center w-full max-w-5xl px-4 mb-2 text-lg font-semibold">
         <span>{`${leftRangeStart}-${leftRangeEnd}`}</span>
-        {rightCardsCount > 0 && <span>{`${rightRangeStart}-${rightRangeEnd}`}</span>}
+        {rightCardsCount > 0 && (
+          <span>{`${rightRangeStart}-${rightRangeEnd}`}</span>
+        )}
       </div>
 
       <div className="relative w-full max-w-5xl">
@@ -413,11 +422,9 @@ export default function Collection({ onBack }) {
                   "Valor:",
                   rarities[rarityKey]
                 );
-
-                const validRarezas = ["MEGALUXURY", "LUXURYXI", "LUXURY"]; // Ajusta según tus nombres
-                const imageSrc = validRarezas.includes(rarityKey)
-                  ? `/assets/card_${rarityKey}.png`
-                  : `/assets/cartaNormal.png`;
+                const imageSrc = validRarezas.includes(rarityKey.toUpperCase())
+                  ? getImageSrc(`card_${rarityKey.toUpperCase()}.png`)
+                  : getImageSrc("cartaNormal.png");
 
                 return (
                   <div
@@ -439,7 +446,7 @@ export default function Collection({ onBack }) {
             </div>
 
             <h3 className="text-xl font-semibold mb-2">Posiciones</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {positions.map((pos) => {
                 // Función para obtener la abreviatura según la posición
                 const getAbbreviation = (positionName) => {
@@ -466,7 +473,7 @@ export default function Collection({ onBack }) {
                     {/* Contenedor relativo para la imagen */}
                     <div className="relative w-12 h-12 mb-2">
                       <img
-                        src={`/assets/circle.png`}
+                        src={circle}
                         alt={pos.nombre}
                         className="w-12 h-12 object-contain"
                         onError={(e) => {
