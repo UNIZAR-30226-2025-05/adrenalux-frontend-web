@@ -8,6 +8,11 @@ const GridOpenedCards = () => {
   
   const { openedCards } = location.state;
 
+  const emptySize = {
+    width: "clamp(7rem, 10vw, 9rem)",
+    height: "clamp(9rem, 12vw, 11rem)"
+  };
+
   return (
     <div className="fixed inset-0 flex justify-center items-center bg-cover bg-center" style={{ backgroundImage: `url(${background})` }}>
       <div className="bg-black bg-opacity-50 p-6 rounded-lg text-center">
@@ -19,7 +24,9 @@ const GridOpenedCards = () => {
               key={index}
               className="relative w-32 h-48 flex justify-center items-center bg-black bg-opacity-50 rounded-lg shadow-lg"
             >
-              <Carta jugador={card}/>
+              <Carta jugador={card}
+              width={emptySize.width}
+              height={emptySize.height}/>
             </div>
           ))}
         </div>

@@ -19,7 +19,7 @@ import Profile from "./components/Profile";
 import CardsForSale from "./components/CardsForSale";
 import EsperandoJugador from "./components/EsperandoJugador";
 import Clasificacion from "./components/Clasificacion";
-import Partida from "./components/Partida"; // Nuevo componente
+import Partida from "./components/Partida"; 
 import React, { useState, useEffect } from "react";
 
 function App() {

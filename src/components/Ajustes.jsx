@@ -6,7 +6,7 @@ import BackButton from './layout/game/BackButton';
 import background from '../assets/background.png';
 import { getToken } from "../services/api/authApi";
 
-import { loadSound, playMusic, playSound, changeMusicVolume, changeSfxVolume } from '../utils/soundManager';
+//import { loadSound, playMusic, playSound, changeMusicVolume, changeSfxVolume } from '../utils/soundManager';
 import bgMusic from '../assets/sounds/background_music.mp3';
 import testSound from '../assets/sounds/opening_sound.mp3';
 

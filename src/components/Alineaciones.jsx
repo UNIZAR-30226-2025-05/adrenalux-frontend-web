@@ -23,6 +23,30 @@ export default function Alineaciones() {
   const [plantillaToDelete, setPlantillaToDelete] = useState(null);
   const [plantillaActivaId, setPlantillaActivaId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [screenSize, setScreenSize] = useState('lg');
+
+  // Detectar tamaño de pantalla para ajustar el grid
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      if (width < 640) {
+        setScreenSize('sm');
+      } else if (width < 1024) {
+        setScreenSize('md');
+      } else {
+        setScreenSize('lg');
+      }
+    };
+
+    // Inicializar
+    handleResize();
+    
+    // Añadir evento de resize
+    window.addEventListener('resize', handleResize);
+    
+    // Limpiar el evento
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Obtener las alineaciones del usuario al cargar el componente
   useEffect(() => {
@@ -41,7 +65,6 @@ export default function Alineaciones() {
 
         const data = await obtenerPlantillas(token);
         setAlineaciones(data?.data || []);
-        console.log(data)
         
         // Obtener la plantilla activa del usuario
         const userData = JSON.parse(localStorage.getItem("user"));
@@ -186,66 +209,83 @@ export default function Alineaciones() {
   };
 
   if (error) {
-    return <div className="text-red-600">{error}</div>;
+    return <div className="text-red-600 p-4 text-center">{error}</div>;
   }
+
+  // Definir número de columnas según tamaño de pantalla
+  const getGridColumns = () => {
+    switch(screenSize) {
+      case 'sm': return 'grid-cols-1';
+      case 'md': return 'grid-cols-2';
+      default: return 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4';
+    }
+  };
 
   return (
     <div
-      className="fixed inset-0 flex justify-center items-start bg-cover bg-center"
+      className="fixed inset-0 flex flex-col justify-start items-center bg-cover bg-center overflow-y-auto"
       style={{ backgroundImage: `url(${background})` }}
     >
-      <div className="absolute top-5 left-5">
-        <BackButton onClick={handleBackClick} />
+      {/* Header con botón de retroceso y título */}
+      <div className="w-full flex justify-between items-center p-4 sm:p-5 lg:p-6">
+        <div className="relative z-10">
+          <BackButton onClick={handleBackClick} />
+        </div>
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white text-center flex-grow">
+          Mis alineaciones
+        </h1>
+        <div className="w-10"></div> {/* Espacio para balancear el layout */}
       </div>
 
-      <div className="absolute top-10 w-full text-center">
-        <h1 className="text-3xl font-bold text-white">Mis alineaciones</h1>
-      </div>
-
-      {/* Contenedor de las alineaciones */}
-      <div className="w-full max-h-screen overflow-y-auto grid grid-cols-4 gap-6 mt-40 px-20">
-        {isLoading && alineaciones.length === 0 ? (
-          <div className="col-span-4 flex justify-center items-center">
-            <p className="text-white">Cargando alineaciones...</p>
-          </div>
-        ) : (
-          <>
-            {alineaciones.map((alineacion) => (
-              <AlineacionMenu
-                key={alineacion.id}
-                nombre={alineacion.nombre}
-                favorito={alineacion.favorita}
-                id={alineacion.id}
-                esActiva={alineacion.id === plantillaActivaId}
-                onDelete={() => handleOpenDeleteModal(alineacion.id)}
-                onActivar={handleActivarPlantilla}
-              />
-            ))}
-
-            {/* Botón para añadir nueva alineación */}
-            <button
-              className="w-64 h-32 bg-white dark:bg-black rounded-lg opacity-80 flex justify-between p-4 hover:opacity-100 transition-opacity"
-              onClick={handleOpenAddModal}
-              disabled={isLoading}
-            >
-              <div className="flex flex-col justify-start w-full">
-                <p className="text-black dark:text-white">Añadir nueva alineación</p>
-                <img
-                  src={FondoAlineacion}
-                  alt="Fondo"
-                  className="w-full h-16 object-cover mt-2 rounded-lg"
+      {/* Contenedor de las alineaciones - ahora responsive */}
+      <div className={`w-full max-w-screen-xl px-4 sm:px-6 lg:px-8 mt-4 sm:mt-8 pb-24`}>
+        <div className={`w-full grid ${getGridColumns()} gap-3 sm:gap-4 md:gap-5 lg:gap-6 justify-items-center`}>
+          {isLoading && alineaciones.length === 0 ? (
+            <div className="col-span-full flex justify-center items-center py-12">
+              <p className="text-white">Cargando alineaciones...</p>
+            </div>
+          ) : (
+            <>
+              {alineaciones.map((alineacion) => (
+                <AlineacionMenu
+                  key={alineacion.id}
+                  nombre={alineacion.nombre}
+                  favorito={alineacion.favorita}
+                  id={alineacion.id}
+                  esActiva={alineacion.id === plantillaActivaId}
+                  onDelete={() => handleOpenDeleteModal(alineacion.id)}
+                  onActivar={handleActivarPlantilla}
+                  screenSize={screenSize}
                 />
-              </div>
-            </button>
-          </>
-        )}
+              ))}
+
+              {/* Botón para añadir nueva alineación */}
+              <button
+                className="w-full max-w-xs sm:max-w-sm h-32 bg-white dark:bg-black rounded-lg opacity-80 flex justify-between p-4 hover:opacity-100 transition-opacity hover:shadow-lg"
+                onClick={handleOpenAddModal}
+                disabled={isLoading}
+              >
+                <div className="flex flex-col justify-start w-full">
+                  <p className="text-black dark:text-white font-medium">Añadir nueva alineación</p>
+                  <div className="w-full h-16 mt-2 rounded-lg overflow-hidden">
+                    <img
+                      src={FondoAlineacion}
+                      alt="Fondo"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Modal para añadir nueva alineación */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-20">
-          <div className="bg-[#1C1A1A] p-6 rounded-lg shadow-lg text-center text-white w-96">
-            <p className="mb-4 text-lg">Nombre de la nueva alineación</p>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-20 p-4">
+          <div className="bg-[#1C1A1A] p-4 sm:p-6 rounded-lg shadow-lg text-center text-white w-full max-w-xs sm:max-w-sm">
+            <p className="mb-4 text-base sm:text-lg">Nombre de la nueva alineación</p>
             <input
               type="text"
               value={newAlineacionNombre}
@@ -254,16 +294,16 @@ export default function Alineaciones() {
               placeholder="Introduce el nombre"
               disabled={isLoading}
             />
-            <div className="flex justify-center gap-4">
+            <div className="flex justify-center gap-3 sm:gap-4">
               <button
-                className="px-4 py-2 rounded-lg text-white bg-[#F62C2C] hover:opacity-90 disabled:opacity-50"
+                className="px-3 py-2 sm:px-4 rounded-lg text-white bg-[#F62C2C] hover:opacity-90 disabled:opacity-50"
                 onClick={handleCloseAddModal}
                 disabled={isLoading}
               >
                 Cancelar
               </button>
               <button
-                className="px-4 py-2 rounded-lg text-white bg-[#44FE23] hover:opacity-90 disabled:opacity-50"
+                className="px-3 py-2 sm:px-4 rounded-lg text-white bg-[#44FE23] hover:opacity-90 disabled:opacity-50"
                 onClick={handleAddAlineacion}
                 disabled={isLoading}
               >
@@ -276,21 +316,21 @@ export default function Alineaciones() {
 
       {/* Modal para confirmar eliminación */}
       {showDeleteModal && plantillaToDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-20">
-          <div className="bg-[#1C1A1A] p-6 rounded-lg shadow-lg text-center text-white">
-            <p className="mb-4 text-lg">
-              ¿Quieres eliminar la alineación <strong>{plantillaToDelete.nombre}</strong>?
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-20 p-4">
+          <div className="bg-[#1C1A1A] p-4 sm:p-6 rounded-lg shadow-lg text-center text-white w-full max-w-xs sm:max-w-sm">
+            <p className="mb-4 text-base sm:text-lg">
+              ¿Quieres eliminar la alineación <strong className="break-words">{plantillaToDelete.nombre}</strong>?
             </p>
-            <div className="flex justify-center gap-4">
+            <div className="flex justify-center gap-3 sm:gap-4">
               <button
-                className="px-4 py-2 rounded-lg text-white bg-[#F62C2C] hover:opacity-90 disabled:opacity-50"
+                className="px-3 py-2 sm:px-4 rounded-lg text-white bg-[#F62C2C] hover:opacity-90 disabled:opacity-50"
                 onClick={handleDeletePlantilla}
                 disabled={isLoading}
               >
                 {isLoading ? "Eliminando..." : "Sí"}
               </button>
               <button
-                className="px-4 py-2 rounded-lg text-white bg-[#44FE23] hover:opacity-90 disabled:opacity-50"
+                className="px-3 py-2 sm:px-4 rounded-lg text-white bg-[#44FE23] hover:opacity-90 disabled:opacity-50"
                 onClick={handleCloseDeleteModal}
                 disabled={isLoading}
               >

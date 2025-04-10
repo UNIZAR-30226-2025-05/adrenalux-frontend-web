@@ -281,28 +281,32 @@ class SocketService {
 
   async handleRoundStart(data) {
     console.log("Ronda iniciada:", data);
-    
+  
     try {
-      // Esperar a que getProfile() se complete
       const profile = await getProfile();
       console.log("Perfil obtenido:", profile);
   
-      // Verificar si el perfil y profile.data existen
       if (!profile || !profile.data) {
         console.error("Error: Perfil no disponible");
         return;
       }
   
-      // Mostrar notificación de turno
       const isPlayerTurn = profile.data.id == data.starter;
+  
+      // Crear una nueva copia del objeto con la propiedad adicional
+      const dataConTurno = {
+        ...data,
+        isPlayerTurn: isPlayerTurn
+      };
+  
       this.showTurnNotification(isPlayerTurn ? "¡TU TURNO!" : "Turno del rival", isPlayerTurn);
+      this.onRoundStart({ dataConTurno });
   
     } catch (error) {
       console.error("Error en handleRoundStart:", error);
-      // Mostrar notificación de error si es necesario
       this.showTurnNotification("Error al obtener datos", false);
     }
-  }
+  }  
   
   // Función auxiliar para mostrar notificaciones
   showTurnNotification(message, isPlayerTurn) {

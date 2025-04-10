@@ -28,6 +28,17 @@ export default function AlineacionEditar() {
   const [selectedPosition, setSelectedPosition] = useState({ id: null, type: null });
   const [filteredCards, setFilteredCards] = useState([]);
   const [hasChanges, setHasChanges] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  // Detector de cambios en el tamaño de la ventana
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     if (!token) {
@@ -88,8 +99,6 @@ export default function AlineacionEditar() {
                 });
               })()
             : [];
-
-          console.log(jugadoresPlantilla)
   
         setJugadores(jugadoresPlantilla);
         setJugadoresUsuario(procesarColeccion(coleccionUsuario));
@@ -153,7 +162,6 @@ export default function AlineacionEditar() {
         j.posicion !== selectedPosition.id && 
         j.id !== carta.id
       );
-      console.log(jugadorActualizado)
       return [...filtered, jugadorActualizado];
     });
 
@@ -222,77 +230,86 @@ export default function AlineacionEditar() {
   };
 
   if (loading) {
-    return <div className="text-white text-center mt-10">Cargando jugadores...</div>;
+    return <div className="text-white text-center mt-10 px-4">Cargando jugadores...</div>;
   }
 
   if (error && error !== "404") {
-    return <div className="text-red-500 text-center mt-10">Error: {error}</div>;
+    return <div className="text-red-500 text-center mt-10 px-4">Error: {error}</div>;
   }
 
+  const getGridCols = () => {
+    if (windowWidth < 640) return "grid-cols-2"; // móvil
+    if (windowWidth < 1024) return "grid-cols-3"; // tablet
+    return "grid-cols-4"; // desktop
+  };
+
   return (
-    <div className="fixed inset-0 flex justify-center items-start bg-cover bg-center" style={{ backgroundImage: `url(${background})` }}>
-      {/* Botón Atrás (funcionará correctamente) */}
-      <div className="absolute top-5 left-5 z-20">
+    <div className="fixed inset-0 flex justify-center items-start bg-cover bg-center overflow-hidden" 
+         style={{ backgroundImage: `url(${background})` }}>
+      
+      {/* Barra superior con controles - versión responsive */}
+      <div className="fixed top-0 left-0 right-0 flex justify-between items-center bg-black bg-opacity-70 px-3 py-2 md:px-5 md:py-3 z-20">
         <BackButton onClick={handleBackClick} />
-      </div>
-  
-      {/* Botón Guardar (funcionará correctamente) */}
-      {hasChanges && (
-        <div className="absolute top-5 right-5 z-20">
+        
+        <div className="flex-1 mx-2 md:mx-4 text-center">
+          {!showNameEdit ? (
+            <div className="flex items-center justify-center">
+              <h2 className="text-white text-lg md:text-xl mr-2 truncate max-w-[60vw]">{nombrePlantilla}</h2>
+              <button 
+                onClick={() => setShowNameEdit(true)}
+                className="text-white hover:text-gray-300"
+                aria-label="Editar nombre"
+              >
+                <FaPen size={14} className="md:text-base" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center flex-wrap gap-2">
+              <input
+                type="text"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                className="px-2 py-1 rounded text-sm md:text-base max-w-[40vw] md:max-w-[50vw]"
+                placeholder="Nuevo nombre"
+              />
+              <div className="flex gap-1">
+                <button
+                  className="px-2 py-1 bg-green-500 text-white rounded text-sm md:text-base"
+                  onClick={handleSaveName}
+                >
+                  Guardar
+                </button>
+                <button
+                  className="px-2 py-1 bg-red-500 text-white rounded text-sm md:text-base"
+                  onClick={handleCancelNameEdit}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+        
+        {hasChanges && (
           <button
             onClick={handleSave}
-            className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
+            className="flex items-center gap-1 md:gap-2 bg-green-500 hover:bg-green-600 text-white px-2 py-1 md:px-4 md:py-2 rounded-lg transition-colors text-sm md:text-base"
           >
-            <FaSave /> Guardar
+            <FaSave className="text-xs md:text-base" /> 
+            <span className="hidden sm:inline">Guardar</span>
           </button>
-        </div>
-      )}
-  
-      {/* Header de nombre de plantilla */}
-      <div className="fixed top-0 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 px-4 py-2 rounded-lg shadow-lg flex items-center z-10">
-        {!showNameEdit ? (
-          <>
-            <h2 className="text-white text-xl mr-2">{nombrePlantilla}</h2>
-            <button 
-              onClick={() => setShowNameEdit(true)}
-              className="text-white hover:text-gray-300"
-            >
-              <FaPen size={16} />
-            </button>
-          </>
-        ) : (
-          <div className="flex items-center">
-            <input
-              type="text"
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              className="px-2 py-1 mr-2 rounded"
-              placeholder="Nuevo nombre"
-            />
-            <button
-              className="px-2 py-1 bg-green-500 text-white rounded mr-1"
-              onClick={handleSaveName}
-            >
-              Guardar
-            </button>
-            <button
-              className="px-2 py-1 bg-red-500 text-white rounded"
-              onClick={handleCancelNameEdit}
-            >
-              Cancelar
-            </button>
-          </div>
         )}
+        {!hasChanges && <div className="w-8 md:w-12"></div>}
       </div>
   
-      {/* Contenedor de la formación */}
-      <div className="absolute inset-0 flex items-center justify-center pt-[4.5rem] pb-4 px-4">
+      {/* Contenedor de la formación - ajustado para responsive */}
+      <div className="absolute inset-0 flex items-center justify-center pt-[3.5rem] md:pt-[4.5rem] pb-2 md:pb-4 px-2 md:px-4">
         <div 
-          className="relative w-full max-w-[1800px] mx-auto overflow-auto"
+          className="relative w-full max-w-[1800px] mx-auto overflow-hidden"
           style={{
-            height: 'calc(100vh - 4.5rem - 1rem)',
+            height: 'calc(100vh - 3.5rem - 0.5rem)',
             maxHeight: '90vh',
-            minHeight: '500px',
+            minHeight: '400px',
             aspectRatio: '16/10'
           }}
         >
@@ -303,42 +320,45 @@ export default function AlineacionEditar() {
         </div>
       </div>
 
+      {/* Selector de cartas - mejorado para responsive */}
       {showCardSelector && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-30">
-          <div className="bg-[#1C1A1A] p-6 rounded-lg shadow-lg w-full max-w-[80vh] max-h-[80vh] flex flex-col">
-            <h3 className="text-white text-xl mb-4 text-center">
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-30 p-2 md:p-4">
+          <div className="bg-[#1C1A1A] p-3 md:p-6 rounded-lg shadow-lg w-full max-w-[95vh] max-h-[90vh] flex flex-col">
+            <h3 className="text-white text-base md:text-xl mb-2 md:mb-4 text-center">
               Selecciona un jugador para {selectedPosition.id}
             </h3>
             
-            <div className="grid grid-cols-4 gap-4 overflow-y-auto" style={{
-              maxHeight: '400px',
-              gridAutoRows: 'minmax(240px, auto)'
+            <div className={`grid ${getGridCols()} gap-2 md:gap-4 overflow-y-auto p-1`} style={{
+              maxHeight: windowWidth < 640 ? '300px' : '400px',
+              gridAutoRows: 'minmax(120px, auto)'
             }}>
               {filteredCards.length > 0 ? (
                 filteredCards.map((carta) => (
                   <button
                     key={carta.id}
-                    className="relative bg-transparent border-none p-0 cursor-pointer h-full flex flex-col items-center"
+                    className="relative bg-transparent border-none p-0 cursor-pointer h-full flex flex-col items-center transform hover:scale-105 transition-transform"
                     onClick={() => handleSelectCard(carta)}
                   >
                     <CartaMediana 
                       jugador={carta} 
-                      className="w-full h-full h-[160px] object-contain" 
+                      className="w-full h-full object-contain" 
+                      responsive={true}
+                      small={windowWidth < 640}
                     />
                   </button>
                 ))
               ) : (
-                <div className="col-span-4 flex items-center justify-center h-40">
-                  <p className="text-white text-center">
+                <div className="col-span-2 md:col-span-3 lg:col-span-4 flex items-center justify-center h-40">
+                  <p className="text-white text-center text-sm md:text-base">
                     No tienes cartas disponibles para esta posición
                   </p>
                 </div>
               )}
             </div>
 
-            <div className="flex justify-end mt-4">
+            <div className="flex justify-end mt-3 md:mt-4">
               <button
-                className="px-4 py-2 bg-red-500 text-white rounded-lg"
+                className="px-3 py-1 md:px-4 md:py-2 bg-red-500 text-white rounded-lg text-sm md:text-base"
                 onClick={() => setShowCardSelector(false)}
               >
                 Cancelar
@@ -348,27 +368,28 @@ export default function AlineacionEditar() {
         </div>
       )}
 
+      {/* Alerta de confirmación - responsive */}
       {showAlert && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-20 p-4">
-          <div className="bg-white dark:bg-[#1C1A1A] p-4 md:p-6 rounded-lg shadow-lg text-center text-white w-full max-w-md mx-4">
-            <p className="text-black dark:text-white mb-4 text-base md:text-lg">
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-40 p-3 md:p-4">
+          <div className="bg-white dark:bg-[#1C1A1A] p-3 md:p-6 rounded-lg shadow-lg text-center text-white w-full max-w-xs md:max-w-md mx-2 md:mx-4">
+            <p className="text-black dark:text-white mb-3 md:mb-4 text-sm md:text-lg">
               ¿Quieres guardar los cambios antes de salir?
             </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
+            <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-4">
               <button
-                className="px-3 py-1 md:px-4 md:py-2 rounded-lg text-white bg-[#44FE23] hover:opacity-90 text-sm md:text-base"
+                className="px-3 py-1 rounded-lg text-white bg-[#44FE23] hover:opacity-90 text-xs md:text-base"
                 onClick={handleConfirm}
               >
                 Sí, guardar
               </button>
               <button
-                className="px-3 py-1 md:px-4 md:py-2 rounded-lg text-white bg-[#F62C2C] hover:opacity-90 text-sm md:text-base"
+                className="px-3 py-1 rounded-lg text-white bg-[#F62C2C] hover:opacity-90 text-xs md:text-base mt-2 sm:mt-0"
                 onClick={handleDiscard}
               >
                 No, descartar
               </button>
               <button
-                className="px-3 py-1 md:px-4 md:py-2 rounded-lg text-white bg-gray-500 hover:opacity-90 text-sm md:text-base"
+                className="px-3 py-1 rounded-lg text-white bg-gray-500 hover:opacity-90 text-xs md:text-base mt-2 sm:mt-0"
                 onClick={handleCancel}
               >
                 Cancelar
