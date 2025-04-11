@@ -226,15 +226,17 @@ class SocketService {
     this.socket.emit('leave_matchmaking');
   }
 
-  selectCardMatch(cartaId, skill) {
+  selectCardMatch({cartaId, skill}) {
     if (!this.socket) {
       console.error("Socket no está conectado");
       return;
     }
+    console.log(skill)
+    console.log(cartaId)
     this.socket.emit('select_card', { cartaId, skill });
   }
 
-  selectResponse(cartaId, skill) {
+  selectResponse({cartaId, skill}) {
     if (!this.socket) {
       console.error("Socket no está conectado");
       return;
@@ -298,6 +300,8 @@ class SocketService {
         ...data,
         isPlayerTurn: isPlayerTurn
       };
+
+      await this.waitForFunction(() => typeof this.onRoundStart === "function", 2000);
   
       this.showTurnNotification(isPlayerTurn ? "¡TU TURNO!" : "Turno del rival", isPlayerTurn);
       this.onRoundStart({ dataConTurno });
@@ -307,6 +311,24 @@ class SocketService {
       this.showTurnNotification("Error al obtener datos", false);
     }
   }  
+
+  waitForFunction(conditionFn, timeout = 2000, interval = 50) {
+    return new Promise((resolve, reject) => {
+      const start = Date.now();
+  
+      const check = () => {
+        if (conditionFn()) {
+          resolve();
+        } else if (Date.now() - start > timeout) {
+          reject(new Error("Tiempo de espera agotado: la función no se definió"));
+        } else {
+          setTimeout(check, interval);
+        }
+      };
+  
+      check();
+    });
+  }
   
   // Función auxiliar para mostrar notificaciones
   showTurnNotification(message, isPlayerTurn) {
@@ -354,13 +376,39 @@ class SocketService {
   }
 
   handleOpponentSelection(data) {
-    console.log("El oponente ha seleccionado:", data);
+    this.onOpponentSelection({data});
   }
 
-  handleRoundResult(data) {
-    console.log("Resultado de ronda:", data);
+  async handleRoundResult(data) {
+    try {
+      const profile = await getProfile();
+      const myId = profile?.data?.id;
+  
+      if (!myId) {
+        console.error("ID del perfil no disponible.");
+        return;
+      }
+  
+      const allPlayerIds = Object.keys(data.scores);
+  
+      // Reorganizar scores
+      const [playerId, opponentId] = allPlayerIds[0] == myId
+        ? [allPlayerIds[0], allPlayerIds[1]]
+        : [allPlayerIds[1], allPlayerIds[0]];
+  
+      data.scores = {
+        player: data.scores[playerId],
+        opponent: data.scores[opponentId]
+      };
+  
+      this.onRoundResult({ data });
+      console.log("Resultado de ronda (ajustado):", data);
+  
+    } catch (error) {
+      console.error("Error al procesar resultado de ronda:", error);
+    }
   }
-
+  
   handleMatchEnd(data) {
     console.log("Partida terminada:", data);
     this.navigate('/home');

@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
 import CartaMediana from "../../../components/layout/game/CartaMediana";
 
-const Formacion433 = ({ jugadores, onJugadorClick }) => {
+const Formacion433 = ({ jugadores = [], onJugadorClick }) => {
   // Estado para controlar el tamaño de la pantalla
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [isMediumScreen, setIsMediumScreen] = useState(false);
@@ -39,7 +39,13 @@ const Formacion433 = ({ jugadores, onJugadorClick }) => {
   ];
 
   const getJugadorEnPosicion = (posicionId) => {
-    return jugadores.find(j => j.posicion === posicionId);
+    // Si jugadores no existe o está vacío, devolver null
+    if (!jugadores || jugadores.length === 0) {
+      return null;
+    }
+    
+    const jugador = jugadores.find(j => j && j.posicion === posicionId);
+    return jugador || null;
   };
 
   const handleClick = (posicion) => {
@@ -241,7 +247,7 @@ Formacion433.propTypes = {
       posicionType: PropTypes.string,
       imagen: PropTypes.string,
     })
-  ).isRequired,
+  ),
   onJugadorClick: PropTypes.func.isRequired,
 };
 
