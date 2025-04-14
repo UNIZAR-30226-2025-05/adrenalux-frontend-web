@@ -20,6 +20,7 @@ import CardsForSale from "./components/CardsForSale";
 import EsperandoJugador from "./components/EsperandoJugador";
 import Clasificacion from "./components/Clasificacion";
 import Partida from "./components/Partida"; 
+import Torneo from "./components/Torneo";
 import React, { useState, useEffect } from "react";
 
 function App() {
@@ -57,6 +58,7 @@ function App() {
         <Route path="/esperando" element={<EsperandoJugador />} />
         <Route path="/clasificacion" element={<Clasificacion />} />
         <Route path="/partida/:matchId" element={<Partida />} /> {/* Nueva ruta */}
+        <Route path="/torneo" element={<Torneo />} />
       </Routes>
     </Router>
   );
