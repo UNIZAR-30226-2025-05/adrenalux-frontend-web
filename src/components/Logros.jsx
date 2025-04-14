@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import NavBarGame from "./layout/game/NavbarGame";
 import background from "../assets/background.png";
 import BackButton from "./layout/game/BackButton";
 import AchievementList from "./layout/game/AchievementList"; 
@@ -13,20 +12,18 @@ const Logros = () => {
 
   return (
     <div
-      className="fixed inset-0 flex justify-center items-center bg-cover bg-center"
+      className="fixed inset-0 bg-cover bg-center overflow-auto"
       style={{ backgroundImage: `url(${background})` }}
     >
-      <NavBarGame />
+      {/* Botón fijo en esquina superior izquierda */}
+      <div className="fixed left-6 top-6 z-50">
+        <BackButton onClick={handleBackClick} />
+      </div>
 
-      <div className="relative w-full flex items-center px-4 md:px-8 lg:px-16">
-        {/* Botón de volver */}
-        <div className="absolute left-10 top-10">
-          <BackButton onClick={handleBackClick} />
-        </div>
-
-        {/* Lista de logros */}
-        <div className="w-full max-w-screen-md mx-auto">
-          <AchievementList /> {/* Aquí se muestra la lista de logros */}
+      {/* Contenido centrado con scroll */}
+      <div className="min-h-full flex items-center justify-center p-4">
+        <div className="w-full max-w-screen-md mx-auto my-8">
+          <AchievementList />
         </div>
       </div>
     </div>
