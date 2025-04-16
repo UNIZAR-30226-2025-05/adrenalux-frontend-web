@@ -1,19 +1,13 @@
-import { Howl, Howler } from 'howler';
+import { Howl } from 'howler';
 
 const sounds = {};
 
+// Cargar un sonido
 export const loadSound = (key, src) => {
   sounds[key] = new Howl({ src: [src] });
 };
 
-export const playSound = (key) => {
-  if (sounds[key]) {
-    sounds[key].play();
-  } else {
-    console.warn(`Sonido con clave "${key}" no cargado.`);
-  }
-};
-
+// Reproducir música de fondo
 export const playMusic = (src) => {
   if (sounds['bg']) {
     sounds['bg'].stop();
@@ -21,17 +15,23 @@ export const playMusic = (src) => {
   sounds['bg'] = new Howl({
     src: [src],
     loop: true,
-    volume: 0.5,
+    volume: 0.5,  // Volumen inicial
   });
   sounds['bg'].play();
 };
 
+// Detener la música de fondo
+export const stopMusic = () => {
+  if (sounds['bg']) {
+    sounds['bg'].stop();
+  }
+};
+
+// Cambiar el volumen de la música de fondo
 export const changeMusicVolume = (volume) => {
   if (sounds['bg']) {
     sounds['bg'].volume(volume);
   }
 };
 
-export const changeSfxVolume = (volume) => {
-  Howler.volume(volume); // Cambia el volumen global para los efectos
-};
+

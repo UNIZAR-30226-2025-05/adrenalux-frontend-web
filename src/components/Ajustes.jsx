@@ -6,9 +6,7 @@ import BackButton from './layout/game/BackButton';
 import background from '../assets/background.png';
 import { getToken } from "../services/api/authApi";
 
-import { loadSound, playMusic, playSound, changeMusicVolume, changeSfxVolume } from '../utils/soundManager';
-import bgMusic from '../assets/sounds/background_music.mp3';
-import testSound from '../assets/sounds/opening_sound.mp3';
+import { loadSound, playMusic, changeMusicVolume } from '../utils/soundManager';
 
 const Ajustes = () => {
   const navigate = useNavigate(); // Obtener la función de navegación
@@ -17,9 +15,6 @@ const Ajustes = () => {
   // Estados iniciales cargados desde localStorage o valores por defecto
   const [musicVolume, setMusicVolume] = useState(
     parseInt(localStorage.getItem("musicVolume")) || 50
-  );
-  const [sfxVolume, setSfxVolume] = useState(
-    parseInt(localStorage.getItem("sfxVolume")) || 80
   );
   const [language, setLanguage] = useState(localStorage.getItem("language") || "es");
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
@@ -30,11 +25,6 @@ const Ajustes = () => {
     localStorage.setItem("musicVolume", musicVolume);
     changeMusicVolume(musicVolume / 100);  // Actualiza el volumen de la música usando Howler.js
   }, [musicVolume]);
-
-  useEffect(() => {
-    localStorage.setItem("sfxVolume", sfxVolume)
-    changeSfxVolume(sfxVolume / 100);  // Actualiza el volumen de los efectos de sonido usando Howler.js
-  }, [sfxVolume]);
 
   useEffect(() => {
     localStorage.setItem("language", language);
@@ -58,14 +48,8 @@ const Ajustes = () => {
     }
   }, [token, navigate]);
 
-  useEffect(() => {
-    loadSound('test', testSound);
-    playMusic(bgMusic);
-  }, []);
-
   // Función para manejar el cambio de tema
   const toggleTheme = () => {
-    playSound('test'); // test
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme);
@@ -145,20 +129,6 @@ const Ajustes = () => {
                 />
                 <p className="text-black dark:text-white text-sm mt-1">Volumen: {musicVolume}%</p>
               </div>
-  
-              <div>
-                <label className="block text-black dark:text-white mb-1">SFX</label>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={sfxVolume}
-                  onChange={(e) => setSfxVolume(e.target.value)}
-                  style={getSliderStyle(sfxVolume)}
-                  className="w-full h-2 rounded-full appearance-none cursor-pointer"
-                />
-                <p className="text-black dark:text-white text-sm mt-1">Volumen: {sfxVolume}%</p>
-              </div>
             </div>
           </div>
   
@@ -224,4 +194,3 @@ const Ajustes = () => {
 };
 
 export default Ajustes;
-

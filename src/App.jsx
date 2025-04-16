@@ -19,9 +19,10 @@ import Profile from "./components/Profile";
 import CardsForSale from "./components/CardsForSale";
 import EsperandoJugador from "./components/EsperandoJugador";
 import Clasificacion from "./components/Clasificacion";
-import Partida from "./components/Partida"; 
+import Partida from "./components/Partida";
 import Torneo from "./components/Torneo";
 import React, { useState, useEffect } from "react";
+import MusicManager from "./context/MusicManager";
 
 function App() {
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
@@ -36,6 +37,7 @@ function App() {
 
   return (
     <Router>
+      <MusicManager />
       <Routes>
         <Route path="/" element={<Inicio />} />
         <Route path="/register" element={<Register />} />
@@ -57,7 +59,7 @@ function App() {
         <Route path="/cards-for-sale" element={<CardsForSale />} />
         <Route path="/esperando" element={<EsperandoJugador />} />
         <Route path="/clasificacion" element={<Clasificacion />} />
-        <Route path="/partida/:matchId" element={<Partida />} /> {/* Nueva ruta */}
+        <Route path="/partida/:matchId" element={<Partida />} />
         <Route path="/torneo" element={<Torneo />} />
       </Routes>
     </Router>
