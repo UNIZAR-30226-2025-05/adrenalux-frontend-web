@@ -241,6 +241,8 @@ class SocketService {
       console.error("Socket no está conectado");
       return;
     }
+    console.log(skill)
+    console.log(cartaId)
     this.socket.emit('select_response', { cartaId, skill });
   }
 

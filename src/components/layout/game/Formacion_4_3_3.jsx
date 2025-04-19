@@ -2,10 +2,13 @@ import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
 import CartaMediana from "../../../components/layout/game/CartaMediana";
 
-const Formacion433 = ({ jugadores = [], onJugadorClick }) => {
+const Formacion433 = ({ jugadores = [], onJugadorClick, highlightPositionType = null }) => {
   // Estado para controlar el tamaño de la pantalla
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [isMediumScreen, setIsMediumScreen] = useState(false);
+  
+  // Estado para guardar qué posición específica resaltar (se calculará automáticamente)
+  const [highlightedPosition, setHighlightedPosition] = useState(null);
 
   // Efecto para detectar el tamaño de la pantalla
   useEffect(() => {
@@ -23,6 +26,32 @@ const Formacion433 = ({ jugadores = [], onJugadorClick }) => {
     // Limpiar
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
+
+  // Efecto para seleccionar una posición vacía para resaltar cuando cambia highlightPositionType
+  useEffect(() => {
+    if (!highlightPositionType) {
+      setHighlightedPosition(null);
+      return;
+    }
+    
+    // Mapeo entre los tipos de posición y sus identificadores
+    const positionMapping = {
+      forward: ["forward1", "forward2", "forward3"],
+      midfielder: ["midfielder1", "midfielder2", "midfielder3"],
+      defender: ["defender1", "defender2", "defender3", "defender4"],
+      goalkeeper: ["goalkeeper1"]
+    };
+    
+    // Obtener la lista de posiciones para el tipo especificado
+    const positionsOfType = positionMapping[highlightPositionType] || [];
+    
+    // Encontrar la primera posición vacía del tipo especificado
+    const firstEmptyPosition = positionsOfType.find(posId => {
+      return !jugadores.some(j => j && j.posicion === posId);
+    });
+    
+    setHighlightedPosition(firstEmptyPosition || null);
+  }, [highlightPositionType, jugadores]);
 
   const posiciones = [
     { id: "forward1", type: "forward" },
@@ -110,15 +139,20 @@ const Formacion433 = ({ jugadores = [], onJugadorClick }) => {
   const cardSize = getCardDimensions();
   const emptySize = getEmptyDimensions();
 
+  // Función para determinar si una posición debe ser resaltada
+  const shouldHighlight = (posicionId) => {
+    return posicionId === highlightedPosition;
+  };
+
   return (
     <div className="formacion-4-3-3 w-full max-w-4xl mx-auto space-y-2 md:space-y-4 lg:space-y-8 px-1 transition-all duration-300">
-      {/* Campo de fútbol como fondo - opcional */}
-      <div className="absolute inset-0 bg-green-800 opacity-20 rounded-xl z-0"></div>
+      {/* Se elimina el div de fondo verde para hacer el fondo completamente transparente */}
       
       {/* Delanteros */}
       <div className={`relative z-10 flex justify-center ${spacing.delanteros}`}>
         {posiciones.slice(0, 3).map((pos) => {
           const jugador = getJugadorEnPosicion(pos.id);
+          const isHighlighted = shouldHighlight(pos.id);
           return (
             <button
               key={pos.id}
@@ -135,7 +169,7 @@ const Formacion433 = ({ jugadores = [], onJugadorClick }) => {
                 />
               ) : (
                 <div 
-                  className="bg-gray-700 rounded-md flex items-center justify-center transition-all duration-300"
+                  className={`bg-gray-700 rounded-md flex items-center justify-center transition-all duration-300 ${isHighlighted ? 'border-4 border-green-500' : ''}`}
                   style={{ width: emptySize.width, height: emptySize.height }}
                 >
                   <span className={`text-white ${isSmallScreen ? 'text-xxs' : 'text-xs'}`}>Vacío</span>
@@ -150,6 +184,7 @@ const Formacion433 = ({ jugadores = [], onJugadorClick }) => {
       <div className={`relative z-10 flex justify-center ${spacing.mediocampistas}`}>
         {posiciones.slice(3, 6).map((pos, index) => {
           const jugador = getJugadorEnPosicion(pos.id);
+          const isHighlighted = shouldHighlight(pos.id);
           return (
             <button
               key={pos.id}
@@ -168,7 +203,7 @@ const Formacion433 = ({ jugadores = [], onJugadorClick }) => {
                 />
               ) : (
                 <div 
-                  className="bg-gray-700 rounded-md flex items-center justify-center transition-all duration-300"
+                  className={`bg-gray-700 rounded-md flex items-center justify-center transition-all duration-300 ${isHighlighted ? 'border-4 border-green-500' : ''}`}
                   style={{ width: emptySize.width, height: emptySize.height }}
                 >
                   <span className={`text-white ${isSmallScreen ? 'text-xxs' : 'text-xs'}`}>Vacío</span>
@@ -183,6 +218,7 @@ const Formacion433 = ({ jugadores = [], onJugadorClick }) => {
       <div className={`relative z-10 flex justify-center ${spacing.defensas}`}>
         {posiciones.slice(6, 10).map((pos) => {
           const jugador = getJugadorEnPosicion(pos.id);
+          const isHighlighted = shouldHighlight(pos.id);
           return (
             <button
               key={pos.id}
@@ -199,7 +235,7 @@ const Formacion433 = ({ jugadores = [], onJugadorClick }) => {
                 />
               ) : (
                 <div 
-                  className="bg-gray-700 rounded-md flex items-center justify-center transition-all duration-300"
+                  className={`bg-gray-700 rounded-md flex items-center justify-center transition-all duration-300 ${isHighlighted ? 'border-4 border-green-500' : ''}`}
                   style={{ width: emptySize.width, height: emptySize.height }}
                 >
                   <span className={`text-white ${isSmallScreen ? 'text-xxs' : 'text-xs'}`}>Vacío</span>
@@ -212,27 +248,34 @@ const Formacion433 = ({ jugadores = [], onJugadorClick }) => {
 
       {/* Portero */}
       <div className="relative z-10 flex justify-center mt-1">
-        <button
-          className={`relative ${getJugadorEnPosicion(posiciones[10].id) ? "opacity-100" : "opacity-70"} bg-transparent border-none p-0 cursor-pointer transition-all duration-300 hover:scale-105`}
-          onClick={() => handleClick(posiciones[10])}
-        >
-          {getJugadorEnPosicion(posiciones[10].id) ? (
-            <CartaMediana 
-              jugador={getJugadorEnPosicion(posiciones[10].id)} 
-              width={cardSize.width}
-              height={cardSize.height}
-              small={isSmallScreen}
-              responsive={true}
-            />
-          ) : (
-            <div 
-              className="bg-gray-700 rounded-md flex items-center justify-center transition-all duration-300"
-              style={{ width: emptySize.width, height: emptySize.height }}
+        {posiciones.slice(10).map((pos) => {
+          const jugador = getJugadorEnPosicion(pos.id);
+          const isHighlighted = shouldHighlight(pos.id);
+          return (
+            <button
+              key={pos.id}
+              className={`relative ${jugador ? "opacity-100" : "opacity-70"} bg-transparent border-none p-0 cursor-pointer transition-all duration-300 hover:scale-105`}
+              onClick={() => handleClick(pos)}
             >
-              <span className={`text-white ${isSmallScreen ? 'text-xxs' : 'text-xs'}`}>Vacío</span>
-            </div>
-          )}
-        </button>
+              {jugador ? (
+                <CartaMediana 
+                  jugador={jugador} 
+                  width={cardSize.width}
+                  height={cardSize.height}
+                  small={isSmallScreen}
+                  responsive={true}
+                />
+              ) : (
+                <div 
+                  className={`bg-gray-700 rounded-md flex items-center justify-center transition-all duration-300 ${isHighlighted ? 'border-4 border-green-500' : ''}`}
+                  style={{ width: emptySize.width, height: emptySize.height }}
+                >
+                  <span className={`text-white ${isSmallScreen ? 'text-xxs' : 'text-xs'}`}>Vacío</span>
+                </div>
+              )}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
@@ -249,6 +292,7 @@ Formacion433.propTypes = {
     })
   ),
   onJugadorClick: PropTypes.func.isRequired,
+  highlightPositionType: PropTypes.string, // Puede ser 'forward', 'midfielder', 'defender', 'goalkeeper' o null
 };
 
 export default Formacion433;
