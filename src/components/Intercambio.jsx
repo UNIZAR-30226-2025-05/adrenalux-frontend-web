@@ -132,108 +132,104 @@ const Intercambio = () => {
 
   return (
     <div
-      className="fixed inset-0 flex justify-center items-center bg-cover bg-center overflow-y-auto p-10"
+      className="fixed inset-0 flex justify-center items-center bg-cover bg-center overflow-y-auto p-2 sm:p-4 md:p-6 lg:p-10"
       style={{ backgroundImage: `url(${background})` }}
     >
-      <div className="absolute top-5 left-5">
+      <div className="absolute top-2 sm:top-5 left-2 sm:left-5">
         <BackButton onClick={handleBackClick} />
       </div>
 
-      {/* Contenedor de dos columnas */}
-      <div className="flex w-full max-w-6xl space-x-6">
+      {/* Contenedor de dos columnas - cambia a columna en móvil */}
+      <div className="flex flex-col lg:flex-row w-full max-w-6xl lg:space-x-4 space-y-4 lg:space-y-0 mt-12 sm:mt-8">
         {/* Columna izquierda */}
-<div className="w-[45%] flex flex-col space-y-6">
-  {/* Caja de intercambio */}
-  <div className="w-full h-[50vh] bg-black/70 rounded-2xl flex flex-col items-center justify-center gap-6 p-6">
-    {/* Cartas de intercambio */}
-    <div className="flex items-center justify-center gap-[60px]">
-      {/* Carta izquierda */}
-      <div className="flex flex-col items-center">
-        {confirmedCard ? (
-          <div className="w-40 h-[225px] shadow-lg"> {/* Contenedor con tamaño fijo */}
-            <CartaMediana
-              jugador={confirmedCard}
-              width="100%" // Ocupa el 100% del contenedor
-              height="100%" // Ocupa el 100% del contenedor
-            />
+        <div className="w-full lg:w-[45%] flex flex-col space-y-4">
+          {/* Caja de intercambio */}
+          <div className="w-full bg-black/70 rounded-2xl flex flex-col items-center justify-center gap-4 p-4 md:p-6">
+            {/* Cartas de intercambio */}
+            <div className="flex items-center justify-center gap-4 md:gap-[60px]">
+              {/* Carta izquierda */}
+              <div className="flex flex-col items-center">
+                {confirmedCard ? (
+                  <div className="w-28 sm:w-32 md:w-40 h-auto shadow-lg">
+                    <CartaMediana
+                      jugador={confirmedCard}
+                    />
+                  </div>
+                ) : (
+                  <img
+                    src={Card}
+                    alt="Carta izquierda"
+                    className="w-28 sm:w-32 md:w-40 h-auto shadow-lg opacity-50"
+                  />
+                )}
+                <p className={`mt-2 ${confirmedExchange ? "text-green-500" : "text-white"}`}>
+                  Tú
+                </p>
+              </div>
+
+              {/* Carta derecha */}
+              <div className="flex flex-col items-center">
+                {opponentCard ? (
+                  <div className="w-28 sm:w-32 md:w-40 h-auto shadow-lg">
+                    <CartaMediana
+                      jugador={opponentCard}
+                    />
+                  </div>
+                ) : (
+                  <img
+                    src={Card}
+                    alt="Carta derecha"
+                    className="w-28 sm:w-32 md:w-40 h-auto shadow-lg opacity-50"
+                  />
+                )}
+                <p className={`mt-2 ${opponentConfirmedExchange ? "text-green-500" : "text-white"}`}>
+                  {opponentUsername}
+                </p>
+              </div>
+            </div>
+
+            {/* Botones de Confirmar y Cancelar */}
+            <div className="flex gap-4">
+              <button
+                onClick={handleConfirmCard}
+                className="px-4 sm:px-6 py-2 text-sm sm:text-base bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              >
+                Confirmar
+              </button>
+              <button
+                onClick={handleCancelCard}
+                className="px-4 sm:px-6 py-2 text-sm sm:text-base bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Cancelar
+              </button>
+            </div>
           </div>
-        ) : (
-          <img
-            src={Card}
-            alt="Carta izquierda"
-            className="w-40 h-[225px] shadow-lg opacity-50"
-          />
-        )}
-        <p className={`mt-2 ${confirmedExchange ? "text-green-500" : "text-white"}`}>
-          Tú
-        </p>
-      </div>
 
-      {/* Carta derecha */}
-      <div className="flex flex-col items-center">
-        {opponentCard ? (
-          <div className="w-40 h-[220px] shadow-lg"> {/* Contenedor con tamaño fijo */}
-            <CartaMediana
-              jugador={opponentCard}
-              width="100%" // Ocupa el 100% del contenedor
-              height="100%" // Ocupa el 100% del contenedor
-            />
+          {/* Buscador */}
+          <div className="w-full bg-black/70 rounded-2xl p-4 md:p-6 flex flex-col items-center">
+            <p className="text-white text-base sm:text-lg font-semibold mb-4">
+              Buscar jugadores
+            </p>
+            <form onSubmit={handleSearch} className="w-full flex space-x-2">
+              <input
+                type="text"
+                placeholder="Buscar..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="flex-grow p-2 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+              <button
+                type="submit"
+                className="px-3 sm:px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+              >
+                Buscar
+              </button>
+            </form>
           </div>
-        ) : (
-          <img
-            src={Card}
-            alt="Carta derecha"
-            className="w-40 h-[220px] shadow-lg opacity-50"
-          />
-        )}
-        <p className={`mt-2 ${opponentConfirmedExchange ? "text-green-500" : "text-white"}`}>
-          {opponentUsername}
-        </p>
-      </div>
-    </div>
-
-    {/* Botones de Confirmar y Cancelar */}
-    <div className="flex gap-4">
-      <button
-        onClick={handleConfirmCard}
-        className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-      >
-        Confirmar
-      </button>
-      <button
-        onClick={handleCancelCard}
-        className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-      >
-        Cancelar
-      </button>
-    </div>
-  </div>
-
-  {/* Buscador */}
-  <div className="w-full bg-black/70 rounded-2xl p-6 flex flex-col items-center">
-    <p className="text-white text-lg font-semibold mb-4">
-      Buscar jugadores
-    </p>
-    <form onSubmit={handleSearch} className="w-full flex space-x-2">
-      <input
-        type="text"
-        placeholder="Buscar..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="flex-grow p-2 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-      />
-      <button
-        type="submit"
-        className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-      >
-        Buscar
-      </button>
-    </form>
-  </div>
-</div>
+        </div>
 
         {/* Columna derecha (Colección de cartas con scroll) */}
-        <div className="w-[80%] bg-black/70 rounded-2xl p-4 overflow-y-auto max-h-[75vh]">
+        <div className="w-full lg:w-[55%] bg-black/70 rounded-2xl p-4 overflow-y-auto max-h-[60vh] lg:max-h-[75vh]">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {cards.map((card, index) => (
               <div
@@ -251,8 +247,8 @@ const Intercambio = () => {
       {/* Alerta de confirmación de salida */}
       {showAlert && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-20">
-          <div className="bg-[#1C1A1A] p-6 rounded-lg shadow-lg text-center text-white">
-            <p className="text-lg font-semibold">
+          <div className="bg-[#1C1A1A] p-4 sm:p-6 rounded-lg shadow-lg text-center text-white max-w-xs sm:max-w-sm">
+            <p className="text-base sm:text-lg font-semibold">
               ¿Deseas abandonar el intercambio?
             </p>
             <div className="mt-4 flex justify-center space-x-4">
@@ -275,8 +271,8 @@ const Intercambio = () => {
 
       {/* Modal de carta seleccionada */}
       {selectedCard && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-20">
-          <div className="bg-black/70 rounded-2xl p-6 shadow-lg">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-20 p-4">
+          <div className="bg-black/70 rounded-2xl p-4 sm:p-6 shadow-lg max-w-xs sm:max-w-sm md:max-w-md">
             <CartaGrande jugador={selectedCard} />
             <div className="mt-4 flex justify-center space-x-4">
               <button

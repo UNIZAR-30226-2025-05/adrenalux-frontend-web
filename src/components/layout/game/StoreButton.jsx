@@ -11,11 +11,12 @@ const StoreButton = () => {
   return (
     <button
       onClick={handleClick}
-      className="flex flex-col items-center text-white bg-transparent p-4 w-32 h-32 
+      className="flex flex-col items-center justify-center text-white bg-transparent p-2 sm:p-3 md:p-4 
+                w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32
                 hover:scale-105 transition-transform focus:outline-none"
     >
-      <FaStore className="text-6xl mb-3" />
-      <span className="bg-black/80 px-3 py-1 text-sm rounded-sm">Tienda</span>
+      <FaStore className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-2 md:mb-3" />
+      <span className="bg-black/80 px-2 py-1 text-xs sm:text-sm rounded-sm whitespace-nowrap">Tienda</span>
     </button>
   );
 };

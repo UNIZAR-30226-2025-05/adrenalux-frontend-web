@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { FaExchangeAlt, FaPlus, FaTrash, FaTimes, FaCheck } from "react-icons/fa";
+import { FaExchangeAlt, FaPlus, FaTrash, FaTimes, FaCheck, FaTrophy } from "react-icons/fa";
+import { motion, AnimatePresence } from "framer-motion";
 import background from "../assets/background.png";
 import BackButton from "../components/layout/game/BackButton";
 import { socketService } from "../services/websocket/socketService";
@@ -24,14 +25,15 @@ export default function Amigo() {
   const [solicitudesEnviadas, setSolicitudesEnviadas] = useState([]);
   const [solicitudesRecibidas, setSolicitudesRecibidas] = useState([]);
   const [currentFriends, setCurrentFriends] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   const maxFriends = 99;
   const token = getToken();
 
   const [showAddFriendModal, setShowAddFriendModal] = useState(false);
   const [newFriendCode, setNewFriendCode] = useState("");
 
-  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false); // Nuevo estado
-  const [friendToDelete, setFriendToDelete] = useState(null); // Para almacenar el amigo a eliminar
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [friendToDelete, setFriendToDelete] = useState(null);
 
   const navigate = useNavigate();
 
@@ -44,16 +46,18 @@ export default function Amigo() {
   }, [token, navigate]);
 
   const fetchData = async () => {
+    setIsLoading(true);
     try {
       const friends = await getFriends();
       const requests = await getFriendRequests();
       const user = await getProfile();
-      console.log(user)
       setUser(user);
       setAmigos(friends);
       setSolicitudesRecibidas(requests || []);
     } catch (error) {
       console.error("Error cargando los datos:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -69,7 +73,6 @@ export default function Amigo() {
   const handleAddFriend = async () => {
     if (!newFriendCode.trim()) return;
     try {
-      console.log(newFriendCode)
       await sendFriendRequest(newFriendCode);
       setSolicitudesEnviadas([
         ...solicitudesEnviadas,
@@ -121,18 +124,28 @@ export default function Amigo() {
     }
   };
 
+  const handleChallenge = (friend) => {
+    // Envía desafío al amigo y navega al home
+    socketService.sendChallengeRequest(friend.id, user.data.username);
+    navigate("/home", { state: { challengeSent: true, challengedFriend: friend.username } });
+  };
+
   const renderRow = (item, tab, id) => {
     return (
-      <div
+      <motion.div
         key={item.id}
-        className="flex items-center justify-between bg-[#0190D2] rounded-lg p-3 mb-2 w-[500px]"
+        className="flex items-center justify-between bg-[#0190D2] rounded-lg p-3 mb-2 w-full"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        whileHover={{ scale: 1.02 }}
       >
         <div className="flex items-center space-x-3">
           {item.crest && (
             <img
               src={item.crest}
               alt="crest"
-              className="w-10 h-10 object-contain"
+              className="w-10 h-10 object-contain rounded-full"
             />
           )}
           <div className="flex flex-col">
@@ -142,150 +155,279 @@ export default function Amigo() {
         </div>
 
         {tab === "amigos" && (
-          <div className="flex space-x-3">
-            <FaExchangeAlt
-              className="text-white cursor-pointer hover:text-yellow-500"
+          <div className="flex items-center space-x-2">
+            <motion.button
+              className="bg-yellow-500 hover:bg-yellow-400 text-white p-2 rounded-full flex items-center justify-center"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => handleChallenge(item)}
+              title="Desafiar"
+            >
+              <FaTrophy size={16} />
+            </motion.button>
+            <motion.button
+              className="bg-blue-500 hover:bg-blue-400 text-white p-2 rounded-full flex items-center justify-center"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
               onClick={() => {
                 socketService.sendExchangeRequest(item['id'], user.data.username);
                 navigate("/esperando", { state: { jugador: item } });
               }}
-            />
-            <FaTrash
-              className="text-white cursor-pointer hover:text-red-500"
+              title="Intercambiar"
+            >
+              <FaExchangeAlt size={16} />
+            </motion.button>
+            <motion.button
+              className="bg-red-500 hover:bg-red-400 text-white p-2 rounded-full flex items-center justify-center"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
               onClick={() => {
                 setFriendToDelete(item); 
                 setShowDeleteConfirmation(true); 
               }}
-            />
+              title="Eliminar"
+            >
+              <FaTrash size={16} />
+            </motion.button>
           </div>
         )}
 
         {tab === "recibidas" && (
-          <div className="flex space-x-4">
-            <FaCheck
-              className="text-green-500 cursor-pointer hover:text-green-400"
+          <div className="flex items-center space-x-2">
+            <motion.button
+              className="bg-green-500 hover:bg-green-400 text-white p-2 rounded-full flex items-center justify-center"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
               onClick={() => handleAcceptRequest(id)}
-            />
-            <FaTimes
-              className="text-red-500 cursor-pointer hover:text-red-400"
+              title="Aceptar"
+            >
+              <FaCheck size={16} />
+            </motion.button>
+            <motion.button
+              className="bg-red-500 hover:bg-red-400 text-white p-2 rounded-full flex items-center justify-center"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
               onClick={() => handleRejectRequest(id)}
-            />
+              title="Rechazar"
+            >
+              <FaTimes size={16} />
+            </motion.button>
           </div>
         )}
-      </div>
+      </motion.div>
     );
   };
 
+  const LoadingSpinner = () => (
+    <div className="flex justify-center items-center h-40">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+    </div>
+  );
+
   return (
     <div
-      className="relative h-screen w-screen bg-cover bg-center text-white flex flex-col items-center"
+      className="fixed inset-0 w-full h-full bg-cover bg-center text-white flex flex-col items-center overflow-auto"
       style={{ backgroundImage: `url(${background})` }}
     >
       <div className="absolute top-5 left-5">
         <BackButton onClick={() => navigate("/home")} />
       </div>
 
-      <div className="flex items-center justify-between bg-[#006298] px-6 py-4 mt-12 w-[600px] rounded-lg">
+      <motion.div 
+        className="flex items-center justify-between bg-[#006298] px-6 py-4 mt-12 w-full max-w-[600px] rounded-lg mx-2"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
         <h2 className="text-2xl font-bold">Amigos</h2>
         <div className="flex items-center space-x-8">
           <p className="text-white text-sm">
             {currentFriends}/{maxFriends}
           </p>
-          <FaPlus
-            className="text-white text-xl cursor-pointer hover:text-green-300"
-            onClick={handleOpenAddFriendModal}
-          />
+          <motion.div
+            whileHover={{ scale: 1.1, rotate: 90 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <button
+              className="bg-green-500 hover:bg-green-400 text-white p-2 rounded-full flex items-center justify-center"
+              onClick={handleOpenAddFriendModal}
+              title="Añadir amigo"
+            >
+              <FaPlus size={16} />
+            </button>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="bg-black/50 mt-6 w-[600px] rounded-lg p-4 flex flex-col items-center max-h-[500px] overflow-y-auto">
-        {(currentTab === "amigos" && (amigos == null || amigos.length === 0)) && (
-          <p className="text-white">Aún no tienes amigos.</p>
+      <motion.div 
+        className="bg-black/50 mt-6 w-full max-w-[600px] rounded-lg p-4 flex flex-col items-center max-h-[500px] overflow-y-auto mx-2"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : (
+          <AnimatePresence mode="wait">
+            {currentTab === "amigos" && (
+              <motion.div 
+                className="w-full"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                key="amigos-tab"
+              >
+                {(amigos == null || amigos.length === 0) ? (
+                  <motion.p 
+                    className="text-white text-center py-10"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    Aún no tienes amigos.
+                  </motion.p>
+                ) : (
+                  amigos?.map((amigo) => renderRow(amigo, "amigos"))
+                )}
+              </motion.div>
+            )}
+            
+            {currentTab === "recibidas" && (
+              <motion.div 
+                className="w-full"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                key="recibidas-tab"
+              >
+                {(solicitudesRecibidas == null || solicitudesRecibidas.length === 0) ? (
+                  <motion.p 
+                    className="text-white text-center py-10"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    No tienes solicitudes de amistad.
+                  </motion.p>
+                ) : (
+                  solicitudesRecibidas?.map((sol) => renderRow(sol.sender, "recibidas", sol.id))
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         )}
-        {currentTab === "amigos" &&
-          amigos?.map((amigo) => renderRow(amigo, "amigos"))}
-       
-        {currentTab === "recibidas" && (solicitudesRecibidas == null || solicitudesRecibidas.length === 0) && (
-          <p className="text-white">No tienes solicitudes de amistad.</p>
-        )}
-        {currentTab === "recibidas" &&
-          solicitudesRecibidas?.map((sol) => renderRow(sol.sender, "recibidas", sol.id))}
-      </div>
+      </motion.div>
 
-      <div className="flex space-x-8 mt-6">
-        <button
+      <div className="flex space-x-4 md:space-x-8 mt-6 mb-10">
+        <motion.button
           onClick={() => setCurrentTab("amigos")}
           className={`px-4 py-2 rounded-md ${
             currentTab === "amigos" ? "bg-[#2B5C94]" : "bg-black/50"
           }`}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
           Amigos
-        </button>
+        </motion.button>
           
-        <button
+        <motion.button
           onClick={() => setCurrentTab("recibidas")}
           className={`px-4 py-2 rounded-md ${
             currentTab === "recibidas" ? "bg-[#2B5C94]" : "bg-black/50"
           }`}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
           Solicitudes recibidas
-        </button>
+        </motion.button>
       </div>
 
-      {showDeleteConfirmation && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-[#2B5C94] p-6 rounded-lg shadow-lg w-80">
-            <h2 className="text-xl font-bold mb-4 text-center">
-              ¿Estás seguro de que deseas eliminar a {friendToDelete?.username}?
-            </h2>
-            <div className="flex justify-around">
-              <button
-                onClick={handleDeleteFriend}
-                className="bg-green-600 px-4 py-2 rounded hover:bg-green-500 transition"
-              >
-                Sí
-              </button>
-              <button
-                onClick={() => setShowDeleteConfirmation(false)}
-                className="bg-red-600 px-4 py-2 rounded hover:bg-red-500 transition"
-              >
-                No
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {showDeleteConfirmation && (
+          <motion.div 
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div 
+              className="bg-[#2B5C94] p-6 rounded-lg shadow-lg w-80 mx-2"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+            >
+              <h2 className="text-xl font-bold mb-4 text-center">
+                ¿Estás seguro de que deseas eliminar a {friendToDelete?.username}?
+              </h2>
+              <div className="flex justify-around">
+                <motion.button
+                  onClick={handleDeleteFriend}
+                  className="bg-green-600 px-4 py-2 rounded hover:bg-green-500 transition"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Sí
+                </motion.button>
+                <motion.button
+                  onClick={() => setShowDeleteConfirmation(false)}
+                  className="bg-red-600 px-4 py-2 rounded hover:bg-red-500 transition"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  No
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {showAddFriendModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-[#2B5C94] p-6 rounded-lg shadow-lg w-80">
-            <h2 className="text-xl font-bold mb-4 text-center">
-              Ingresa el código de amigo
-            </h2>
-            <input
-              type="text"
-              value={newFriendCode}
-              onChange={(e) => setNewFriendCode(e.target.value)}
-              className="w-full px-4 py-2 mb-4 rounded-md text-white"
-              placeholder="Código de amigo"
-            />
-            <div className="flex justify-around">
-              <button
-                onClick={handleAddFriend}
-                className="bg-blue-600 px-4 py-2 rounded hover:bg-blue-500 transition"
-              >
-                Enviar solicitud
-              </button>
-              <button
-                onClick={handleCloseAddFriendModal}
-                className="bg-red-600 px-4 py-2 rounded hover:bg-red-500 transition"
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {showAddFriendModal && (
+          <motion.div 
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div 
+              className="bg-[#2B5C94] p-6 rounded-lg shadow-lg w-80 mx-2"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+            >
+              <h2 className="text-xl font-bold mb-4 text-center">
+                Ingresa el código de amigo
+              </h2>
+              <input
+                type="text"
+                value={newFriendCode}
+                onChange={(e) => setNewFriendCode(e.target.value)}
+                className="w-full px-4 py-2 mb-4 rounded-md text-black bg-white/90"
+                placeholder="Código de amigo"
+              />
+              <div className="flex justify-around">
+                <motion.button
+                  onClick={handleAddFriend}
+                  className="bg-blue-600 px-4 py-2 rounded hover:bg-blue-500 transition"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Enviar solicitud
+                </motion.button>
+                <motion.button
+                  onClick={handleCloseAddFriendModal}
+                  className="bg-red-600 px-4 py-2 rounded hover:bg-red-500 transition"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Cancelar
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

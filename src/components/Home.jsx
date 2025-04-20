@@ -34,19 +34,20 @@ const Home = () => {
 
     return (
         <div className="fixed inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${background})` }}>
-            <div className="h-screen w-full backdrop-blur-sm">
+            <div className="h-screen w-full backdrop-blur-sm overflow-y-auto">
                 <NavBarGame />
                 
-                <div className="h-[calc(100vh-80px)] grid grid-cols-3 grid-rows-[1fr_auto] gap-8 p-8">
+                {/* Diseño para pantallas medianas y grandes - Layout original */}
+                <div className="hidden md:grid h-[calc(100vh-80px)] grid-cols-3 grid-rows-[1fr_auto] gap-4 md:gap-8 p-4 md:p-8">
                     {/* Left Side - Menu Items */}
-                    <div className="flex flex-col items-start justify-center gap-6 pl-12">
+                    <div className="flex flex-col items-start justify-center gap-4 md:gap-6 pl-4 md:pl-12">
                         <ClassificationButton 
                             className="glass-container hover:!bg-indigo-600/50 transition-all"
-                            iconClassName="text-indigo-400 h-8 w-8"
+                            iconClassName="text-indigo-400 h-6 md:h-8 w-6 md:w-8"
                         />
                         <TournamentButton 
                             className="glass-container hover:!bg-purple-600/50 transition-all"
-                            iconClassName="text-purple-400 h-8 w-8"
+                            iconClassName="text-purple-400 h-6 md:h-8 w-6 md:w-8"
                         />
                     </div>
 
@@ -56,23 +57,64 @@ const Home = () => {
                     </div>
 
                     {/* Right Side - Menu Items */}
-                    <div className="flex flex-col items-end justify-center gap-6 pr-12">
+                    <div className="flex flex-col items-end justify-center gap-4 md:gap-6 pr-4 md:pr-12">
                         <StoreButton 
                             className="glass-container hover:!bg-emerald-600/50 transition-all"
-                            iconClassName="text-emerald-400 h-8 w-8"
+                            iconClassName="text-emerald-400 h-6 md:h-8 w-6 md:w-8"
                         />
                         <CollectionButton 
                             className="glass-container hover:!bg-amber-600/50 transition-all"
-                            iconClassName="text-amber-400 h-8 w-8"
+                            iconClassName="text-amber-400 h-6 md:h-8 w-6 md:w-8"
                         />
                     </div>
 
                     {/* Play Button - Bottom Center */}
-                    <div className="col-span-3 flex justify-center pb-8">
+                    <div className="col-span-3 flex justify-center pb-4 md:pb-8">
                         <PlayButton 
                             className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 
-                            px-12 py-4 rounded-2xl shadow-xl hover:shadow-2xl transition-all"
-                            iconClassName="h-10 w-10"
+                            px-8 md:px-12 py-3 md:py-4 rounded-xl md:rounded-2xl shadow-lg md:shadow-xl hover:shadow-2xl transition-all"
+                            iconClassName="h-8 md:h-10 w-8 md:w-10"
+                        />
+                    </div>
+                </div>
+
+                {/* Diseño para pantallas pequeñas - Layout vertical */}
+                <div className="md:hidden flex flex-col items-center justify-between h-[calc(100vh-80px)] p-4 gap-4">
+                    {/* Cards Menu en la parte superior */}
+                    <div className="w-full">
+                        <CardsMenu className="transform hover:scale-105 transition-transform duration-300" />
+                    </div>
+                    
+                    {/* Botones laterales en medio */}
+                    <div className="flex justify-center w-full gap-4">
+                        <div className="flex gap-2">
+                            <ClassificationButton 
+                                className="glass-container hover:!bg-indigo-600/50 transition-all"
+                                iconClassName="text-indigo-400 h-6 w-6"
+                            />
+                            <TournamentButton 
+                                className="glass-container hover:!bg-purple-600/50 transition-all"
+                                iconClassName="text-purple-400 h-6 w-6"
+                            />
+                        </div>
+                        <div className="flex gap-2">
+                            <StoreButton 
+                                className="glass-container hover:!bg-emerald-600/50 transition-all"
+                                iconClassName="text-emerald-400 h-6 w-6"
+                            />
+                            <CollectionButton 
+                                className="glass-container hover:!bg-amber-600/50 transition-all"
+                                iconClassName="text-amber-400 h-6 w-6"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Play Button en la parte inferior */}
+                    <div className="w-full flex justify-center pb-4">
+                        <PlayButton 
+                            className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 
+                            px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all"
+                            iconClassName="h-8 w-8"
                         />
                     </div>
                 </div>

@@ -602,7 +602,7 @@ const handleRoundResult = (data) => {
     flexDirection: 'column',
     overflow: 'auto'
   };
-
+  
   const headerStyle = {
     display: 'flex',
     justifyContent: 'space-between',
@@ -610,7 +610,7 @@ const handleRoundResult = (data) => {
     width: '100%',
     marginBottom: '2vh'
   };
-
+  
   const formationsContainerStyle = {
     display: 'flex',
     flexDirection: windowWidth < 768 ? 'column' : 'row',
@@ -620,7 +620,7 @@ const handleRoundResult = (data) => {
     gap: '1rem',
     padding: '0.5rem'
   };
-
+  
   const formationStyle = {
     flex: 1,
     display: 'flex',
@@ -628,7 +628,7 @@ const handleRoundResult = (data) => {
     alignItems: 'center',
     marginBottom: windowWidth < 768 ? '1rem' : '0'
   };
-
+  
   const playerNameStyle = {
     color: 'white',
     fontSize: 'clamp(1rem, 2vw, 1.5rem)',
@@ -636,7 +636,7 @@ const handleRoundResult = (data) => {
     textAlign: 'center',
     fontWeight: 'bold'
   };
-
+  
   const skillsContainerStyle = {
     display: 'flex',
     flexDirection: windowWidth < 500 ? 'column' : 'row',
@@ -646,7 +646,7 @@ const handleRoundResult = (data) => {
     marginTop: '1rem',
     width: '100%'
   };
-
+  
   const skillButtonStyle = {
     padding: '0.75rem 1rem',
     borderRadius: '8px',
@@ -659,7 +659,7 @@ const handleRoundResult = (data) => {
     width: windowWidth < 500 ? '100%' : 'auto',
     transition: 'all 0.2s ease'
   };
-
+  
   const confirmButtonStyle = {
     padding: '0.75rem 1rem',
     borderRadius: '8px',
@@ -674,7 +674,7 @@ const handleRoundResult = (data) => {
     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
     transition: 'all 0.2s ease'
   };
-
+  
   const selectedCardContainerStyle = {
     display: 'flex',
     flexDirection: 'column',
@@ -682,10 +682,15 @@ const handleRoundResult = (data) => {
     backgroundColor: 'rgba(31, 41, 55, 0.8)',
     padding: '1rem',
     borderRadius: '10px',
-    marginTop: '1rem',
+    marginBottom: '1rem',
     width: windowWidth < 768 ? '95%' : '90%',
     maxWidth: '600px',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    zIndex: 50
   };
   
   const modalStyle = {
@@ -703,7 +708,7 @@ const handleRoundResult = (data) => {
     zIndex: 100,
     boxShadow: '0 8px 16px rgba(0, 0, 0, 0.4)'
   };
-
+  
   const surrenderButtonStyle = {
     position: 'fixed',
     bottom: '2vh',
@@ -719,7 +724,7 @@ const handleRoundResult = (data) => {
     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.2)',
     transition: 'all 0.2s ease'
   };
-
+  
   const alertStyle = {
     position: 'fixed',
     top: '20px',
@@ -736,7 +741,7 @@ const handleRoundResult = (data) => {
     maxWidth: '90%',
     textAlign: 'center'
   };
-
+  
   const backButtonStyle = {
     padding: '0.75rem 1.5rem',
     borderRadius: '8px',
@@ -751,7 +756,7 @@ const handleRoundResult = (data) => {
     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
     transition: 'all 0.2s ease'
   };
-
+  
   const contentContainerStyle = {
     position: 'relative',
     flexGrow: 1,
@@ -759,13 +764,29 @@ const handleRoundResult = (data) => {
     width: '100%',
     height: '100%'
   };
-
+  
+  const waitingModalStyle = {
+    position: 'fixed',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    padding: '2rem',
+    borderRadius: '15px',
+    textAlign: 'center',
+    color: 'white',
+    width: '90%',
+    maxWidth: '450px',
+    zIndex: 1000,
+    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
+  };
+  
   const renderPhase = () => {
     switch (gameState.phase) {
       case 'waiting':
         return (
           <motion.div 
-            style={modalStyle}
+            style={waitingModalStyle}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
@@ -804,70 +825,6 @@ const handleRoundResult = (data) => {
                   jugadores={gameState.availablePlayerCards} 
                   onJugadorClick={handleCardSelect}
                 />
-                
-                {gameState.selectedCard && (
-                  <motion.div 
-                    style={selectedCardContainerStyle}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <CartaGrande jugador={gameState.selectedCard} />
-                    
-                    <div style={skillsContainerStyle}>
-                      <button 
-                        style={{
-                          ...skillButtonStyle,
-                          backgroundColor: gameState.selectedSkill === 'ataque' ? '#0d6efd' : '#3b82f6',
-                          opacity: isSkillDisabled('ataque') ? 0.5 : 1,
-                          cursor: isSkillDisabled('ataque') ? 'not-allowed' : 'pointer',
-                          transform: gameState.selectedSkill === 'ataque' ? 'scale(1.05)' : 'scale(1)'
-                        }}
-                        onClick={() => handleSkillSelect('ataque')}
-                        disabled={isSkillDisabled('ataque')}
-                      >
-                        Ataque
-                      </button>
-                      <button 
-                        style={{
-                          ...skillButtonStyle,
-                          backgroundColor: gameState.selectedSkill === 'control' ? '#0d6efd' : '#3b82f6',
-                          opacity: isSkillDisabled('control') ? 0.5 : 1,
-                          cursor: isSkillDisabled('control') ? 'not-allowed' : 'pointer',
-                          transform: gameState.selectedSkill === 'control' ? 'scale(1.05)' : 'scale(1)'
-                        }}
-                        onClick={() => handleSkillSelect('control')}
-                        disabled={isSkillDisabled('control')}
-                      >
-                        Control
-                      </button>
-                      <button 
-                        style={{
-                          ...skillButtonStyle,
-                          backgroundColor: gameState.selectedSkill === 'defensa' ? '#0d6efd' : '#3b82f6',
-                          opacity: isSkillDisabled('defensa') ? 0.5 : 1,
-                          cursor: isSkillDisabled('defensa') ? 'not-allowed' : 'pointer',
-                          transform: gameState.selectedSkill === 'defensa' ? 'scale(1.05)' : 'scale(1)'
-                        }}
-                        onClick={() => handleSkillSelect('defensa')}
-                        disabled={isSkillDisabled('defensa')}
-                      >
-                        Defensa
-                      </button>
-                    </div>
-                    
-                    {gameState.selectedSkill && (
-                      <motion.button 
-                        style={confirmButtonStyle}
-                        onClick={handleConfirmSelection}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        Confirmar {gameState.selectedSkill}
-                      </motion.button>
-                    )}
-                  </motion.div>
-                )}
               </div>
               
               {/* Formación del oponente */}
@@ -878,265 +835,306 @@ const handleRoundResult = (data) => {
                   onJugadorClick={() => {}}
                   highlightPositionType={highlightedPosition}
                 />
-                
               </div>
             </div>
+  
+            {/* Selección de carta flotante en el centro */}
+            {gameState.selectedCard && (
+              <motion.div 
+                style={selectedCardContainerStyle}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <CartaGrande jugador={gameState.selectedCard} />
+                
+                <div style={skillsContainerStyle}>
+                  <button 
+                    style={{
+                      ...skillButtonStyle,
+                      backgroundColor: gameState.selectedSkill === 'ataque' ? '#0d6efd' : '#3b82f6',
+                      opacity: isSkillDisabled('ataque') ? 0.5 : 1,
+                      cursor: isSkillDisabled('ataque') ? 'not-allowed' : 'pointer',
+                      transform: gameState.selectedSkill === 'ataque' ? 'scale(1.05)' : 'scale(1)'
+                    }}
+                    onClick={() => handleSkillSelect('ataque')}
+                    disabled={isSkillDisabled('ataque')}
+                  >
+                    Ataque
+                  </button>
+                  <button 
+                    style={{
+                      ...skillButtonStyle,
+                      backgroundColor: gameState.selectedSkill === 'control' ? '#0d6efd' : '#3b82f6',
+                      opacity: isSkillDisabled('control') ? 0.5 : 1,
+                      cursor: isSkillDisabled('control') ? 'not-allowed' : 'pointer',
+                      transform: gameState.selectedSkill === 'control' ? 'scale(1.05)' : 'scale(1)'
+                    }}
+                    onClick={() => handleSkillSelect('control')}
+                    disabled={isSkillDisabled('control')}
+                  >
+                    Control
+                  </button>
+                  <button 
+                    style={{
+                      ...skillButtonStyle,
+                      backgroundColor: gameState.selectedSkill === 'defensa' ? '#0d6efd' : '#3b82f6',
+                      opacity: isSkillDisabled('defensa') ? 0.5 : 1,
+                      cursor: isSkillDisabled('defensa') ? 'not-allowed' : 'pointer',
+                      transform: gameState.selectedSkill === 'defensa' ? 'scale(1.05)' : 'scale(1)'
+                    }}
+                    onClick={() => handleSkillSelect('defensa')}
+                    disabled={isSkillDisabled('defensa')}
+                  >
+                    Defensa
+                  </button>
+                </div>
+                
+                {gameState.selectedSkill && (
+                  <motion.button 
+                    style={confirmButtonStyle}
+                    onClick={handleConfirmSelection}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Confirmar {gameState.selectedSkill}
+                  </motion.button>
+                )}
+              </motion.div>
+            )}
           </>
         );
       
-        case 'response':
-          return (
-            <motion.div 
-              style={{
-                position: 'fixed',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                backgroundColor: 'rgba(30, 41, 59, 0.95)',
-                padding: '2rem',
-                borderRadius: '12px',
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
-                textAlign: 'center',
-                color: 'white',
-                width: '90%',
-                maxWidth: '450px',
-                zIndex: 1000
-              }}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3 }}
-            >
-              <h2 style={{
-                fontSize: 'clamp(18px, 4vw, 26px)',
-                marginBottom: '1.5rem'
-              }}>Esperando respuesta del oponente...</h2>
+      case 'response':
+        return (
+          <motion.div 
+            style={waitingModalStyle}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <h2 style={{
+              fontSize: 'clamp(18px, 4vw, 26px)',
+              marginBottom: '1.5rem'
+            }}>Esperando respuesta del oponente...</h2>
+            
+            <div style={{ marginBottom: '1.5rem' }}>
+              <p style={{
+                fontSize: 'clamp(16px, 3vw, 20px)',
+              }}>Has seleccionado:</p>
               
-              <div style={{ marginBottom: '1.5rem' }}>
-                <p style={{
-                  fontSize: 'clamp(16px, 3vw, 20px)',
-                }}>Has seleccionado:</p>
-                
-                <div style={{ 
-                  marginTop: '1rem',
-                  display: 'flex',
-                  justifyContent: 'center'
-                }}>
-                  <div style={{ maxWidth: '250px' }}>
-                    <CartaGrande jugador={gameState.selectedCard} />
-                    <div style={{ 
-                      marginTop: '0.5rem',
-                      fontWeight: 'bold',
-                      backgroundColor: '#0d6efd',
-                      padding: '5px 10px',
-                      borderRadius: '5px',
-                      display: 'inline-block'
-                    }}>
-                      {gameState.selectedSkill.charAt(0).toUpperCase() + gameState.selectedSkill.slice(1)}
-                    </div>
+              <div style={{ 
+                marginTop: '1rem',
+                display: 'flex',
+                justifyContent: 'center'
+              }}>
+                <div style={{ maxWidth: '250px' }}>
+                  <CartaGrande jugador={gameState.selectedCard} />
+                  <div style={{ 
+                    marginTop: '0.5rem',
+                    fontWeight: 'bold',
+                    backgroundColor: '#0d6efd',
+                    padding: '5px 10px',
+                    borderRadius: '5px',
+                    display: 'inline-block'
+                  }}>
+                    {gameState.selectedSkill.charAt(0).toUpperCase() + gameState.selectedSkill.slice(1)}
                   </div>
                 </div>
               </div>
-              
-              <div style={{ marginTop: '1rem' }}>
-                <div className="loader" style={{
-                  border: '5px solid rgba(255,255,255,0.2)',
-                  borderTop: '5px solid #3b82f6',
-                  borderRadius: '50%',
-                  width: '40px',
-                  height: '40px',
-                  animation: 'spin 1s linear infinite',
-                  margin: '0 auto'
-                }}></div>
-                <style jsx>{`
-                  @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                  }
-                `}</style>
-              </div>
-            </motion.div>
-          );
-      
-        case 'result':
-          // Verificaciones seguras de los datos
-          // eslint-disable-next-line no-case-declarations
-          const playerWon = gameState.roundResult?.includes("ganado") || false;
-          // eslint-disable-next-line no-case-declarations
-          const tie = gameState.roundResult?.includes("empate") || false;
-          // eslint-disable-next-line no-case-declarations
-          const playerScore = gameState.scores?.player || 0;
-          console.log(playerScore);
-          const opponentScore = gameState.scores?.opponent || 0;
-          console.log(opponentScore);
-          
-          // Datos de la carta del jugador con valores por defecto
-          const playerCard = gameState.selectedCard || {
-            alias: "Carta no disponible",
-            ataque: 0,
-            defensa: 0,
-            control: 0,
-            photo: "",
-            escudo: "",
-            equipo: "",
-            tipo_carta: "Normal"
-          };
-          
-          const playerSkill = gameState.selectedSkill || "none";
-          const playerSkillValue = playerCard[playerSkill] || 0;
-          console.log(playerSkillValue);
-          
-          // Datos de la carta del oponente con valores por defecto
-          const opponentCard = gameState.opponentSelectedCard || {
-            alias: "Carta oponente no disponible",
-            ataque: 0,
-            defensa: 0,
-            control: 0,
-            photo: "",
-            escudo: "",
-            equipo: "",
-            tipo_carta: "Normal"
-          };
-          
-          const opponentSkill = gameState.opponentSelectedSkill || "none";
-          const opponentSkillValue = opponentCard[opponentSkill] || 0;
-          console.log(opponentSkillValue);
-
-          return (
-            <motion.div 
-              style={{
-                position: 'fixed',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: windowWidth < 768 ? '95%' : '85%',
-                maxWidth: '800px',
-                backgroundColor: 'rgba(31, 41, 55, 0.95)',
-                padding: '2rem',
-                borderRadius: '15px',
-                color: 'white',
-                zIndex: 100,
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+            </div>
+            
+            <div style={{ marginTop: '1rem' }}>
+              <div className="loader" style={{
+                border: '5px solid rgba(255,255,255,0.2)',
+                borderTop: '5px solid #3b82f6',
+                borderRadius: '50%',
+                width: '40px',
+                height: '40px',
+                animation: 'spin 1s linear infinite',
+                margin: '0 auto'
+              }}></div>
+            </div>
+          </motion.div>
+        );
+    
+      case 'result':
+        // Verificaciones seguras de los datos
+        const playerWon = gameState.roundResult?.includes("ganado") || false;
+        const tie = gameState.roundResult?.includes("empate") || false;
+        const playerScore = gameState.scores?.player || 0;
+        console.log(playerScore);
+        const opponentScore = gameState.scores?.opponent || 0;
+        console.log(opponentScore);
+        
+        // Datos de la carta del jugador con valores por defecto
+        const playerCard = gameState.selectedCard || {
+          alias: "Carta no disponible",
+          ataque: 0,
+          defensa: 0,
+          control: 0,
+          photo: "",
+          escudo: "",
+          equipo: "",
+          tipo_carta: "Normal"
+        };
+        
+        const playerSkill = gameState.selectedSkill || "none";
+        const playerSkillValue = playerCard[playerSkill] || 0;
+        console.log(playerSkillValue);
+        
+        // Datos de la carta del oponente con valores por defecto
+        const opponentCard = gameState.opponentSelectedCard || {
+          alias: "Carta oponente no disponible",
+          ataque: 0,
+          defensa: 0,
+          control: 0,
+          photo: "",
+          escudo: "",
+          equipo: "",
+          tipo_carta: "Normal"
+        };
+        
+        const opponentSkill = gameState.opponentSelectedSkill || "none";
+        const opponentSkillValue = opponentCard[opponentSkill] || 0;
+        console.log(opponentSkillValue);
+  
+        return (
+          <motion.div 
+            style={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: windowWidth < 768 ? '95%' : '85%',
+              maxWidth: '800px',
+              backgroundColor: 'rgba(31, 41, 55, 0.95)',
+              padding: '2rem',
+              borderRadius: '15px',
+              color: 'white',
+              zIndex: 100,
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              textAlign: 'center'
+            }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            {/* Contenido del modal */}
+            <h2 style={{
+              fontSize: 'clamp(18px, 4vw, 26px)',
+              marginBottom: '1.5rem',
+              color: 'white',
+              width: '100%'
+            }}>
+              Resultado de la ronda {gameState.roundNumber}
+            </h2>
+            
+            {/* Contenedor de cartas */}
+            <div style={{
+              display: 'flex',
+              flexDirection: windowWidth < 768 ? 'column' : 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: '2rem',
+              width: '100%',
+              margin: '1rem 0'
+            }}>
+              {/* Tu carta */}
+              <div style={{ 
+                position: 'relative',
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: 'center',
-                textAlign: 'center'
-              }}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3 }}
-            >
-              {/* Contenido del modal */}
-              <h2 style={{
-                fontSize: 'clamp(18px, 4vw, 26px)',
-                marginBottom: '1.5rem',
-                color: 'white',
-                width: '100%'
+                alignItems: 'center'
               }}>
-                Resultado de la ronda {gameState.roundNumber}
-              </h2>
-              
-              {/* Contenedor de cartas */}
-              <div style={{
-                display: 'flex',
-                flexDirection: windowWidth < 768 ? 'column' : 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-                gap: '2rem',
-                width: '100%',
-                margin: '1rem 0'
-              }}>
-                {/* Tu carta */}
-                <div style={{ 
-                  position: 'relative',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center'
-                }}>
-                  {/* ... (mantén el contenido de tu carta) */}
-                </div>
-                
-                {/* VS (solo en desktop) */}
-                {windowWidth >= 768 && (
-                  <div style={{
-                    width: '60px',
-                    height: '60px',
-                    borderRadius: '50%',
-                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    fontSize: '1.5rem',
-                    fontWeight: 'bold',
-                    color: 'white',
-                    flexShrink: 0
-                  }}>
-                    VS
-                  </div>
-                )}
-                
-                {/* Carta oponente */}
-                <div style={{ 
-                  position: 'relative',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center'
-                }}>
-                  {/* ... (mantén el contenido de la carta oponente) */}
-                </div>
+                {/* ... (mantén el contenido de tu carta) */}
               </div>
               
-              {/* Resultado */}
-              <motion.div 
-                style={{ 
-                  marginTop: '1rem',
-                  padding: '1rem',
-                  width: '100%',
-                  backgroundColor: tie ? '#f59e0b' : (playerWon ? '#10b981' : '#ef4444'),
-                  borderRadius: '8px',
-                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.2)'
-                }}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.3 }}
-              >
-                {/* ... (mantén el texto de resultado) */}
-              </motion.div>
-              
-              {/* Marcador */}
-              <div style={{ 
-                marginTop: '1.5rem',
-                display: 'flex',
-                justifyContent: 'space-around',
-                width: '100%',
-                maxWidth: '300px'
-              }}>
-                {/* ... (mantén el marcador) */}
-              </div>
-              
-              {/* Botón siguiente */}
-              <motion.button 
-                style={{
-                  padding: '0.75rem 2rem',
-                  borderRadius: '8px',
-                  border: 'none',
-                  cursor: 'pointer',
-                  backgroundColor: '#10b981',
-                  color: 'white',
+              {/* VS (solo en desktop) */}
+              {windowWidth >= 768 && (
+                <div style={{
+                  width: '60px',
+                  height: '60px',
+                  borderRadius: '50%',
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  fontSize: '1.5rem',
                   fontWeight: 'bold',
-                  fontSize: 'clamp(0.9rem, 1.5vw, 1.1rem)',
-                  marginTop: '2rem',
-                  width: 'auto',
-                  minWidth: '200px'
-                }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Siguiente ronda
-              </motion.button>
+                  color: 'white',
+                  flexShrink: 0
+                }}>
+                  VS
+                </div>
+              )}
+              
+              {/* Carta oponente */}
+              <div style={{ 
+                position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center'
+              }}>
+                {/* ... (mantén el contenido de la carta oponente) */}
+              </div>
+            </div>
+            
+            {/* Resultado */}
+            <motion.div 
+              style={{ 
+                marginTop: '1rem',
+                padding: '1rem',
+                width: '100%',
+                backgroundColor: tie ? '#f59e0b' : (playerWon ? '#10b981' : '#ef4444'),
+                borderRadius: '8px',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.2)'
+              }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.3 }}
+            >
+              {/* ... (mantén el texto de resultado) */}
             </motion.div>
-          );
-      
+            
+            {/* Marcador */}
+            <div style={{ 
+              marginTop: '1.5rem',
+              display: 'flex',
+              justifyContent: 'space-around',
+              width: '100%',
+              maxWidth: '300px'
+            }}>
+              {/* ... (mantén el marcador) */}
+            </div>
+            
+            {/* Botón siguiente */}
+            <motion.button 
+              style={{
+                padding: '0.75rem 2rem',
+                borderRadius: '8px',
+                border: 'none',
+                cursor: 'pointer',
+                backgroundColor: '#10b981',
+                color: 'white',
+                fontWeight: 'bold',
+                fontSize: 'clamp(0.9rem, 1.5vw, 1.1rem)',
+                marginTop: '2rem',
+                width: 'auto',
+                minWidth: '200px'
+              }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Siguiente ronda
+            </motion.button>
+          </motion.div>
+        );
+    
       case 'ended':
         const finalWin = gameState.winner === 'player';
         
@@ -1229,14 +1227,18 @@ const handleRoundResult = (data) => {
             color: 'white',
             textAlign: 'center',
             fontSize: 'clamp(14px, 3vw, 18px)',
-            padding: '2rem'
+            padding: '2rem',
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)'
           }}>
             Cargando partida...
           </div>
         );
     }
   };
-
+  
   return (
     <div style={containerStyle}>
       {/* Estilos globales para asegurar que el fondo ocupe toda la pantalla */}
@@ -1249,7 +1251,7 @@ const handleRoundResult = (data) => {
             width: 100%;
             overflow: hidden;
           }
-
+  
           @keyframes fadeInOut {
             0% { opacity: 0; }
             15% { opacity: 1; }
@@ -1263,7 +1265,7 @@ const handleRoundResult = (data) => {
           }
         `}
       </style>
-
+  
       {/* Header con información de la partida */}
       <div style={headerStyle}>
         <div style={{ 
@@ -1336,12 +1338,12 @@ const handleRoundResult = (data) => {
           </motion.h2>
         </div>
       </div>
-
+  
       {/* Contenido principal de la partida */}
       <div style={contentContainerStyle}>
         {renderPhase()}
       </div>
-
+  
       {/* Botón de rendirse */}
       <motion.button 
         onClick={handleSurrender}
@@ -1351,7 +1353,7 @@ const handleRoundResult = (data) => {
       >
         Rendirse
       </motion.button>
-
+  
       {showAlert && (
         <div style={alertStyle}>
           {alertMessage}
@@ -1359,6 +1361,6 @@ const handleRoundResult = (data) => {
       )}
     </div>
   );
-};
-
-export default Partida;
+  };
+  
+  export default Partida;

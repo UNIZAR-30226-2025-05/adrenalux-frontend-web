@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; 
 import { logout } from "../services/api/authApi"; // Importar la función logout
-import NavBarGame from './layout/game/NavbarGame';
 import BackButton from './layout/game/BackButton';
 import background from '../assets/background.png';
 import { getToken } from "../services/api/authApi";
 
-import { loadSound, playMusic, changeMusicVolume } from '../utils/soundManager';
+import { changeMusicVolume } from '../utils/soundManager';
 
 const Ajustes = () => {
   const navigate = useNavigate(); // Obtener la función de navegación
@@ -89,7 +88,6 @@ const Ajustes = () => {
 
   return (
     <div className="fixed inset-0 overflow-y-auto bg-cover bg-center" style={{ backgroundImage: `url(${background})` }}>
-      <NavBarGame />
       <div className="relative w-full min-h-screen flex flex-col items-center pt-24 pb-8 px-4">
         {/* Botón de retroceso */}
         <div className="absolute left-4 top-24 z-10">
