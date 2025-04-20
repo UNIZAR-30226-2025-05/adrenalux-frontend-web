@@ -68,8 +68,8 @@ const Home = () => {
                         />
                     </div>
 
-                    {/* Play Button - Bottom Center */}
-                    <div className="col-span-3 flex justify-center pb-4 md:pb-8">
+                    {/* Play Button - Bottom Center con mayor espacio superior */}
+                    <div className="col-span-3 flex justify-center pb-4 md:pb-8 mt-6 md:mt-10">
                         <PlayButton 
                             className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 
                             px-8 md:px-12 py-3 md:py-4 rounded-xl md:rounded-2xl shadow-lg md:shadow-xl hover:shadow-2xl transition-all"
@@ -79,14 +79,20 @@ const Home = () => {
                 </div>
 
                 {/* Diseño para pantallas pequeñas - Layout vertical */}
-                <div className="md:hidden flex flex-col items-center justify-between h-[calc(100vh-80px)] p-4 gap-4">
-                    {/* Cards Menu en la parte superior */}
-                    <div className="w-full">
-                        <CardsMenu className="transform hover:scale-105 transition-transform duration-300" />
+                <div className="md:hidden flex flex-col h-[calc(100vh-80px)] p-4">
+                    {/* Espacio adicional entre Navbar y Cards Menu */}
+                    <div className="h-40"></div>
+                    
+                    {/* Cards Menu área con altura fija/máxima y escalado para cartas más grandes */}
+                    <div className="w-full flex-shrink-0 max-h-[45vh] flex items-center justify-center">
+                        <CardsMenu className="transform scale-125 hover:scale-130 transition-transform duration-300" />
                     </div>
                     
+                    {/* Espacio flexible entre elementos - Ahora más grande */}
+                    <div className="flex-grow"></div>
+                    
                     {/* Botones laterales en medio */}
-                    <div className="flex justify-center w-full gap-4">
+                    <div className="flex justify-center w-full gap-4 mb-8">
                         <div className="flex gap-2">
                             <ClassificationButton 
                                 className="glass-container hover:!bg-indigo-600/50 transition-all"
@@ -109,8 +115,8 @@ const Home = () => {
                         </div>
                     </div>
 
-                    {/* Play Button en la parte inferior */}
-                    <div className="w-full flex justify-center pb-4">
+                    {/* Play Button en la parte inferior con más espacio */}
+                    <div className="w-full flex-shrink-0 flex justify-center pb-6">
                         <PlayButton 
                             className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 
                             px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all"

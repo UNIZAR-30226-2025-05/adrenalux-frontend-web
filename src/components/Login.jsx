@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../services/api/authApi";
-import googleLogo from "../assets/googleLogo.png";
 import background from "../assets/background.png";
 import { googleSignIn } from "../services/api/authApi";
 import GoogleSignInButton from "../components/layout/game/GoogleSignInButton";
+
 const Login = () => {
   const navigate = useNavigate();
 
@@ -90,12 +90,13 @@ const Login = () => {
 
   return (
     <div
-      className="fixed inset-0 flex justify-center items-center bg-cover bg-center"
+      className="fixed inset-0 flex justify-center items-center bg-cover bg-center px-4 sm:px-6 py-8"
       style={{ backgroundImage: `url(${background})` }}
     >
-      <div className="bg-gray-300 dark:bg-gray-900 p-8 w-full max-w-lg text-white">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-black dark:text-white text-2xl font-bold">
+      <div className="bg-gray-300 dark:bg-gray-900 p-4 sm:p-6 md:p-8 w-full max-w-lg rounded-lg shadow-xl">
+        {/* Header row with title and Google button - flex items-center makes them vertically aligned */}
+        <div className="flex flex-row justify-between items-center mb-4 gap-2">
+          <h2 className="text-black dark:text-white text-xl sm:text-2xl font-bold">
             Inicio de sesión
           </h2>
 
@@ -117,7 +118,7 @@ const Login = () => {
             placeholder="Correo electrónico"
             className={`w-full bg-gray-800 border ${
               errors.email ? "border-red-500" : "border-gray-700"
-            } rounded px-4 py-2 text-white focus:outline-none`}
+            } rounded px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500`}
             value={formData.email}
             onChange={handleChange}
           />
@@ -132,7 +133,7 @@ const Login = () => {
             placeholder="Contraseña"
             className={`w-full bg-gray-800 border ${
               errors.password ? "border-red-500" : "border-gray-700"
-            } rounded px-4 py-2 text-white focus:outline-none`}
+            } rounded px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500`}
             value={formData.password}
             onChange={handleChange}
           />
@@ -142,7 +143,7 @@ const Login = () => {
           )}
 
           {/* Botones de iniciar sesión y olvidar contraseña */}
-          <div className="flex justify-between">
+          <div className="flex flex-row items-center justify-between gap-4">
             <button
               className="bg-blue-600 hover:bg-blue-500 text-white rounded py-2 px-4 transition duration-300"
               type="submit"
@@ -151,7 +152,7 @@ const Login = () => {
             </button>
 
             <button
-              className="text-blue-600 bg-gray-900 hover:text-blue-200 transition duration-300"
+              className="text-blue-600 hover:text-blue-200 transition duration-300 py-2 bg-gray-300 dark:bg-gray-900"
               type="button"
             >
               Olvidé mi contraseña
@@ -161,7 +162,7 @@ const Login = () => {
           {/* Botón "No tengo cuenta" debajo */}
           <div className="flex justify-center mt-4">
             <button
-              className="text-blue-600 bg-gray-900 hover:text-blue-200 transition duration-300"
+              className="text-blue-600 hover:text-blue-200 transition duration-300 py-2 bg-gray-300 dark:bg-gray-900"
               type="button"
               onClick={() => navigate("/register")}
             >
