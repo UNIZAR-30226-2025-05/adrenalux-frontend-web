@@ -1,7 +1,8 @@
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Register from "./components/Register";
 import Login from "./components/Login";
 import Inicio from "./components/Inicio";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./components/Home";
 import Shop from "./components/Shop";
 import ShopCollection from "./components/ShopCollection";
@@ -21,18 +22,28 @@ import EsperandoJugador from "./components/EsperandoJugador";
 import Clasificacion from "./components/Clasificacion";
 import Partida from "./components/Partida";
 import Torneo from "./components/Torneo";
-import React, { useState, useEffect } from "react";
 import MusicManager from "./context/MusicManager";
 
 function App() {
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
 
   useEffect(() => {
+    // Aplicar el tema a la raíz del documento HTML
     if (theme === "dark") {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
     }
+
+    // Agregar el script de Tidio
+    const tidioScript = document.createElement("script");
+    tidioScript.src = "//code.tidio.co/zb1pfoly1cmbv7sux114egm7klfmzirv.js";
+    tidioScript.async = true;
+    document.body.appendChild(tidioScript);
+
+    return () => {
+      document.body.removeChild(tidioScript); // Limpiar el script al desmontar el componente
+    };
   }, [theme]);
 
   return (
