@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { FaStar } from "react-icons/fa";
+
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import background from "../assets/background.png";
@@ -18,6 +20,19 @@ import {
 import circle from "../assets/circle.png";
 
 export default function Collection({ onBack }) {
+  const [isFlipped, setIsFlipped] = useState(false);
+  const rarityToStars = (tipo) => {
+    switch (tipo.toLowerCase()) {
+      case "megaluxury":
+        return 5;
+      case "luxuryxi":
+        return 4;
+      case "luxury":
+        return 3;
+      default:
+        return 1; // normal o cualquier otro tipo
+    }
+  };
   const [cards, setCards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCard, setSelectedCard] = useState(null);
@@ -323,8 +338,50 @@ export default function Collection({ onBack }) {
       {showModal && selectedCard && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
           <div className="bg-black p-6 rounded-lg shadow-lg max-w-sm mx-auto">
-            <div className="flex justify-center mb-4">
-              <Carta2 jugador={selectedCard} />
+            {/* → Flip-card container */}
+            <div
+              className="flip-card perspective-1000 mb-4 cursor-pointer"
+              onClick={() => setIsFlipped((f) => !f)}
+            >
+              <div
+                className={`
+            flip-card-inner preserve-3d transition-transform
+            ${isFlipped ? "rotate-y-180" : ""}
+          `}
+              >
+                {/* Anverso: stats visibles */}
+                <div className="flip-card-front  backface-hidden">
+                  <Carta2 jugador={selectedCard} />
+                </div>
+                {/* Reverso: mismas dimensiones, sólo imagen */}
+                {/* Reverso: mismas dimensiones, sólo imagen */}
+                <div className="flip-card-back relative backface-hidden rotate-y-180">
+                  {/* Carta sin stats */}
+                  <Carta2 jugador={selectedCard} hideStats responsive={false} />
+
+                  {/* Estrellas, posición y cantidad, posicionados arriba */}
+                  <div className="absolute top-[275px] left-1/2 transform -translate-x-1/2 w-full px-2 py-1 bg-transparent text-white rounded">
+                    <div className="flex justify-center gap-1 mb-1">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <FaStar
+                          key={i}
+                          className={
+                            i < rarityToStars(selectedCard.tipo_carta)
+                              ? "text-yellow-400"
+                              : "text-gray-700"
+                          }
+                        />
+                      ))}
+                    </div>
+                    <p className="text-center font-bold text-sm">
+                      {selectedCard.posicion.toUpperCase()}
+                    </p>
+                    <p className="text-center text-xs">
+                      x{selectedCard.cantidad}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
             {selectedCard.enVenta ? (
               <>
