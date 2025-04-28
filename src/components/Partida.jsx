@@ -12,6 +12,7 @@ import {
 import { getToken } from "../services/api/authApi";
 import Formacion433 from "../components/layout/game/Formacion_4_3_3";
 import CartaGrande from "../components/layout/game/CartaGrande";
+import CartaMediana from "../components/layout/game/CartaMediana";
 
 import { motion } from "framer-motion";
 import ModalWrapper from "../components/layout/game/ModalWrapper";
@@ -29,13 +30,55 @@ const Partida = () => {
   const selectedCardRef = useRef(null);
   const opponentCardsRef = useRef([]);
 
+  const [showPausedMenu, setShowPausedMenu] = useState(false);
+  const [pausedMatches, setPausedMatches] = useState([]);
+  const [loadingPaused, setLoadingPaused] = useState(false);
+  const handleShowPausedMenu = async () => {
+    setLoadingPaused(true);
+    setShowPausedMenu(true);
+    try {
+      const matches = await getPartidasPausadas(token);
+      setPausedMatches(matches);
+    } catch (err) {
+      setAlertMessage("Error cargando partidas pausadas");
+      setShowAlert(true);
+    }
+    setLoadingPaused(false);
+  };
+
   const [currentOpponentCard, setCurrentOpponentCard] = useState(null);
   console.log(currentOpponentCard);
   const [highlightedPosition, setHighlightedPosition] = useState(null);
   const handlePause = () => {
     console.log("Pausa solicitada");
+    socketService.pause(matchId);
     setShowMenu(false);
   };
+  const handleResume = () => {
+    socketService.resumeMatch(matchId);
+    setShowMenu(false);
+  };
+
+  // 1) CALLBACKS DE PAUSA / REANUDAR
+  useEffect(() => {
+    socketService.setOnMatchPaused(() => {
+      setGameState((prev) => ({ ...prev, phase: "paused" }));
+    });
+
+    socketService.setOnMatchResumed(() => {
+      setGameState((prev) => ({ ...prev, phase: "selection" }));
+    });
+
+    socketService.setOnMatchEnd((payload) => {
+      setGameState((prev) => ({
+        ...prev,
+        phase: "ended",
+        scores: payload.scores,
+        winner: payload.winner,
+        puntosDelta: payload.puntosDelta,
+      }));
+    });
+  }, []);
 
   const [gameState, setGameState] = useState({
     phase: "waiting",
@@ -607,7 +650,7 @@ const Partida = () => {
     }));
 
     // Programar el cambio a la fase de selección después de mostrar el resultado
-    setTimeout(() => {
+    /*setTimeout(() => {
       // SOLO limpiar la carta seleccionada, pero MANTENER las cartas del oponente
       selectedCardRef.current = null;
 
@@ -619,7 +662,7 @@ const Partida = () => {
         // IMPORTANTE: Preservar explícitamente las cartas del oponente
         opponentCards: updatedOpponentCards,
       }));
-    }, 3000); // Mostrar el resultado durante 3 segundos
+    }, 10000); // Mostrar el resultado durante 3 segundos*/
   };
 
   const handleMatchEnd = (data) => {
@@ -1106,176 +1149,82 @@ const Partida = () => {
             </motion.div>
           </ModalWrapper>
         );
-
-      case "result":
-        // Verificaciones seguras de los datos
-        const playerWon = gameState.roundResult?.includes("ganado") || false;
-        const tie = gameState.roundResult?.includes("empate") || false;
-        const playerScore = gameState.scores?.player || 0;
-        console.log(playerScore);
-        const opponentScore = gameState.scores?.opponent || 0;
-        console.log(opponentScore);
-
-        // Datos de la carta del jugador con valores por defecto
-        const playerCard = gameState.selectedCard || {
-          alias: "Carta no disponible",
-          ataque: 0,
-          defensa: 0,
-          control: 0,
-          photo: "",
-          escudo: "",
-          equipo: "",
-          tipo_carta: "Normal",
-        };
-
-        const playerSkill = gameState.selectedSkill || "none";
-        const playerSkillValue = playerCard[playerSkill] || 0;
-        console.log(playerSkillValue);
-
-        // Datos de la carta del oponente con valores por defecto
-        const opponentCard = gameState.opponentSelectedCard || {
-          alias: "Carta oponente no disponible",
-          ataque: 0,
-          defensa: 0,
-          control: 0,
-          photo: "",
-          escudo: "",
-          equipo: "",
-          tipo_carta: "Normal",
-        };
-
-        const opponentSkill = gameState.opponentSelectedSkill || "none";
-        const opponentSkillValue = opponentCard[opponentSkill] || 0;
-        console.log(opponentSkillValue);
-
+      //Paused
+      case "paused":
         return (
-          // Contenedor “centrador” estático
           <ModalWrapper style={centeredModalStyle}>
-            {/* Ahora el <motion.div> SOLO anima opacidad/escala/y, pero NO el transform de centrado */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
+            <h2 className="text-2xl mb-4">Partida pausada</h2>
+            <button
+              onClick={() => navigate("/home")}
+              className="bg-blue-600 px-4 py-2 rounded hover:bg-blue-500"
             >
-              {/* Contenido del modal */}
-              <h2
-                style={{
-                  fontSize: "clamp(18px, 4vw, 26px)",
-                  marginBottom: "1.5rem",
-                  width: "100%",
-                }}
-              >
-                Resultado de la ronda {gameState.roundNumber}
-              </h2>
-
-              {/* …resto de tu JSX: contenedor de cartas, VS, resultado, marcador, botón… */}
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: windowWidth < 768 ? "column" : "row",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  gap: "2rem",
-                  width: "100%",
-                  margin: "1rem 0",
-                }}
-              >
-                {/* Tu carta */}
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                  }}
-                >
-                  {/* … */}
-                </div>
-
-                {windowWidth >= 768 && (
-                  <div
-                    style={{
-                      width: "60px",
-                      height: "60px",
-                      borderRadius: "50%",
-                      backgroundColor: "rgba(255, 255, 255, 0.2)",
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      fontSize: "1.5rem",
-                      fontWeight: "bold",
-                      color: "white",
-                      flexShrink: 0,
-                    }}
-                  >
-                    VS
-                  </div>
-                )}
-
-                {/* Carta oponente */}
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                  }}
-                >
-                  {/* … */}
-                </div>
-              </div>
-
-              <motion.div
-                style={{
-                  marginTop: "1rem",
-                  padding: "1rem",
-                  width: "100%",
-                  backgroundColor: tie
-                    ? "#f59e0b"
-                    : playerWon
-                    ? "#10b981"
-                    : "#ef4444",
-                  borderRadius: "8px",
-                  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
-                }}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.3 }}
-              >
-                {/* …texto de resultado… */}
-              </motion.div>
-
-              <div
-                style={{
-                  marginTop: "1.5rem",
-                  display: "flex",
-                  justifyContent: "space-around",
-                  width: "100%",
-                  maxWidth: "300px",
-                }}
-              >
-                {/* …marcador… */}
-              </div>
-
-              <motion.button
-                style={{
-                  padding: "0.75rem 2rem",
-                  borderRadius: "8px",
-                  border: "none",
-                  cursor: "pointer",
-                  backgroundColor: "#10b981",
-                  color: "white",
-                  fontWeight: "bold",
-                  fontSize: "clamp(0.9rem, 1.5vw, 1.1rem)",
-                  marginTop: "2rem",
-                  minWidth: "200px",
-                }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Siguiente ronda
-              </motion.button>
-            </motion.div>
+              Volver al inicio
+            </button>
           </ModalWrapper>
         );
+      case "result": {
+        const playerWon = gameState.roundResult?.includes("ganado");
+        const estadistica = gameState.selectedSkill; // "ataque" | "control" | "defensa"
+        const playerValue = gameState.selectedCard[estadistica];
+        const rivalValue = gameState.opponentSelectedCard[estadistica];
+
+        return (
+          <ModalWrapper style={centeredModalStyle}>
+            <div className="text-center mb-4">
+              <h2
+                className="text-3xl font-bold"
+                style={{ color: playerWon ? "#10b981" : "#ef4444" }}
+              >
+                {playerWon ? "Victory" : "Defeat"}
+              </h2>
+            </div>
+            <div className="flex justify-center items-center gap-8 mb-6">
+              {/* Tu carta */}
+              <div className="flex flex-col items-center">
+                <CartaMediana jugador={gameState.selectedCard} />
+                <p className="mt-2 uppercase font-semibold text-blue-400">
+                  {estadistica}
+                </p>
+              </div>
+              <span className="text-2xl font-bold text-white">VS</span>
+              {/* Carta rival */}
+              <div className="flex flex-col items-center">
+                <CartaMediana jugador={gameState.opponentSelectedCard} />
+                <p className="mt-2 uppercase font-semibold text-yellow-400">
+                  {estadistica}
+                </p>
+              </div>
+            </div>
+            <div className="flex justify-around items-center text-lg font-medium">
+              <div className="flex flex-col items-center">
+                <span className="text-2xl text-blue-400">
+                  {playerValue} <i className="fas fa-arrow-up" />
+                </span>
+                <span>You</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <span className="text-2xl text-yellow-400">
+                  {rivalValue} <i className="fas fa-arrow-down" />
+                </span>
+                <span>Rival</span>
+              </div>
+            </div>
+            <motion.button
+              style={confirmButtonStyle}
+              onClick={() =>
+                setGameState((prev) => ({
+                  ...prev,
+                  phase: "selection",
+                  selectedCard: null,
+                  selectedSkill: null,
+                }))
+              }
+            >
+              Continuar
+            </motion.button>
+          </ModalWrapper>
+        );
+      }
 
       case "ended":
         const finalWin = gameState.winner === "player";
@@ -1521,44 +1470,15 @@ const Partida = () => {
             overflow: "hidden",
           }}
         >
-          <button
-            onClick={handlePause}
-            style={{
-              display: "block",
-              width: "100%",
-              padding: "10px 16px",
-              background: "transparent",
-              color: "white",
-              textAlign: "left",
-              fontSize: "14px",
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
-            Pausar partida
-          </button>
-          <button
-            onClick={handleSurrender}
-            style={{
-              display: "block",
-              width: "100%",
-              padding: "10px 16px",
-              background: "transparent",
-              color: "#F87171",
-              textAlign: "left",
-              fontSize: "14px",
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
-            Rendirse
-          </button>
+          <button onClick={handlePause}>Pausar partida</button>
+          <button onClick={handleSurrender}>Rendirse</button>
         </div>
       )}
 
       {/* —— MODALES flotantes, SIEMPRE FUERA del container —— */}
-      {["waiting", "response", "result", "ended"].includes(gameState.phase) &&
-        renderPhase()}
+      {["waiting", "paused", "response", "result", "ended"].includes(
+        gameState.phase
+      ) && renderPhase()}
 
       {/* —— ALERTA flotante —— */}
       {showAlert && (

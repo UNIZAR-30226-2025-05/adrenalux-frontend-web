@@ -365,6 +365,25 @@ class SocketService {
     this.socket.emit("surrender", { matchId: matchIdInt });
   }
 
+  // emitter de pausa
+  pause(matchId) {
+    if (!this.socket) return;
+    this.socket.emit("request_pause", { matchId });
+  }
+  // emitter de reanudar
+  resume(matchId) {
+    if (!this.socket) return;
+    this.socket.emit("request_resume", { matchId });
+  }
+
+  // registra callback
+  setOnMatchPaused(cb) {
+    this.onMatchPaused = cb;
+  }
+  setOnMatchResumed(cb) {
+    this.onMatchResumed = cb;
+  }
+
   setupMatchListeners() {
     if (!this.socket) return;
 
@@ -382,6 +401,19 @@ class SocketService {
     this.socket.on("round_result", (data) => this.handleRoundResult(data));
     this.socket.on("match_ended", (data) => this.handleMatchEnd(data));
     this.socket.on("match_error", (data) => this.handleMatchError(data));
+
+    this.socket.on("match_paused", (data) => this.handleMatchPaused(data));
+    this.socket.on("match_resumed", (data) => this.handleMatchResumed(data));
+  }
+
+  //Hanlders
+  handleMatchPaused(data) {
+    console.log("Partida pausada:", data);
+    if (this.onMatchPaused) this.onMatchPaused(data);
+  }
+  handleMatchResumed(data) {
+    console.log("Partida reanudada:", data);
+    if (this.onMatchResumed) this.onMatchResumed(data);
   }
 
   handleMatchmakingStatus(data) {
