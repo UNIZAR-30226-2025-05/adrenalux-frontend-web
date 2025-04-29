@@ -1,4 +1,3 @@
-import React from "react";
 import { useGLTF, useTexture, Text } from "@react-three/drei";
 import RotatingModel from "./RotatingModel";
 import { DoubleSide } from "three";

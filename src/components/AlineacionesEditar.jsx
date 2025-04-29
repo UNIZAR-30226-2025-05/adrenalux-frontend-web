@@ -302,21 +302,27 @@ export default function AlineacionEditar() {
         {!hasChanges && <div className="w-8 md:w-12"></div>}
       </div>
   
-      {/* Contenedor de la formación - ajustado para responsive */}
-      <div className="absolute inset-0 flex items-center justify-center pt-[3.5rem] md:pt-[4.5rem] pb-2 md:pb-4 px-2 md:px-4">
+      {/* Contenedor de la formación - MODIFICADO para aumentar el tamaño */}
+      <div className="fixed inset-0 flex items-center justify-center pt-16 md:pt-20 pb-2 md:pb-4 px-2 md:px-4">
         <div 
-          className="relative w-full max-w-[1800px] mx-auto overflow-hidden"
+          className="w-full h-full flex items-center justify-center"
           style={{
-            height: 'calc(100vh - 3.5rem - 0.5rem)',
-            maxHeight: '90vh',
-            minHeight: '400px',
-            aspectRatio: '16/10'
+            paddingTop: '0.5rem',
+            paddingBottom: '0.5rem'
           }}
         >
-          <Formacion433 
-            jugadores={jugadores} 
-            onJugadorClick={handleJugadorClick}
-          />
+          <div
+            className="relative w-full h-full flex items-center justify-center"
+            style={{
+              maxWidth: '95vw',
+              maxHeight: 'calc(100vh - 5rem)'
+            }}
+          >
+            <Formacion433 
+              jugadores={jugadores} 
+              onJugadorClick={handleJugadorClick}
+            />
+          </div>
         </div>
       </div>
 

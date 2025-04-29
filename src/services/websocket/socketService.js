@@ -98,56 +98,6 @@ class SocketService {
     this.onMatchEnd = callback;
   }
 
-  static getInstance() {
-    if (!SocketService.instance) {
-      SocketService.instance = new SocketService();
-      console.log("No estaba conectado");
-    }
-    return SocketService.instance;
-  }
-
-  // Función para inicializar el socket
-  initialize(token, username, navigate) {
-    this.navigate = navigate;
-    this.connect(token, username);
-  }
-
-  async connect(token, username) {
-    if (this.socket) {
-      console.log("Socket ya está conectado.");
-      return;
-    }
-    try {
-      this.socket = io("wss://adrenalux.duckdns.org", {
-        path: "/socket.io",
-        transports: ["websocket"],
-        query: { username },
-        auth: { token },
-        reconnection: true,
-        reconnectionAttempts: 5,
-        reconnectionDelay: 3000,
-        secure: true,
-        withCredentials: true,
-      });
-
-      this.socket.on("connect", () => {
-        console.log("Conectado al socket");
-        this.setupExchangeListeners();
-        this.setupMatchListeners();
-      });
-
-      this.socket.on("notification", (data) => this.handleNotification(data));
-      this.socket.on("connect_error", (error) =>
-        console.log("Error de conexión:", error)
-      );
-      this.socket.on("connect_timeout", () =>
-        console.log("Tiempo de conexión agotado")
-      );
-    } catch (error) {
-      console.error("Error al conectar con el socket:", error);
-    }
-  }
-
   // Configuración de los listeners
   setupExchangeListeners() {
     this.socket.on("request_exchange_received", (data) =>
@@ -562,11 +512,6 @@ class SocketService {
     }
   }
 
-  handleMatchEnd(data) {
-    console.log("Partida terminada:", data);
-    if (this.onMatchEnd) this.onMatchEnd(data);
-  }
-
   handleMatchError(data) {
     console.error("Error en partida:", data);
   }
@@ -586,10 +531,6 @@ class SocketService {
 
   setOnRoundResult(callback) {
     this.onRoundResult = callback;
-  }
-
-  setOnMatchEnd(callback) {
-    this.onMatchEnd = callback;
   }
 }
 
