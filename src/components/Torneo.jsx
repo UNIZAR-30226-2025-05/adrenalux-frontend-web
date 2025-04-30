@@ -5,7 +5,7 @@ import {
   FaUsers, FaCalendarAlt, FaCoins, FaSignOutAlt, 
   FaLock, FaSpinner, FaTimes, FaArrowLeft 
 } from "react-icons/fa";
-import tournamentApi from "../services/api/tournamentApi";
+import { tournamentApi } from "../services/api/tournamentApi";
 import { getToken, logout } from "../services/api/authApi";
 import { jwtDecode } from "jwt-decode";
 import NavBarGame from "./layout/game/NavbarGame";
@@ -28,7 +28,8 @@ const Torneo = () => {
       contrasena: "",
       esPrivado: false
     },
-    torneoParaUnirse: null
+    torneoParaUnirse: null,
+    passwordInput: ""
   });
 
   // Obtener usuario del token
@@ -77,9 +78,15 @@ const Torneo = () => {
   const torneosFiltrados = state.torneos.filter(torneo => {
     const coincideBusqueda = torneo.nombre.toLowerCase().includes(state.filtros.busqueda.toLowerCase());
     const estaDisponible = !state.filtros.soloDisponibles || 
-      (torneo.participantes < torneo.maxParticipantes && !torneo.torneo_en_curso);
+      (torneo.participantes < torneo.maxParticipantes && torneo.estado === "pendiente");
     return coincideBusqueda && estaDisponible;
   });
+
+  // Verificar si el usuario está en un torneo
+  const isUserInTournament = (torneo) => {
+    if (!user || !torneo.participantes) return false;
+    return torneo.participantes.some(p => p.id === user.id);
+  };
 
   // Acciones principales
   const manejarUnion = async (torneo) => {
@@ -89,33 +96,43 @@ const Torneo = () => {
     }
 
     if (torneo.requiereContraseña) {
-      setState(prev => ({ ...prev, torneoParaUnirse: torneo, modal: { ...prev.modal, password: true } }));
+      setState(prev => ({ 
+        ...prev, 
+        torneoParaUnirse: torneo, 
+        modal: { ...prev.modal, password: true },
+        passwordInput: ""
+      }));
       return;
     }
     await confirmarUnion(torneo.id);
   };
 
-  const confirmarUnion = async (torneoId, contrasena = null) => {
+  const confirmarUnion = async (torneoId, contrasena) => {
     try {
       setState(prev => ({ ...prev, loading: { ...prev.loading, action: true } }));
       
-      const resultado = await tournamentApi.unirseATorneo(torneoId, contrasena);
-      alert(resultado.message);
+      // Solo pasamos contraseña si tiene valor
+      await tournamentApi.unirseATorneo(
+        torneoId, 
+        contrasena && contrasena.trim() !== "" ? contrasena : undefined
+      );
       
       const actualizados = await tournamentApi.obtenerTorneosActivos();
       setState(prev => ({ 
         ...prev, 
         torneos: actualizados,
         modal: { ...prev.modal, password: false },
-        loading: { ...prev.loading, action: false }
+        loading: { ...prev.loading, action: false },
+        passwordInput: "",
+        error: null
       }));
     } catch (error) {
+      console.error("Error al unirse al torneo:", error);
       setState(prev => ({ 
         ...prev, 
-        error: error.message,
+        error: error.response?.data?.message || error.message || "Error al unirse al torneo",
         loading: { ...prev.loading, action: false }
       }));
-      alert(error.message);
     }
   };
 
@@ -129,12 +146,13 @@ const Torneo = () => {
         ...prev, 
         torneos: actualizados,
         torneoSeleccionado: null,
-        loading: { ...prev.loading, action: false }
+        loading: { ...prev.loading, action: false },
+        error: null
       }));
     } catch (error) {
       setState(prev => ({ 
         ...prev, 
-        error: error.message,
+        error: error.response?.data?.message || error.message || "Error al abandonar torneo",
         loading: { ...prev.loading, action: false }
       }));
     }
@@ -148,7 +166,7 @@ const Torneo = () => {
         nombre: state.form.nombre,
         descripcion: state.form.descripcion,
         premio: state.form.premio,
-        contrasena: state.form.esPrivado ? state.form.contrasena : null
+        contrasena: state.form.esPrivado ? state.form.contrasena : undefined
       });
       
       setState(prev => ({
@@ -162,12 +180,13 @@ const Torneo = () => {
           contrasena: "",
           esPrivado: false
         },
-        loading: { ...prev.loading, action: false }
+        loading: { ...prev.loading, action: false },
+        error: null
       }));
     } catch (error) {
       setState(prev => ({ 
         ...prev, 
-        error: error.message,
+        error: error.response?.data?.message || error.message || "Error al crear torneo",
         loading: { ...prev.loading, action: false }
       }));
     }
@@ -177,9 +196,19 @@ const Torneo = () => {
     try {
       setState(prev => ({ ...prev, loading: { ...prev.loading, action: true } }));
       const detalles = await tournamentApi.obtenerDetallesTorneo(torneoId);
-      setState(prev => ({ ...prev, torneoSeleccionado: detalles }));
+      setState(prev => ({ 
+        ...prev, 
+        torneoSeleccionado: {
+          ...detalles,
+          participanteActual: isUserInTournament(detalles)
+        },
+        error: null
+      }));
     } catch (error) {
-      setState(prev => ({ ...prev, error: error.message }));
+      setState(prev => ({ 
+        ...prev, 
+        error: error.response?.data?.message || error.message || "Error al cargar detalles"
+      }));
     } finally {
       setState(prev => ({ ...prev, loading: { ...prev.loading, action: false } }));
     }
@@ -195,44 +224,59 @@ const Torneo = () => {
   };
 
   // Componente de tarjeta de torneo
-  const CardTorneo = ({ torneo }) => (
-    <div className="bg-gray-700 rounded-lg p-4 border border-gray-600 hover:border-yellow-400 transition-colors">
-      <div className="flex justify-between items-start mb-2">
-        <h3 className="text-lg font-semibold text-white">{torneo.nombre}</h3>
-        {torneo.requiereContraseña && <FaLock className="text-red-400" />}
+  const CardTorneo = ({ torneo }) => {
+    const esParticipante = isUserInTournament(torneo);
+    const estaLleno = torneo.participantes >= torneo.maxParticipantes;
+    const enCurso = torneo.estado === "en_curso";
+    
+    return (
+      <div className="bg-gray-700 rounded-lg p-4 border border-gray-600 hover:border-yellow-400 transition-colors">
+        <div className="flex justify-between items-start mb-2">
+          <h3 className="text-lg font-semibold text-white">{torneo.nombre}</h3>
+          {torneo.requiereContraseña && <FaLock className="text-red-400" />}
+        </div>
+        <p className="text-gray-300 text-sm mb-3 line-clamp-2">{torneo.descripcion}</p>
+        
+        <div className="flex justify-between text-sm mb-3">
+          <span className="text-yellow-400">
+            <FaUsers className="inline mr-1" />
+            {torneo.participantes}/{torneo.maxParticipantes}
+          </span>
+          <span className="text-yellow-400">
+            <FaCoins className="inline mr-1" />
+            {torneo.premio}
+          </span>
+          <span className={enCurso ? "text-red-400" : "text-green-400"}>
+            {enCurso ? "En curso" : "Pendiente"}
+          </span>
+        </div>
+        
+        <button
+          onClick={() => esParticipante ? verDetalles(torneo.id) : manejarUnion(torneo)}
+          className={`w-full py-1 rounded text-sm font-medium ${
+            esParticipante 
+              ? "bg-blue-500 hover:bg-blue-600" 
+              : estaLleno || enCurso
+                ? "bg-gray-500 cursor-not-allowed"
+                : "bg-green-500 hover:bg-green-600"
+          } text-white`}
+          disabled={state.loading.action || estaLleno || enCurso}
+        >
+          {state.loading.action ? (
+            <FaSpinner className="animate-spin mx-auto" />
+          ) : esParticipante ? (
+            "Ver Detalles"
+          ) : estaLleno ? (
+            "Lleno"
+          ) : enCurso ? (
+            "En curso"
+          ) : (
+            "Unirse"
+          )}
+        </button>
       </div>
-      <p className="text-gray-300 text-sm mb-3 line-clamp-2">{torneo.descripcion}</p>
-      
-      <div className="flex justify-between text-sm mb-3">
-        <span className="text-yellow-400">
-          <FaUsers className="inline mr-1" />
-          {torneo.participantes}/{torneo.maxParticipantes}
-        </span>
-        <span className="text-yellow-400">
-          <FaCoins className="inline mr-1" />
-          {torneo.premio}
-        </span>
-      </div>
-      
-      <button
-        onClick={() => torneo.participanteActual ? verDetalles(torneo.id) : manejarUnion(torneo)}
-        className={`w-full py-1 rounded text-sm font-medium ${
-          torneo.participanteActual 
-            ? "bg-blue-500 hover:bg-blue-600" 
-            : "bg-green-500 hover:bg-green-600"
-        } text-white`}
-        disabled={state.loading.action || torneo.torneo_en_curso}
-      >
-        {state.loading.action ? (
-          <FaSpinner className="animate-spin mx-auto" />
-        ) : torneo.participanteActual ? (
-          "Ver Detalles"
-        ) : (
-          "Unirse"
-        )}
-      </button>
-    </div>
-  );
+    );
+  };
 
   // Estados de carga y error
   if (state.loading.global) {
@@ -324,6 +368,13 @@ const Torneo = () => {
             )}
           </div>
           
+          {/* Mostrar error general */}
+          {state.error && (
+            <div className="mb-4 p-3 bg-red-500 bg-opacity-20 border border-red-400 text-red-200 rounded-lg">
+              {state.error}
+            </div>
+          )}
+          
           {/* Contenido principal */}
           {state.torneoSeleccionado ? (
             <div className="bg-gray-700 rounded-lg p-6 border border-gray-600">
@@ -334,11 +385,11 @@ const Torneo = () => {
                   </h3>
                   <div className="text-gray-200 space-y-2">
                     <p><span className="font-medium">Descripción:</span> {state.torneoSeleccionado.descripcion}</p>
-                    <p><span className="font-medium">Estado:</span> {state.torneoSeleccionado.torneo_en_curso ? "En curso" : "Pendiente"}</p>
+                    <p><span className="font-medium">Estado:</span> {state.torneoSeleccionado.estado === "en_curso" ? "En curso" : "Pendiente"}</p>
                     <p><span className="font-medium">Premio:</span> {state.torneoSeleccionado.premio}</p>
-                    <p><span className="font-medium">Participantes:</span> {state.torneoSeleccionado.participantes}/{state.torneoSeleccionado.maxParticipantes}</p>
+                    <p><span className="font-medium">Participantes:</span> {state.torneoSeleccionado.participantes?.length || 0}/{state.torneoSeleccionado.maxParticipantes}</p>
                     {state.torneoSeleccionado.fechaInicio && (
-                      <p><span className="font-medium">Inicio:</span> {new Date(state.torneoSeleccionado.fechaInicio).toLocaleDateString()}</p>
+                      <p><span className="font-medium">Inicio:</span> {new Date(state.torneoSeleccionado.fechaInicio).toLocaleString()}</p>
                     )}
                   </div>
                 </div>
@@ -348,18 +399,18 @@ const Torneo = () => {
                     <FaUsers className="mr-2 text-yellow-400" /> Jugadores
                   </h3>
                   <div className="max-h-60 overflow-y-auto">
-                    {state.torneoSeleccionado.participantes > 0 ? (
-                      state.torneoSeleccionado.jugadores.map(jugador => (
+                    {state.torneoSeleccionado.participantes?.length > 0 ? (
+                      state.torneoSeleccionado.participantes.map(jugador => (
                         <div key={jugador.id} className="flex items-center gap-3 py-2 border-b border-gray-500 last:border-0">
                           <div className="w-8 h-8 rounded-full bg-gray-500 flex items-center justify-center overflow-hidden">
                             {jugador.avatar ? (
                               <img src={jugador.avatar} alt="Avatar" className="w-full h-full object-cover" />
                             ) : (
-                              <span className="text-sm font-medium">{jugador.nombre.charAt(0)}</span>
+                              <span className="text-sm font-medium">{jugador.nombre?.charAt(0) || "?"}</span>
                             )}
                           </div>
                           <span className={jugador.id === user?.id ? "text-green-400 font-medium" : "text-gray-200"}>
-                            {jugador.nombre}
+                            {jugador.nombre || "Jugador anónimo"}
                           </span>
                         </div>
                       ))
@@ -418,7 +469,7 @@ const Torneo = () => {
                 onClick={() => setState(prev => ({ 
                   ...prev, 
                   modal: { ...prev.modal, password: false },
-                  form: { ...prev.form, contrasena: "" }
+                  passwordInput: ""
                 }))}
                 className="text-gray-400 hover:text-white"
               >
@@ -432,12 +483,9 @@ const Torneo = () => {
               type="password"
               className="w-full px-4 py-2 bg-gray-600 text-white rounded mb-4 border border-gray-500 focus:ring-2 focus:ring-yellow-400"
               placeholder="Contraseña del torneo"
-              value={state.form.contrasena}
-              onChange={(e) => setState(prev => ({ 
-                ...prev, 
-                form: { ...prev.form, contrasena: e.target.value } 
-              }))}
-              onKeyPress={(e) => e.key === 'Enter' && confirmarUnion(state.torneoParaUnirse.id, state.form.contrasena)}
+              value={state.passwordInput}
+              onChange={(e) => setState(prev => ({ ...prev, passwordInput: e.target.value }))}
+              onKeyPress={(e) => e.key === 'Enter' && state.passwordInput && confirmarUnion(state.torneoParaUnirse.id, state.passwordInput)}
             />
             
             <div className="flex justify-end gap-2">
@@ -445,16 +493,16 @@ const Torneo = () => {
                 onClick={() => setState(prev => ({ 
                   ...prev, 
                   modal: { ...prev.modal, password: false },
-                  form: { ...prev.form, contrasena: "" }
+                  passwordInput: ""
                 }))}
                 className="px-4 py-2 bg-gray-500 hover:bg-gray-400 rounded text-white"
               >
                 Cancelar
               </button>
               <button
-                onClick={() => confirmarUnion(state.torneoParaUnirse.id, state.form.contrasena)}
+                onClick={() => confirmarUnion(state.torneoParaUnirse.id, state.passwordInput)}
                 className="px-4 py-2 bg-green-500 hover:bg-green-600 rounded text-white"
-                disabled={state.loading.action}
+                disabled={state.loading.action || !state.passwordInput}
               >
                 {state.loading.action ? <FaSpinner className="animate-spin" /> : "Confirmar"}
               </button>
