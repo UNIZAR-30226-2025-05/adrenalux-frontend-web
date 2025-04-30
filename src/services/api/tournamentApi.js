@@ -1,5 +1,6 @@
 import axios from "axios";
 import { getToken } from "../api/authApi";
+import { jwtDecode } from "jwt-decode";
 
 const API_URL = "https://adrenalux.duckdns.org/api/v1/torneos";
 
@@ -46,6 +47,9 @@ export const tournamentApi = {
       const data = response.data.data || response.data;
       return Array.isArray(data) ? data.map(formatTorneo) : [formatTorneo(data)];
     } catch (error) {
+      if(error.response?.status == 404) {
+        return [];
+      }
       console.error("Error al obtener torneos:", {
         status: error.response?.status,
         data: error.response?.data,
@@ -184,6 +188,55 @@ export const tournamentApi = {
     } catch (error) {
       console.error("Error al obtener torneos de amigos:", error.response?.data || error.message);
       throw new Error(error.response?.data?.message || "Error al cargar torneos de amigos");
+    }
+  },
+
+  /**
+   * Obtiene los torneos en los que el usuario ha participado
+   * @returns {Promise<Array>} Lista de torneos formateados
+   */
+  obtenerTorneosJugador: async () => {
+    try {
+      const token = getToken();
+      if (!token) throw new Error("No hay token de autenticación");
+
+      const { id: jugadorId } = jwtDecode(token);
+
+      const response = await api.get("/getTorneosJugador", {
+        params: { jugadorId }
+      });
+
+      const data = response.data.data || response.data;
+
+      const torneos = data.map(item => {
+        const torneo = item.infoTorneo.torneo;
+        return {
+          id: item.infoTorneo.torneo_id,
+          nombre: torneo.nombre,
+          descripcion: torneo.descripcion,
+          premio: torneo.premio,
+          estado: torneo.torneo_en_curso ? "en_curso" : "pendiente",
+          participantes: item.numParticipantes || 0,
+          maxParticipantes: torneo.maxParticipantes || 8,
+          requiereContraseña: !!torneo.contrasena,
+          creadorId: torneo.creador_id,
+          fechaInicio: torneo.fecha_inicio ? new Date(torneo.fecha_inicio) : null
+        };
+      });
+
+      return torneos;
+
+    } catch (error) {
+      if(error.response?.status == 404){
+        return [];
+      }
+      console.error("Error al obtener torneos del jugador:", {
+        response: error.response?.data,
+        message: error.message
+      });
+      throw new Error(
+        error.response?.data?.message || "Error al cargar torneos del jugador"
+      );
     }
   },
 

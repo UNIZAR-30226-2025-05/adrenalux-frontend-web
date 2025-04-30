@@ -29,7 +29,8 @@ const Torneo = () => {
       esPrivado: false
     },
     torneoParaUnirse: null,
-    passwordInput: ""
+    passwordInput: "",
+    initialCheckDone: false
   });
 
   // Obtener usuario del token
@@ -61,6 +62,25 @@ const Torneo = () => {
     };
     cargarTorneos();
   }, []);
+
+  useEffect(() => {
+    const checkUserTorneos = async () => {
+      if (user && !state.initialCheckDone) {
+        try {
+          const jugados = await tournamentApi.obtenerTorneosJugador();
+          console.log("Jugados:", JSON.stringify(jugados, null, 2));
+          if (Array.isArray(jugados) && jugados.length > 0) {
+            verDetalles(jugados[0].id);
+          }
+        } catch (err) {
+          console.error("Error al obtener torneos jugados:", err);
+        } finally {
+          setState(prev => ({ ...prev, initialCheckDone: true }));
+        }
+      }
+    };
+    if (!state.loading.global) checkUserTorneos();
+  }, [state.loading.global, user]);
 
   // Manejar cambios en formularios
   const handleChange = (e) => {
@@ -111,7 +131,6 @@ const Torneo = () => {
     try {
       setState(prev => ({ ...prev, loading: { ...prev.loading, action: true } }));
       
-      // Solo pasamos contraseña si tiene valor
       await tournamentApi.unirseATorneo(
         torneoId, 
         contrasena && contrasena.trim() !== "" ? contrasena : undefined
@@ -126,6 +145,7 @@ const Torneo = () => {
         passwordInput: "",
         error: null
       }));
+      verDetalles(torneoId);
     } catch (error) {
       console.error("Error al unirse al torneo:", error);
       setState(prev => ({ 
@@ -317,13 +337,10 @@ const Torneo = () => {
       <NavBarGame />
       
       <div className="container mx-auto px-4 py-20 max-w-6xl">
-        <BackButton 
-          onClick={() => state.torneoSeleccionado ? 
-            setState(prev => ({ ...prev, torneoSeleccionado: null })) : 
-            navigate("/home")
-          } 
-          className="absolute left-4 top-20"
-        />
+      <BackButton 
+        onClick={() => navigate("/home")}
+        className="absolute left-4 top-20"
+      />
         
         <div className="bg-gray-800 bg-opacity-90 rounded-xl p-6 border border-gray-700 shadow-lg">
           {/* Header y filtros */}
