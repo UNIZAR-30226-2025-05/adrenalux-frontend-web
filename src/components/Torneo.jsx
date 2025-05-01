@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { 
   FaSearch, FaPlus, FaUserFriends, FaTrophy, 
   FaUsers, FaCalendarAlt, FaCoins, FaSignOutAlt, 
-  FaLock, FaSpinner, FaTimes, FaArrowLeft 
+  FaLock, FaSpinner, FaTimes, FaArrowLeft,
+  FaPlay, FaTrash
 } from "react-icons/fa";
 import { tournamentApi } from "../services/api/tournamentApi";
 import { getToken, logout } from "../services/api/authApi";
@@ -33,7 +34,6 @@ const Torneo = () => {
     initialCheckDone: false
   });
 
-  // Obtener usuario del token
   const user = useMemo(() => {
     const token = getToken();
     if (!token) return null;
@@ -45,7 +45,6 @@ const Torneo = () => {
     }
   }, []);
 
-  // Cargar torneos al montar el componente
   useEffect(() => {
     const cargarTorneos = async () => {
       try {
@@ -68,7 +67,6 @@ const Torneo = () => {
       if (user && !state.initialCheckDone) {
         try {
           const jugados = await tournamentApi.obtenerTorneosJugador();
-          console.log("Jugados:", JSON.stringify(jugados, null, 2));
           if (Array.isArray(jugados) && jugados.length > 0) {
             verDetalles(jugados[0].id);
           }
@@ -82,7 +80,6 @@ const Torneo = () => {
     if (!state.loading.global) checkUserTorneos();
   }, [state.loading.global, user]);
 
-  // Manejar cambios en formularios
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setState(prev => ({
@@ -94,7 +91,6 @@ const Torneo = () => {
     }));
   };
 
-  // Filtrado de torneos
   const torneosFiltrados = state.torneos.filter(torneo => {
     const coincideBusqueda = torneo.nombre.toLowerCase().includes(state.filtros.busqueda.toLowerCase());
     const estaDisponible = !state.filtros.soloDisponibles || 
@@ -102,13 +98,11 @@ const Torneo = () => {
     return coincideBusqueda && estaDisponible;
   });
 
-  // Verificar si el usuario está en un torneo
   const isUserInTournament = (torneo) => {
     if (!user || !torneo.participantes) return false;
-    return torneo.participantes.some(p => p.id === user.id);
+    return torneo.participantes.some(p => p.id === user.id || p.user_id === user.id);
   };
 
-  // Acciones principales
   const manejarUnion = async (torneo) => {
     if (!user) {
       navigate('/login');
@@ -131,10 +125,7 @@ const Torneo = () => {
     try {
       setState(prev => ({ ...prev, loading: { ...prev.loading, action: true } }));
       
-      await tournamentApi.unirseATorneo(
-        torneoId, 
-        contrasena && contrasena.trim() !== "" ? contrasena : undefined
-      );
+      await tournamentApi.unirseATorneo(torneoId, contrasena);
       
       const actualizados = await tournamentApi.obtenerTorneosActivos();
       setState(prev => ({ 
@@ -147,10 +138,9 @@ const Torneo = () => {
       }));
       verDetalles(torneoId);
     } catch (error) {
-      console.error("Error al unirse al torneo:", error);
       setState(prev => ({ 
         ...prev, 
-        error: error.response?.data?.message || error.message || "Error al unirse al torneo",
+        error: error.message,
         loading: { ...prev.loading, action: false }
       }));
     }
@@ -172,7 +162,55 @@ const Torneo = () => {
     } catch (error) {
       setState(prev => ({ 
         ...prev, 
-        error: error.response?.data?.message || error.message || "Error al abandonar torneo",
+        error: error.message,
+        loading: { ...prev.loading, action: false }
+      }));
+    }
+  };
+
+  const manejarInicio = async () => {
+    try {
+      setState(prev => ({ ...prev, loading: { ...prev.loading, action: true } }));
+      
+      await tournamentApi.iniciarTorneo(state.torneoSeleccionado.id);
+      
+      const detalles = await tournamentApi.obtenerDetallesTorneo(state.torneoSeleccionado.id);
+      setState(prev => ({ 
+        ...prev, 
+        torneoSeleccionado: {
+          ...detalles,
+          participanteActual: isUserInTournament(detalles)
+        },
+        loading: { ...prev.loading, action: false },
+        error: null
+      }));
+    } catch (error) {
+      setState(prev => ({ 
+        ...prev, 
+        error: error.message,
+        loading: { ...prev.loading, action: false }
+      }));
+    }
+  };
+
+  const manejarEliminacion = async () => {
+    try {
+      setState(prev => ({ ...prev, loading: { ...prev.loading, action: true } }));
+      
+      await tournamentApi.eliminarTorneo(state.torneoSeleccionado.id);
+      
+      const actualizados = await tournamentApi.obtenerTorneosActivos();
+      setState(prev => ({ 
+        ...prev, 
+        torneos: actualizados,
+        torneoSeleccionado: null,
+        loading: { ...prev.loading, action: false },
+        error: null
+      }));
+    } catch (error) {
+      setState(prev => ({ 
+        ...prev, 
+        error: error.message,
         loading: { ...prev.loading, action: false }
       }));
     }
@@ -206,7 +244,7 @@ const Torneo = () => {
     } catch (error) {
       setState(prev => ({ 
         ...prev, 
-        error: error.response?.data?.message || error.message || "Error al crear torneo",
+        error: error.message,
         loading: { ...prev.loading, action: false }
       }));
     }
@@ -216,6 +254,9 @@ const Torneo = () => {
     try {
       setState(prev => ({ ...prev, loading: { ...prev.loading, action: true } }));
       const detalles = await tournamentApi.obtenerDetallesTorneo(torneoId);
+      
+      console.log("Detalles del torneo recibidos:", detalles);
+      
       setState(prev => ({ 
         ...prev, 
         torneoSeleccionado: {
@@ -227,23 +268,13 @@ const Torneo = () => {
     } catch (error) {
       setState(prev => ({ 
         ...prev, 
-        error: error.response?.data?.message || error.message || "Error al cargar detalles"
+        error: error.message
       }));
     } finally {
       setState(prev => ({ ...prev, loading: { ...prev.loading, action: false } }));
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/login');
-    } catch (error) {
-      setState(prev => ({ ...prev, error: "Error al cerrar sesión" }));
-    }
-  };
-
-  // Componente de tarjeta de torneo
   const CardTorneo = ({ torneo }) => {
     const esParticipante = isUserInTournament(torneo);
     const estaLleno = torneo.participantes >= torneo.maxParticipantes;
@@ -298,7 +329,6 @@ const Torneo = () => {
     );
   };
 
-  // Estados de carga y error
   if (state.loading.global) {
     return (
       <div className="fixed inset-0 flex justify-center items-center bg-cover bg-center" style={{backgroundImage: `url(${background})`}}>
@@ -337,13 +367,12 @@ const Torneo = () => {
       <NavBarGame />
       
       <div className="container mx-auto px-4 py-20 max-w-6xl">
-      <BackButton 
-        onClick={() => navigate("/home")}
-        className="absolute left-4 top-20"
-      />
+        <BackButton 
+          onClick={() => navigate("/home")}
+          className="absolute left-4 top-20"
+        />
         
         <div className="bg-gray-800 bg-opacity-90 rounded-xl p-6 border border-gray-700 shadow-lg">
-          {/* Header y filtros */}
           <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
             <h1 className="text-2xl font-bold text-white flex items-center">
               <FaTrophy className="text-yellow-400 mr-2" /> 
@@ -385,14 +414,12 @@ const Torneo = () => {
             )}
           </div>
           
-          {/* Mostrar error general */}
           {state.error && (
             <div className="mb-4 p-3 bg-red-500 bg-opacity-20 border border-red-400 text-red-200 rounded-lg">
               {state.error}
             </div>
           )}
           
-          {/* Contenido principal */}
           {state.torneoSeleccionado ? (
             <div className="bg-gray-700 rounded-lg p-6 border border-gray-600">
               <div className="grid md:grid-cols-2 gap-6 mb-6">
@@ -426,7 +453,7 @@ const Torneo = () => {
                               <span className="text-sm font-medium">{jugador.nombre?.charAt(0) || "?"}</span>
                             )}
                           </div>
-                          <span className={jugador.id === user?.id ? "text-green-400 font-medium" : "text-gray-200"}>
+                          <span className={jugador.id === user?.id || jugador.user_id === user?.id ? "text-green-400 font-medium" : "text-gray-200"}>
                             {jugador.nombre || "Jugador anónimo"}
                           </span>
                         </div>
@@ -438,21 +465,59 @@ const Torneo = () => {
                 </div>
               </div>
               
-              {state.torneoSeleccionado.participanteActual && (
-                <button
-                  onClick={() => manejarAbandono(state.torneoSeleccionado.id)}
-                  className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-white font-medium mx-auto"
-                  disabled={state.loading.action}
-                >
-                  {state.loading.action ? (
-                    <FaSpinner className="animate-spin" />
-                  ) : (
-                    <>
-                      <FaSignOutAlt /> Abandonar Torneo
-                    </>
-                  )}
-                </button>
-              )}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
+                {state.torneoSeleccionado?.participanteActual && (
+                  <button
+                    onClick={() => manejarAbandono(state.torneoSeleccionado.id)}
+                    className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-white font-medium"
+                    disabled={state.loading.action}
+                  >
+                    {state.loading.action ? (
+                      <FaSpinner className="animate-spin" />
+                    ) : (
+                      <>
+                        <FaSignOutAlt /> Abandonar Torneo
+                      </>
+                    )}
+                  </button>
+                )}
+
+                {user && state.torneoSeleccionado && (user.id === state.torneoSeleccionado.creadorId) && (
+                  <>
+                    {!state.torneoSeleccionado.torneo_en_curso && (
+                      <button
+                        onClick={manejarInicio}
+                        className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 rounded-lg text-white font-medium"
+                        disabled={state.loading.action || state.torneoSeleccionado.participantes.length < 2}
+                        title={state.torneoSeleccionado.participantes.length < 2 ? "Se necesitan al menos 2 participantes" : ""}
+                      >
+                        {state.loading.action ? (
+                          <FaSpinner className="animate-spin" />
+                        ) : (
+                          <>
+                            <FaPlay /> Iniciar Torneo
+                          </>
+                        )}
+                      </button>
+                    )}
+
+                    <button
+                      onClick={manejarEliminacion}
+                      className="flex items-center gap-2 px-4 py-2 bg-red-700 hover:bg-red-800 rounded-lg text-white font-medium"
+                      disabled={state.loading.action || state.torneoSeleccionado.torneo_en_curso}
+                      title={state.torneoSeleccionado.torneo_en_curso ? "No se puede eliminar un torneo en curso" : ""}
+                    >
+                      {state.loading.action ? (
+                        <FaSpinner className="animate-spin" />
+                      ) : (
+                        <>
+                          <FaTrash /> Eliminar Torneo
+                        </>
+                      )}
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

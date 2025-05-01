@@ -17,12 +17,10 @@ api.interceptors.request.use((config) => {
   const token = getToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
-    console.log('Token añadido a la solicitud'); // Debug
   }
   return config;
 });
 
-// Formateador estándar de torneos
 const formatTorneo = (torneo) => ({
   id: torneo.id,
   nombre: torneo.nombre,
@@ -105,54 +103,21 @@ export const tournamentApi = {
    */
   unirseATorneo: async (torneoId, contrasena) => {
     try {
-      // Validación exhaustiva del ID
       const id = Number(torneoId);
-      if (isNaN(id) || id <= 0) {
-        throw new Error("ID de torneo inválido");
-      }
+      if (isNaN(id)) throw new Error("ID de torneo inválido");
 
-      // Construcción del payload según requisitos del backend
       const payload = { torneo_id: id };
-      
-      // Solo añadir contraseña si tiene valor (no null/undefined/string vacío)
-      if (contrasena !== undefined && contrasena !== null && String(contrasena).trim() !== '') {
-        payload.contrasena = String(contrasena).trim();
-      }
-
-      console.log("Enviando payload:", payload); // Debug
+      if (contrasena) payload.contrasena = contrasena;
 
       const response = await api.post("/unirse", payload);
-      const responseData = response.data.data || response.data;
-
-      // Manejo específico de errores del backend
-      if (responseData.status?.error_code === 1000) {
-        throw {
-          message: responseData.status.error_message,
-          response: { data: responseData }
-        };
-      }
-
       return {
         success: true,
-        message: responseData.message || "Te has unido al torneo correctamente",
-        torneo: formatTorneo(responseData.torneo || responseData)
+        message: response.data.message || "Te has unido al torneo correctamente",
+        torneo: formatTorneo(response.data.data || response.data)
       };
     } catch (error) {
-      console.error("Error detallado al unirse:", {
-        request: { torneoId, contrasena },
-        response: error.response?.data,
-        error: error.message
-      });
-
-      // Mensajes de error específicos
-      let errorMessage = "Error al unirse al torneo";
-      if (error.response?.data) {
-        errorMessage = error.response.data.message || 
-                      error.response.data.status?.error_message || 
-                      errorMessage;
-      }
-
-      throw new Error(errorMessage);
+      console.error("Error al unirse:", error.response?.data || error.message);
+      throw new Error(error.response?.data?.message || "Error al unirse al torneo");
     }
   },
 
@@ -208,35 +173,23 @@ export const tournamentApi = {
 
       const data = response.data.data || response.data;
 
-      const torneos = data.map(item => {
-        const torneo = item.infoTorneo.torneo;
-        return {
-          id: item.infoTorneo.torneo_id,
-          nombre: torneo.nombre,
-          descripcion: torneo.descripcion,
-          premio: torneo.premio,
-          estado: torneo.torneo_en_curso ? "en_curso" : "pendiente",
-          participantes: item.numParticipantes || 0,
-          maxParticipantes: torneo.maxParticipantes || 8,
-          requiereContraseña: !!torneo.contrasena,
-          creadorId: torneo.creador_id,
-          fechaInicio: torneo.fecha_inicio ? new Date(torneo.fecha_inicio) : null
-        };
-      });
-
-      return torneos;
+      return data.map(item => ({
+        id: item.infoTorneo.torneo_id,
+        nombre: item.infoTorneo.torneo.nombre,
+        descripcion: item.infoTorneo.torneo.descripcion,
+        premio: item.infoTorneo.torneo.premio,
+        estado: item.infoTorneo.torneo.torneo_en_curso ? "en_curso" : "pendiente",
+        participantes: item.numParticipantes || 0,
+        maxParticipantes: item.infoTorneo.torneo.maxParticipantes || 8,
+        requiereContraseña: !!item.infoTorneo.torneo.contrasena,
+        creadorId: item.infoTorneo.torneo.creador_id,
+        fechaInicio: item.infoTorneo.torneo.fecha_inicio ? new Date(item.infoTorneo.torneo.fecha_inicio) : null
+      }));
 
     } catch (error) {
-      if(error.response?.status == 404){
-        return [];
-      }
-      console.error("Error al obtener torneos del jugador:", {
-        response: error.response?.data,
-        message: error.message
-      });
-      throw new Error(
-        error.response?.data?.message || "Error al cargar torneos del jugador"
-      );
+      if(error.response?.status == 404) return [];
+      console.error("Error al obtener torneos del jugador:", error.response?.data || error.message);
+      throw new Error(error.response?.data?.message || "Error al cargar torneos del jugador");
     }
   },
 
@@ -253,6 +206,36 @@ export const tournamentApi = {
     } catch (error) {
       console.error("Error al obtener partidas:", error.response?.data || error.message);
       throw new Error(error.response?.data?.message || "Error al cargar partidas");
+    }
+  },
+
+  /**
+   * Inicia un torneo
+   * @param {number} torneoId - ID del torneo
+   * @returns {Promise<Object>} Resultado de la operación
+   */
+  iniciarTorneo: async (torneoId) => {
+    try {
+      const response = await api.post("/iniciarTorneo", { torneo_id: Number(torneoId) });
+      return response.data;
+    } catch (error) {
+      console.error("Error al iniciar torneo:", error.response?.data || error.message);
+      throw new Error(error.response?.data?.message || "Error al iniciar torneo");
+    }
+  },
+
+  /**
+   * Elimina un torneo (usa el endpoint abandonarTorneo que ya maneja la lógica para creadores)
+   * @param {number} torneoId - ID del torneo
+   * @returns {Promise<Object>} Resultado de la operación
+   */
+  eliminarTorneo: async (torneoId) => {
+    try {
+      const response = await api.post("/abandonarTorneo", { torneo_id: Number(torneoId) });
+      return response.data;
+    } catch (error) {
+      console.error("Error al eliminar torneo:", error.response?.data || error.message);
+      throw new Error(error.response?.data?.message || "Error al eliminar torneo");
     }
   }
 };
