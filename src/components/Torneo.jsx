@@ -7,7 +7,7 @@ import {
 } from "react-icons/fa";
 import tournamentApi from "../services/api/tournamentApi";
 import { getToken, logout } from "../services/api/authApi";
-import { jwtDecode } from "jwt-decode";
+//import { jwtDecode } from "jwt-decode";
 import NavBarGame from "./layout/game/NavbarGame";
 import BackButton from "./layout/game/BackButton";
 import background from "../assets/background.png";
