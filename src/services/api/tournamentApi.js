@@ -1,9 +1,9 @@
 import axios from "axios";
 import { getToken } from "../api/authApi";
+import { jwtDecode } from "jwt-decode";
 
 const API_URL = "https://adrenalux.duckdns.org/api/v1/torneos";
 
-// Configuración de Axios para manejar errores globalmente
 const api = axios.create({
   baseURL: API_URL,
   timeout: 10000,
@@ -15,7 +15,10 @@ const api = axios.create({
 // Interceptor para añadir token
 api.interceptors.request.use((config) => {
   const token = getToken();
-  if (token) config.headers.Authorization = `Bearer ${token}`;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+    console.log('Token añadido a la solicitud'); // Debug
+  }
   return config;
 });
 
@@ -26,28 +29,12 @@ const formatTorneo = (torneo) => ({
   descripcion: torneo.descripcion,
   premio: torneo.premio,
   estado: torneo.torneo_en_curso ? "en_curso" : "pendiente",
-  participantes: torneo.participantes || 0,
-  maxParticipantes: torneo.maxParticipantes || 8, // Valor por defecto
+  participantes: torneo.participantes?.length || 0,
+  maxParticipantes: torneo.maxParticipantes || 8,
   requiereContraseña: !!torneo.contrasena,
   creadorId: torneo.creador_id,
   fechaInicio: torneo.fecha_inicio ? new Date(torneo.fecha_inicio) : null
 });
-
-// Helper para procesar respuestas
-const handleResponse = (response) => {
-  // Caso 1: La respuesta es directamente un array
-  if (Array.isArray(response.data)) {
-    return response.data.map(formatTorneo);
-  }
-  
-  // Caso 2: La respuesta tiene propiedad 'data' con el array
-  if (response.data && Array.isArray(response.data.data)) {
-    return response.data.data.map(formatTorneo);
-  }
-  
-  // Caso 3: La respuesta tiene otro formato
-  throw new Error(`Formato de respuesta no soportado: ${JSON.stringify(response.data)}`);
-};
 
 export const tournamentApi = {
   /**
@@ -57,12 +44,16 @@ export const tournamentApi = {
   obtenerTorneosActivos: async () => {
     try {
       const response = await api.get("/getTorneosActivos");
-      return handleResponse(response);
+      const data = response.data.data || response.data;
+      return Array.isArray(data) ? data.map(formatTorneo) : [formatTorneo(data)];
     } catch (error) {
-      console.error("[TournamentAPI] Error en obtenerTorneosActivos:", {
+      if(error.response?.status == 404) {
+        return [];
+      }
+      console.error("Error al obtener torneos:", {
         status: error.response?.status,
-        message: error.message,
-        data: error.response?.data
+        data: error.response?.data,
+        message: error.message
       });
       throw new Error(error.response?.data?.message || "Error al cargar torneos");
     }
@@ -70,132 +61,197 @@ export const tournamentApi = {
 
   /**
    * Crea un nuevo torneo
-   * @param {Object} datosTorneo
-   * @param {string} datosTorneo.nombre
-   * @param {string} datosTorneo.descripcion
-   * @param {string} datosTorneo.premio
-   * @param {string} [datosTorneo.contrasena]
+   * @param {Object} datos - Datos del torneo {nombre, descripcion, premio, contrasena?}
    * @returns {Promise<Object>} Torneo creado
    */
-  crearTorneo: async ({ nombre, descripcion, premio, contrasena = null }) => {
+  crearTorneo: async ({ nombre, descripcion, premio, contrasena }) => {
     try {
-      const response = await api.post("/crear", {
-        nombre,
-        descripcion,
-        premio,
-        contrasena
-      });
-      
-      return formatTorneo(response.data);
+      const payload = { nombre, descripcion, premio };
+      if (contrasena) payload.contrasena = contrasena;
+
+      const response = await api.post("/crear", payload);
+      return formatTorneo(response.data.data || response.data);
     } catch (error) {
-      console.error("[TournamentAPI] Error en crearTorneo:", error.response?.data);
+      console.error("Error al crear torneo:", error.response?.data || error.message);
       throw new Error(error.response?.data?.message || "Error al crear torneo");
     }
   },
 
   /**
    * Obtiene detalles de un torneo específico
-   * @param {number} torneoId
+   * @param {number} torneoId - ID del torneo
    * @returns {Promise<Object>} Detalles del torneo
    */
   obtenerDetallesTorneo: async (torneoId) => {
     try {
       const response = await api.get(`/getTorneo/${torneoId}`);
-      
-      // Formateo especial para detalles
+      const data = response.data.data || response.data;
       return {
-        ...formatTorneo(response.data.torneo),
-        participantes: response.data.participantes || [],
-        partidas: response.data.partidas || []
+        ...formatTorneo(data.torneo || data),
+        participantes: data.participantes || [],
+        partidas: data.partidas || []
       };
     } catch (error) {
-      console.error("[TournamentAPI] Error en obtenerDetallesTorneo:", error.response?.data);
+      console.error("Error al obtener detalles:", error.response?.data || error.message);
       throw new Error(error.response?.data?.message || "Error al obtener detalles");
     }
   },
 
   /**
-   * Unirse a un torneo
-   * @param {number} torneoId
-   * @param {string} [contrasena]
+   * Une un usuario a un torneo
+   * @param {number} torneoId - ID del torneo
+   * @param {string} [contrasena] - Contraseña opcional (solo para torneos privados)
    * @returns {Promise<Object>} Resultado de la operación
    */
-  unirseATorneo: async (torneoId, contrasena = null) => {
+  unirseATorneo: async (torneoId, contrasena) => {
     try {
-      const response = await api.post("/unirse", {
-        torneo_id: torneoId,
-        contrasena
-      });
+      // Validación exhaustiva del ID
+      const id = Number(torneoId);
+      if (isNaN(id) || id <= 0) {
+        throw new Error("ID de torneo inválido");
+      }
+
+      // Construcción del payload según requisitos del backend
+      const payload = { torneo_id: id };
       
+      // Solo añadir contraseña si tiene valor (no null/undefined/string vacío)
+      if (contrasena !== undefined && contrasena !== null && String(contrasena).trim() !== '') {
+        payload.contrasena = String(contrasena).trim();
+      }
+
+      console.log("Enviando payload:", payload); // Debug
+
+      const response = await api.post("/unirse", payload);
+      const responseData = response.data.data || response.data;
+
+      // Manejo específico de errores del backend
+      if (responseData.status?.error_code === 1000) {
+        throw {
+          message: responseData.status.error_message,
+          response: { data: responseData }
+        };
+      }
+
       return {
         success: true,
-        message: response.data.message || "Te has unido al torneo correctamente",
-        torneo: formatTorneo(response.data.torneo)
+        message: responseData.message || "Te has unido al torneo correctamente",
+        torneo: formatTorneo(responseData.torneo || responseData)
       };
     } catch (error) {
-      console.error("[TournamentAPI] Error en unirseATorneo:", error.response?.data);
-      throw new Error(error.response?.data?.message || "Error al unirse al torneo");
+      console.error("Error detallado al unirse:", {
+        request: { torneoId, contrasena },
+        response: error.response?.data,
+        error: error.message
+      });
+
+      // Mensajes de error específicos
+      let errorMessage = "Error al unirse al torneo";
+      if (error.response?.data) {
+        errorMessage = error.response.data.message || 
+                      error.response.data.status?.error_message || 
+                      errorMessage;
+      }
+
+      throw new Error(errorMessage);
     }
   },
 
   /**
-   * Abandonar un torneo
-   * @param {number} torneoId
+   * Abandona un torneo
+   * @param {number} torneoId - ID del torneo
    * @returns {Promise<Object>} Resultado de la operación
    */
   abandonarTorneo: async (torneoId) => {
     try {
       const response = await api.post("/abandonarTorneo", {
-        torneo_id: torneoId
+        torneo_id: Number(torneoId)
       });
-      
       return {
         success: true,
         message: response.data.message || "Has abandonado el torneo correctamente"
       };
     } catch (error) {
-      console.error("[TournamentAPI] Error en abandonarTorneo:", error.response?.data);
+      console.error("Error al abandonar:", error.response?.data || error.message);
       throw new Error(error.response?.data?.message || "Error al abandonar torneo");
     }
   },
 
   /**
-   * Obtener torneos de amigos
+   * Obtiene torneos de amigos
    * @returns {Promise<Array>} Lista de torneos
    */
   obtenerTorneosAmigos: async () => {
     try {
       const response = await api.get("/getTorneosAmigos");
-      return handleResponse(response);
+      const data = response.data.data || response.data;
+      return Array.isArray(data) ? data.map(formatTorneo) : [formatTorneo(data)];
     } catch (error) {
-      console.error("[TournamentAPI] Error en obtenerTorneosAmigos:", error.response?.data);
+      console.error("Error al obtener torneos de amigos:", error.response?.data || error.message);
       throw new Error(error.response?.data?.message || "Error al cargar torneos de amigos");
     }
   },
 
   /**
-   * Obtener partidas de un torneo
-   * @param {number} torneoId
+   * Obtiene los torneos en los que el usuario ha participado
+   * @returns {Promise<Array>} Lista de torneos formateados
+   */
+  obtenerTorneosJugador: async () => {
+    try {
+      const token = getToken();
+      if (!token) throw new Error("No hay token de autenticación");
+
+      const { id: jugadorId } = jwtDecode(token);
+
+      const response = await api.get("/getTorneosJugador", {
+        params: { jugadorId }
+      });
+
+      const data = response.data.data || response.data;
+
+      const torneos = data.map(item => {
+        const torneo = item.infoTorneo.torneo;
+        return {
+          id: item.infoTorneo.torneo_id,
+          nombre: torneo.nombre,
+          descripcion: torneo.descripcion,
+          premio: torneo.premio,
+          estado: torneo.torneo_en_curso ? "en_curso" : "pendiente",
+          participantes: item.numParticipantes || 0,
+          maxParticipantes: torneo.maxParticipantes || 8,
+          requiereContraseña: !!torneo.contrasena,
+          creadorId: torneo.creador_id,
+          fechaInicio: torneo.fecha_inicio ? new Date(torneo.fecha_inicio) : null
+        };
+      });
+
+      return torneos;
+
+    } catch (error) {
+      if(error.response?.status == 404){
+        return [];
+      }
+      console.error("Error al obtener torneos del jugador:", {
+        response: error.response?.data,
+        message: error.message
+      });
+      throw new Error(
+        error.response?.data?.message || "Error al cargar torneos del jugador"
+      );
+    }
+  },
+
+  /**
+   * Obtiene partidas de un torneo
+   * @param {number} torneoId - ID del torneo
    * @returns {Promise<Array>} Lista de partidas
    */
   obtenerPartidasTorneo: async (torneoId) => {
     try {
       const response = await api.get(`/torneo/${torneoId}/partidas`);
-      
-      if (!Array.isArray(response.data)) {
-        return response.data.partidas || [];
-      }
-      
-      return response.data.map(partida => ({
-        id: partida.id,
-        jugador1: partida.user1_id,
-        jugador2: partida.user2_id,
-        estado: partida.estado,
-        ganador: partida.ganador_id,
-        fecha: partida.fecha ? new Date(partida.fecha) : null
-      }));
+      const data = response.data.data || response.data;
+      return Array.isArray(data) ? data : (data.partidas || []);
     } catch (error) {
-      console.error("[TournamentAPI] Error en obtenerPartidasTorneo:", error.response?.data);
+      console.error("Error al obtener partidas:", error.response?.data || error.message);
       throw new Error(error.response?.data?.message || "Error al cargar partidas");
     }
   }
