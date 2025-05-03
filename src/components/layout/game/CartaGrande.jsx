@@ -30,17 +30,21 @@ function CartaGrande({
 
   const media = Math.round((ataque + control + defensa) / 3);
 
+  // Clases más refinadas para una mejor experiencia responsive
+  const containerClasses = responsive
+    ? "w-[160px] h-[250px] xs:w-[180px] xs:h-[280px] sm:w-[220px] sm:h-[340px] md:w-[260px] md:h-[400px] lg:w-[300px] lg:h-[470px]"
+    : "w-[300px] h-[470px]";
+
+  const imageClasses = "w-28 h-28 xs:w-32 xs:h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-48 lg:h-48 object-cover";
+  const escudoClasses = "absolute top-5 right-3 w-6 h-6 xs:top-6 xs:right-3 xs:w-8 xs:h-8 sm:top-7 sm:right-4 sm:w-10 sm:h-10 md:top-8 md:right-5 md:w-12 md:h-12 lg:top-9 lg:right-5 lg:w-14 lg:h-14";
+  const aliasClasses = "text-xs xs:text-sm sm:text-base md:text-base lg:text-lg";
+  const statsBoxClasses = "w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-11 lg:h-11 rounded-lg flex items-center justify-center text-white font-semibold text-xs xs:text-xs sm:text-sm";
+  const mediaBoxClasses = "w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-11 lg:h-11 bg-yellow-500 rounded-lg flex items-center justify-center";
+  const mediaTextClasses = "text-white font-semibold text-xs xs:text-xs sm:text-sm";
+
   return (
     <div
-      className={`
-        relative bg-cover rounded-lg overflow-hidden transition-all duration-300
-        ${
-          responsive
-            ? "w-[180px] h-[290px] xs:w-[200px] xs:h-[320px] sm:w-[250px] sm:h-[400px] md:w-[280px] md:h-[450px] lg:w-[320px] lg:h-[500px]"
-            : "w-[320px] h-[500px]"
-        }
-        ${className}
-      `}
+      className={`relative bg-cover rounded-lg overflow-hidden transition-all duration-300 ${containerClasses} ${className}`}
       style={{ backgroundImage: `url(${getFondo()})` }}
     >
       {/* Solo renderizamos foto y escudo si no estamos ocultando stats */}
@@ -50,13 +54,13 @@ function CartaGrande({
             <img
               src={photo}
               alt={alias}
-              className="w-32 h-32 xs:w-36 xs:h-36 sm:w-40 sm:h-40 md:w-44 md:h-44 lg:w-52 lg:h-52 object-cover"
+              className={imageClasses}
             />
           </div>
           <img
             src={escudo}
             alt={equipo}
-            className="absolute top-6 right-4 w-8 h-8 xs:top-7 xs:right-4 xs:w-10 xs:h-10 sm:top-8 sm:right-5 sm:w-12 sm:h-12 md:top-9 md:right-6 md:w-14 md:h-14 lg:top-10 lg:right-6 lg:w-16 lg:h-16"
+            className={escudoClasses}
           />
         </>
       )}
@@ -64,25 +68,25 @@ function CartaGrande({
       {/* Si hideStats es false, renderizo alias y stats */}
       {!hideStats && (
         <>
-          <div className="absolute bottom-[39%] left-[30px] xs:left-[35px] sm:left-[40px] md:left-[45px] lg:left-[50px] text-white font-semibold">
-            <p className="text-xs xs:text-sm sm:text-base md:text-base lg:text-lg">
+          <div className="absolute bottom-[39%] left-[25px] xs:left-[30px] sm:left-[35px] md:left-[40px] lg:left-[45px] text-white font-semibold">
+            <p className={aliasClasses}>
               {alias}
             </p>
           </div>
-          <div className="absolute bottom-[80px] xs:bottom-[100px] sm:bottom-[120px] md:bottom-[130px] lg:bottom-[135px] left-1/2 transform -translate-x-1/2 flex gap-2 xs:gap-3 sm:gap-3 md:gap-4">
-            <div className="w-7 h-7 xs:w-9 xs:h-9 sm:w-10 sm:h-10 md:w-11 md:h-11 lg:w-12 lg:h-12 rounded-lg flex items-center justify-center text-white font-semibold text-xs xs:text-sm sm:text-sm bg-red-600">
+          <div className="absolute bottom-[70px] xs:bottom-[80px] sm:bottom-[100px] md:bottom-[120px] lg:bottom-[130px] left-1/2 transform -translate-x-1/2 flex gap-1 xs:gap-2 sm:gap-3 md:gap-4">
+            <div className={`${statsBoxClasses} bg-red-600`}>
               {ataque}
             </div>
-            <div className="w-7 h-7 xs:w-9 xs:h-9 sm:w-10 sm:h-10 md:w-11 md:h-11 lg:w-12 lg:h-12 rounded-lg flex items-center justify-center text-white font-semibold text-xs xs:text-sm sm:text-sm bg-blue-600">
+            <div className={`${statsBoxClasses} bg-blue-600`}>
               {control}
             </div>
-            <div className="w-7 h-7 xs:w-9 xs:h-9 sm:w-10 sm:h-10 md:w-11 md:h-11 lg:w-12 lg:h-12 rounded-lg flex items-center justify-center text-white font-semibold text-xs xs:text-sm sm:text-sm bg-green-600">
+            <div className={`${statsBoxClasses} bg-green-600`}>
               {defensa}
             </div>
           </div>
-          <div className="absolute bottom-[45px] xs:bottom-[55px] sm:bottom-[60px] md:bottom-[65px] lg:bottom-[70px] left-1/2 transform -translate-x-1/2 flex items-center justify-center">
-            <div className="w-7 h-7 xs:w-9 xs:h-9 sm:w-10 sm:h-10 md:w-11 md:h-11 lg:w-12 lg:h-12 bg-yellow-500 rounded-lg flex items-center justify-center">
-              <p className="text-white font-semibold text-xs xs:text-sm sm:text-sm">
+          <div className="absolute bottom-[40px] xs:bottom-[45px] sm:bottom-[55px] md:bottom-[60px] lg:bottom-[65px] left-1/2 transform -translate-x-1/2 flex items-center justify-center">
+            <div className={mediaBoxClasses}>
+              <p className={mediaTextClasses}>
                 {media}
               </p>
             </div>

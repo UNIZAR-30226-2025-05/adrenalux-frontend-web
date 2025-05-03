@@ -650,55 +650,55 @@ export default function Collection({ onBack }) {
     );
   };
 
-  // Modal for card details and selling
+  // Modal for card details and selling - versión responsive
   const renderCardModal = () => {
     if (!showModal || !selectedCard) return null;
     
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 backdrop-blur-sm animate-fadeIn p-4">
-        <div className="bg-gradient-to-b from-gray-900 to-black p-6 rounded-lg shadow-2xl max-w-sm mx-auto border border-gray-700 w-full">
+      <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 backdrop-blur-sm animate-fadeIn p-2 sm:p-4 overflow-y-auto">
+        <div className="bg-gradient-to-b from-gray-900 to-black p-4 sm:p-6 rounded-lg shadow-2xl max-w-md mx-auto border border-gray-700 w-full">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-bold text-white">Detalle de la carta</h3>
+            <h3 className="text-lg sm:text-xl font-bold text-white">Detalle de la carta</h3>
             <button
               onClick={() => setShowModal(false)}
               className="text-gray-400 hover:text-white transition-colors"
             >
-              <X size={24} />
+              <X size={20} />
             </button>
           </div>
           
-          <div className="flex justify-center mb-6">
-            <div className="relative w-44 h-60 card-shine">
-              <Carta2 jugador={selectedCard} />
+          <div className="flex justify-center mb-4 sm:mb-6">
+            <div className="relative w-32 h-44 sm:w-40 sm:h-56 md:w-44 md:h-60 card-shine">
+              <Carta2 jugador={selectedCard} responsive={true} />
             </div>
           </div>
           
-          <div className="space-y-4">
-            <div className="bg-black/40 p-3 rounded-lg">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="bg-black/40 p-2 sm:p-3 rounded-lg">
               <div className="flex justify-between items-center mb-2">
-                <span className="font-medium text-gray-300">Nombre:</span>
-                <span className="font-bold">{selectedCard.nombre}</span>
+                <span className="font-medium text-gray-300 text-sm sm:text-base">Nombre:</span>
+                <span className="font-bold text-sm sm:text-base">{selectedCard.nombre}</span>
               </div>
               <div className="flex justify-between items-center mb-2">
-                <span className="font-medium text-gray-300">Equipo:</span>
-                <span>{selectedCard.equipo}</span>
+                <span className="font-medium text-gray-300 text-sm sm:text-base">Equipo:</span>
+                <span className="text-sm sm:text-base">{selectedCard.equipo}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="font-medium text-gray-300">Posición:</span>
-                <span>{selectedCard.posicion}</span>
+                <span className="font-medium text-gray-300 text-sm sm:text-base">Posición:</span>
+                <span className="text-sm sm:text-base">{selectedCard.posicion}</span>
               </div>
             </div>
             
             {selectedCard.enVenta ? (
               <div className="space-y-3">
-                <div className="bg-yellow-800/40 p-3 rounded-lg border border-yellow-700/50">
-                  <p className="text-yellow-300 text-center font-medium">
+                <div className="bg-yellow-800/40 p-2 sm:p-3 rounded-lg border border-yellow-700/50">
+                  <p className="text-yellow-300 text-center font-medium text-sm sm:text-base">
                     Esta carta ya está en venta
                   </p>
                 </div>
                 <button
                   onClick={handleRetirarCarta}
-                  className="w-full bg-red-600 hover:bg-red-700 transition-colors p-3 rounded-lg font-medium"
+                  className="w-full bg-red-600 hover:bg-red-700 transition-colors p-2 sm:p-3 rounded-lg font-medium text-sm sm:text-base"
                   disabled={loading}
                 >
                   {loading ? "Retirando..." : "Retirar del mercado"}
@@ -706,29 +706,29 @@ export default function Collection({ onBack }) {
               </div>
             ) : (
               <div className="space-y-3">
-                <div className="bg-black/40 p-3 rounded-lg">
-                  <label className="block text-gray-300 mb-1">Precio de venta:</label>
+                <div className="bg-black/40 p-2 sm:p-3 rounded-lg">
+                  <label className="block text-gray-300 mb-1 text-sm sm:text-base">Precio de venta:</label>
                   <div className="relative">
-                    <DollarSign size={18} className="absolute top-3 left-3 text-yellow-500" />
+                    <DollarSign size={16} className="absolute top-2 sm:top-3 left-3 text-yellow-500" />
                     <input
                       type="number"
                       value={price}
                       onChange={(e) => setPrice(e.target.value)}
-                      className="w-full bg-black/70 border border-gray-700 p-2 pl-9 rounded-lg text-white focus:outline-none focus:border-yellow-500"
+                      className="w-full bg-black/70 border border-gray-700 p-1 sm:p-2 pl-8 sm:pl-9 rounded-lg text-white focus:outline-none focus:border-yellow-500 text-sm sm:text-base"
                       placeholder="Ingresa el precio"
                     />
                   </div>
                 </div>
                 <button
                   onClick={handleConfirmSale}
-                  className="w-full bg-green-600 hover:bg-green-700 transition-colors p-3 rounded-lg font-medium flex items-center justify-center space-x-2"
+                  className="w-full bg-green-600 hover:bg-green-700 transition-colors p-2 sm:p-3 rounded-lg font-medium flex items-center justify-center space-x-2 text-sm sm:text-base"
                   disabled={loading}
                 >
                   {loading ? (
                     <span>Publicando...</span>
                   ) : (
                     <>
-                      <DollarSign size={18} />
+                      <DollarSign size={16} className="sm:w-5 sm:h-5" />
                       <span>Poner en venta</span>
                     </>
                   )}
