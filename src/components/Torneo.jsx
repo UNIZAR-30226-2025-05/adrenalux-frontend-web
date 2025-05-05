@@ -1,38 +1,40 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   FaSearch, FaPlus, FaUserFriends, FaTrophy, 
   FaUsers, FaCalendarAlt, FaCoins, FaSignOutAlt, 
   FaLock, FaSpinner, FaTimes, FaArrowLeft,
-  FaPlay, FaTrash
+  FaPlay
 } from "react-icons/fa";
 import { tournamentApi } from "../services/api/tournamentApi";
-import { getToken, logout } from "../services/api/authApi";
+import { getToken } from "../services/api/authApi";
 import { jwtDecode } from "jwt-decode";
 import NavBarGame from "./layout/game/NavbarGame";
 import BackButton from "./layout/game/BackButton";
 import background from "../assets/background.png";
 
+const initialState = {
+  torneos: [],
+  torneoSeleccionado: null,
+  loading: { global: true, action: false, torneoId: null },
+  error: null,
+  filtros: { busqueda: "", soloDisponibles: true },
+  modal: { password: false, crear: false },
+  form: {
+    nombre: "",
+    descripcion: "",
+    premio: "",
+    contrasena: "",
+    esPrivado: false
+  },
+  torneoParaUnirse: null,
+  passwordInput: "",
+  initialCheckDone: false
+};
+
 const Torneo = () => {
   const navigate = useNavigate();
-  const [state, setState] = useState({
-    torneos: [],
-    torneoSeleccionado: null,
-    loading: { global: true, action: false },
-    error: null,
-    filtros: { busqueda: "", soloDisponibles: true },
-    modal: { password: false, crear: false },
-    form: {
-      nombre: "",
-      descripcion: "",
-      premio: "",
-      contrasena: "",
-      esPrivado: false
-    },
-    torneoParaUnirse: null,
-    passwordInput: "",
-    initialCheckDone: false
-  });
+  const [state, setState] = useState(initialState);
 
   const user = useMemo(() => {
     const token = getToken();
@@ -45,12 +47,17 @@ const Torneo = () => {
     }
   }, []);
 
+  // Cargar torneos al montar el componente
   useEffect(() => {
     const cargarTorneos = async () => {
       try {
         setState(prev => ({ ...prev, loading: { ...prev.loading, global: true }, error: null }));
         const data = await tournamentApi.obtenerTorneosActivos();
-        setState(prev => ({ ...prev, torneos: data, loading: { ...prev.loading, global: false } }));
+        setState(prev => ({ 
+          ...prev, 
+          torneos: data, 
+          loading: { ...prev.loading, global: false } 
+        }));
       } catch (err) {
         setState(prev => ({ 
           ...prev, 
@@ -62,9 +69,10 @@ const Torneo = () => {
     cargarTorneos();
   }, []);
 
+  // Verificar torneos del usuario
   useEffect(() => {
     const checkUserTorneos = async () => {
-      if (user && !state.initialCheckDone) {
+      if (user && !state.initialCheckDone && !state.loading.global) {
         try {
           const jugados = await tournamentApi.obtenerTorneosJugador();
           if (Array.isArray(jugados) && jugados.length > 0) {
@@ -77,7 +85,7 @@ const Torneo = () => {
         }
       }
     };
-    if (!state.loading.global) checkUserTorneos();
+    checkUserTorneos();
   }, [state.loading.global, user]);
 
   const handleChange = (e) => {
@@ -98,10 +106,10 @@ const Torneo = () => {
     return coincideBusqueda && estaDisponible;
   });
 
-  const isUserInTournament = (torneo) => {
+  const isUserInTournament = useCallback((torneo) => {
     if (!user || !torneo.participantes) return false;
     return torneo.participantes.some(p => p.id === user.id || p.user_id === user.id);
-  };
+  }, [user]);
 
   const manejarUnion = async (torneo) => {
     if (!user) {
@@ -123,7 +131,10 @@ const Torneo = () => {
 
   const confirmarUnion = async (torneoId, contrasena) => {
     try {
-      setState(prev => ({ ...prev, loading: { ...prev.loading, action: true } }));
+      setState(prev => ({ 
+        ...prev, 
+        loading: { ...prev.loading, action: true, torneoId } 
+      }));
       
       await tournamentApi.unirseATorneo(torneoId, contrasena);
       
@@ -132,7 +143,7 @@ const Torneo = () => {
         ...prev, 
         torneos: actualizados,
         modal: { ...prev.modal, password: false },
-        loading: { ...prev.loading, action: false },
+        loading: { ...prev.loading, action: false, torneoId: null },
         passwordInput: "",
         error: null
       }));
@@ -141,14 +152,17 @@ const Torneo = () => {
       setState(prev => ({ 
         ...prev, 
         error: error.message,
-        loading: { ...prev.loading, action: false }
+        loading: { ...prev.loading, action: false, torneoId: null }
       }));
     }
   };
 
   const manejarAbandono = async (torneoId) => {
     try {
-      setState(prev => ({ ...prev, loading: { ...prev.loading, action: true } }));
+      setState(prev => ({ 
+        ...prev, 
+        loading: { ...prev.loading, action: true, torneoId } 
+      }));
       await tournamentApi.abandonarTorneo(torneoId);
       
       const actualizados = await tournamentApi.obtenerTorneosActivos();
@@ -156,21 +170,24 @@ const Torneo = () => {
         ...prev, 
         torneos: actualizados,
         torneoSeleccionado: null,
-        loading: { ...prev.loading, action: false },
+        loading: { ...prev.loading, action: false, torneoId: null },
         error: null
       }));
     } catch (error) {
       setState(prev => ({ 
         ...prev, 
         error: error.message,
-        loading: { ...prev.loading, action: false }
+        loading: { ...prev.loading, action: false, torneoId: null }
       }));
     }
   };
 
   const manejarInicio = async () => {
     try {
-      setState(prev => ({ ...prev, loading: { ...prev.loading, action: true } }));
+      setState(prev => ({ 
+        ...prev, 
+        loading: { ...prev.loading, action: true } 
+      }));
       
       await tournamentApi.iniciarTorneo(state.torneoSeleccionado.id);
       
@@ -193,32 +210,13 @@ const Torneo = () => {
     }
   };
 
-  const manejarEliminacion = async () => {
-    try {
-      setState(prev => ({ ...prev, loading: { ...prev.loading, action: true } }));
-      
-      await tournamentApi.eliminarTorneo(state.torneoSeleccionado.id);
-      
-      const actualizados = await tournamentApi.obtenerTorneosActivos();
-      setState(prev => ({ 
-        ...prev, 
-        torneos: actualizados,
-        torneoSeleccionado: null,
-        loading: { ...prev.loading, action: false },
-        error: null
-      }));
-    } catch (error) {
-      setState(prev => ({ 
-        ...prev, 
-        error: error.message,
-        loading: { ...prev.loading, action: false }
-      }));
-    }
-  };
-
   const manejarCreacion = async () => {
     try {
-      setState(prev => ({ ...prev, loading: { ...prev.loading, action: true } }));
+      setState(prev => ({ 
+        ...prev, 
+        loading: { ...prev.loading, action: true }, 
+        error: null 
+      }));
       
       const nuevoTorneo = await tournamentApi.crearTorneo({
         nombre: state.form.nombre,
@@ -226,7 +224,7 @@ const Torneo = () => {
         premio: state.form.premio,
         contrasena: state.form.esPrivado ? state.form.contrasena : undefined
       });
-      
+
       setState(prev => ({
         ...prev,
         torneos: [nuevoTorneo, ...prev.torneos],
@@ -238,12 +236,14 @@ const Torneo = () => {
           contrasena: "",
           esPrivado: false
         },
-        loading: { ...prev.loading, action: false },
-        error: null
+        loading: { ...prev.loading, action: false }
       }));
+
+      verDetalles(nuevoTorneo.id);
+      
     } catch (error) {
-      setState(prev => ({ 
-        ...prev, 
+      setState(prev => ({
+        ...prev,
         error: error.message,
         loading: { ...prev.loading, action: false }
       }));
@@ -252,10 +252,11 @@ const Torneo = () => {
 
   const verDetalles = async (torneoId) => {
     try {
-      setState(prev => ({ ...prev, loading: { ...prev.loading, action: true } }));
+      setState(prev => ({ 
+        ...prev, 
+        loading: { ...prev.loading, action: true, torneoId } 
+      }));
       const detalles = await tournamentApi.obtenerDetallesTorneo(torneoId);
-      
-      console.log("Detalles del torneo recibidos:", detalles);
       
       setState(prev => ({ 
         ...prev, 
@@ -271,7 +272,10 @@ const Torneo = () => {
         error: error.message
       }));
     } finally {
-      setState(prev => ({ ...prev, loading: { ...prev.loading, action: false } }));
+      setState(prev => ({ 
+        ...prev, 
+        loading: { ...prev.loading, action: false, torneoId: null } 
+      }));
     }
   };
 
@@ -279,6 +283,7 @@ const Torneo = () => {
     const esParticipante = isUserInTournament(torneo);
     const estaLleno = torneo.participantes >= torneo.maxParticipantes;
     const enCurso = torneo.estado === "en_curso";
+    const isLoading = state.loading.action && state.loading.torneoId === torneo.id;
     
     return (
       <div className="bg-gray-700 rounded-lg p-4 border border-gray-600 hover:border-yellow-400 transition-colors">
@@ -311,9 +316,9 @@ const Torneo = () => {
                 ? "bg-gray-500 cursor-not-allowed"
                 : "bg-green-500 hover:bg-green-600"
           } text-white`}
-          disabled={state.loading.action || estaLleno || enCurso}
+          disabled={isLoading || estaLleno || enCurso}
         >
-          {state.loading.action ? (
+          {isLoading ? (
             <FaSpinner className="animate-spin mx-auto" />
           ) : esParticipante ? (
             "Ver Detalles"
@@ -483,39 +488,22 @@ const Torneo = () => {
                 )}
 
                 {user && state.torneoSeleccionado && (user.id === state.torneoSeleccionado.creadorId) && (
-                  <>
-                    {!state.torneoSeleccionado.torneo_en_curso && (
-                      <button
-                        onClick={manejarInicio}
-                        className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 rounded-lg text-white font-medium"
-                        disabled={state.loading.action || state.torneoSeleccionado.participantes.length < 2}
-                        title={state.torneoSeleccionado.participantes.length < 2 ? "Se necesitan al menos 2 participantes" : ""}
-                      >
-                        {state.loading.action ? (
-                          <FaSpinner className="animate-spin" />
-                        ) : (
-                          <>
-                            <FaPlay /> Iniciar Torneo
-                          </>
-                        )}
-                      </button>
-                    )}
-
+                  !state.torneoSeleccionado.torneo_en_curso && (
                     <button
-                      onClick={manejarEliminacion}
-                      className="flex items-center gap-2 px-4 py-2 bg-red-700 hover:bg-red-800 rounded-lg text-white font-medium"
-                      disabled={state.loading.action || state.torneoSeleccionado.torneo_en_curso}
-                      title={state.torneoSeleccionado.torneo_en_curso ? "No se puede eliminar un torneo en curso" : ""}
+                      onClick={manejarInicio}
+                      className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 rounded-lg text-white font-medium"
+                      disabled={state.loading.action || state.torneoSeleccionado.participantes.length < 2}
+                      title={state.torneoSeleccionado.participantes.length < 2 ? "Se necesitan al menos 2 participantes" : ""}
                     >
                       {state.loading.action ? (
                         <FaSpinner className="animate-spin" />
                       ) : (
                         <>
-                          <FaTrash /> Eliminar Torneo
+                          <FaPlay /> Iniciar Torneo
                         </>
                       )}
                     </button>
-                  </>
+                  )
                 )}
               </div>
             </div>
