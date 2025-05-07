@@ -6,8 +6,9 @@ import { useNavigate } from "react-router-dom";
 import { socketService } from "../../../services/websocket/socketService";
 import { getProfile } from "../../../services/api/profileApi";
 import { motion, AnimatePresence } from "framer-motion";
+import PropTypes from "prop-types";
 
-export default function PlayButton() {
+export default function PlayButton({ className = "", iconClassName = "" }) {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [showAlert, setShowAlert] = useState(false);
@@ -49,7 +50,7 @@ export default function PlayButton() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="absolute bottom-28 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-lg border-2 border-purple-500 z-50 flex items-center"
+            className="fixed bottom-28 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-lg border-2 border-purple-500 z-50 flex items-center"
           >
             <GiSwordman className="text-yellow-400 mr-2" />
             <span>No tienes ninguna plantilla activa</span>
@@ -124,7 +125,7 @@ export default function PlayButton() {
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.3 }}
-        className="absolute bottom-5 left-1/2 -translate-x-1/2 flex items-center bg-gradient-to-r from-purple-900/80 to-gray-900/80 border-2 border-purple-500 rounded-full shadow-xl backdrop-blur-sm overflow-hidden"
+        className={`flex items-center justify-center bg-gradient-to-r from-purple-900/80 to-gray-900/80 border-2 border-purple-500 rounded-full shadow-xl backdrop-blur-sm overflow-hidden ${className}`}
       >
         <button
           onClick={handleAlineacionesClick}
@@ -159,7 +160,7 @@ export default function PlayButton() {
 
         <button className="flex flex-col items-center justify-center px-4 py-2 hover:bg-purple-900/50 transition group">
           <div className="relative">
-            <FaBolt className="text-xl text-yellow-400 group-hover:scale-110 transition" />
+            <FaBolt className={`text-xl text-yellow-400 group-hover:scale-110 transition ${iconClassName}`} />
             <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-purple-500 rounded-full opacity-0 group-hover:opacity-100 transition"></div>
           </div>
           <span className="text-xs text-gray-300 group-hover:text-white mt-1">
@@ -170,3 +171,8 @@ export default function PlayButton() {
     </>
   );
 }
+
+PlayButton.propTypes = {
+  className: PropTypes.string,
+  iconClassName: PropTypes.string,
+};

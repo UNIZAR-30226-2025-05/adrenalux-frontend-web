@@ -4,7 +4,7 @@ import {
   FaSearch, FaPlus, FaUserFriends, FaTrophy, 
   FaUsers, FaCalendarAlt, FaCoins, FaSignOutAlt, 
   FaLock, FaSpinner, FaTimes, FaArrowLeft,
-  FaPlay
+  FaPlay, FaExclamationTriangle
 } from "react-icons/fa";
 import { tournamentApi } from "../services/api/tournamentApi";
 import { getToken } from "../services/api/authApi";
@@ -26,6 +26,12 @@ const initialState = {
     premio: "",
     contrasena: "",
     esPrivado: false
+  },
+  formErrors: {
+    nombre: "",
+    descripcion: "",
+    premio: "",
+    contrasena: ""
   },
   torneoParaUnirse: null,
   passwordInput: "",
@@ -88,6 +94,53 @@ const Torneo = () => {
     checkUserTorneos();
   }, [state.loading.global, user]);
 
+  const validateForm = () => {
+    let isValid = true;
+    const errors = {
+      nombre: "",
+      descripcion: "",
+      premio: "",
+      contrasena: ""
+    };
+
+    // Validación del nombre (mínimo 4 caracteres)
+    if (!state.form.nombre.trim()) {
+      errors.nombre = "El nombre es obligatorio";
+      isValid = false;
+    } else if (state.form.nombre.trim().length < 4) {
+      errors.nombre = "El nombre debe tener al menos 4 caracteres";
+      isValid = false;
+    }
+
+    // Validación de la descripción (no puede ser nulo)
+    if (!state.form.descripcion.trim()) {
+      errors.descripcion = "La descripción es obligatoria";
+      isValid = false;
+    }
+
+    // Validación del premio (debe ser un número)
+    if (!state.form.premio.trim()) {
+      errors.premio = "El premio es obligatorio";
+      isValid = false;
+    } else if (isNaN(Number(state.form.premio))) {
+      errors.premio = "El premio debe ser un número";
+      isValid = false;
+    }
+
+    // Validación de la contraseña (si es torneo privado)
+    if (state.form.esPrivado && !state.form.contrasena.trim()) {
+      errors.contrasena = "La contraseña es obligatoria para torneos privados";
+      isValid = false;
+    }
+
+    setState(prev => ({
+      ...prev,
+      formErrors: errors
+    }));
+
+    return isValid;
+  };
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setState(prev => ({
@@ -95,6 +148,10 @@ const Torneo = () => {
       form: {
         ...prev.form,
         [name]: type === 'checkbox' ? checked : value
+      },
+      formErrors: {
+        ...prev.formErrors,
+        [name]: "" // Limpiar el error cuando el usuario modifica el campo
       }
     }));
   };
@@ -211,6 +268,10 @@ const Torneo = () => {
   };
 
   const manejarCreacion = async () => {
+    if (!validateForm()) {
+      return;
+    }
+
     try {
       setState(prev => ({ 
         ...prev, 
@@ -235,6 +296,12 @@ const Torneo = () => {
           premio: "",
           contrasena: "",
           esPrivado: false
+        },
+        formErrors: {
+          nombre: "",
+          descripcion: "",
+          premio: "",
+          contrasena: ""
         },
         loading: { ...prev.loading, action: false }
       }));
@@ -597,6 +664,12 @@ const Torneo = () => {
                     premio: "",
                     contrasena: "",
                     esPrivado: false
+                  },
+                  formErrors: {
+                    nombre: "",
+                    descripcion: "",
+                    premio: "",
+                    contrasena: ""
                   }
                 }))}
                 className="text-gray-400 hover:text-white"
@@ -611,36 +684,51 @@ const Torneo = () => {
                 <input
                   type="text"
                   name="nombre"
-                  className="w-full px-4 py-2 bg-gray-600 text-white rounded border border-gray-500"
+                  className={`w-full px-4 py-2 bg-gray-600 text-white rounded border ${state.formErrors.nombre ? 'border-red-500' : 'border-gray-500'}`}
                   value={state.form.nombre}
                   onChange={handleChange}
                   required
                 />
+                {state.formErrors.nombre && (
+                  <p className="text-red-400 text-sm mt-1 flex items-center">
+                    <FaExclamationTriangle className="mr-1" /> {state.formErrors.nombre}
+                  </p>
+                )}
               </div>
               
               <div>
-                <label className="block text-gray-300 mb-1">Descripción</label>
+                <label className="block text-gray-300 mb-1">Descripción*</label>
                 <textarea
                   name="descripcion"
-                  className="w-full px-4 py-2 bg-gray-600 text-white rounded border border-gray-500"
+                  className={`w-full px-4 py-2 bg-gray-600 text-white rounded border ${state.formErrors.descripcion ? 'border-red-500' : 'border-gray-500'}`}
                   rows="3"
                   value={state.form.descripcion}
                   onChange={handleChange}
+                  required
                 />
+                {state.formErrors.descripcion && (
+                  <p className="text-red-400 text-sm mt-1 flex items-center">
+                    <FaExclamationTriangle className="mr-1" /> {state.formErrors.descripcion}
+                  </p>
+                )}
               </div>
               
               <div>
-                <label className="block text-gray-300 mb-1">Premio*</label>
+                <label className="block text-gray-300 mb-1">Premio* (número)</label>
                 <input
                   type="text"
                   name="premio"
-                  className="w-full px-4 py-2 bg-gray-600 text-white rounded border border-gray-500"
+                  className={`w-full px-4 py-2 bg-gray-600 text-white rounded border ${state.formErrors.premio ? 'border-red-500' : 'border-gray-500'}`}
                   value={state.form.premio}
                   onChange={handleChange}
                   required
                 />
+                {state.formErrors.premio && (
+                  <p className="text-red-400 text-sm mt-1 flex items-center">
+                    <FaExclamationTriangle className="mr-1" /> {state.formErrors.premio}
+                  </p>
+                )}
               </div>
-              
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -648,6 +736,7 @@ const Torneo = () => {
                   name="esPrivado"
                   checked={state.form.esPrivado}
                   onChange={handleChange}
+                  className="rounded text-yellow-400 focus:ring-yellow-400"
                 />
                 <label htmlFor="esPrivado" className="text-gray-300">Torneo privado</label>
               </div>
@@ -658,18 +747,23 @@ const Torneo = () => {
                   <input
                     type="password"
                     name="contrasena"
-                    className="w-full px-4 py-2 bg-gray-600 text-white rounded border border-gray-500"
+                    className={`w-full px-4 py-2 bg-gray-600 text-white rounded border ${state.formErrors.contrasena ? 'border-red-500' : 'border-gray-500'}`}
                     value={state.form.contrasena}
                     onChange={handleChange}
                     required={state.form.esPrivado}
                   />
+                  {state.formErrors.contrasena && (
+                    <p className="text-red-400 text-sm mt-1 flex items-center">
+                      <FaExclamationTriangle className="mr-1" /> {state.formErrors.contrasena}
+                    </p>
+                  )}
                 </div>
               )}
               
               <button
                 onClick={manejarCreacion}
                 className="w-full py-2 bg-green-500 hover:bg-green-600 rounded text-white font-medium mt-4"
-                disabled={state.loading.action || !state.form.nombre || !state.form.premio || (state.form.esPrivado && !state.form.contrasena)}
+                disabled={state.loading.action}
               >
                 {state.loading.action ? (
                   <FaSpinner className="animate-spin mx-auto" />

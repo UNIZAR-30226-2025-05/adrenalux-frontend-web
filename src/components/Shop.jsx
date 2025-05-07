@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef  } from "react";
-import { FaPlusCircle, FaCoins, FaSearch, FaFilter } from "react-icons/fa";
+import { FaPlusCircle, FaCoins} from "react-icons/fa";
+import { Search, Filter } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import background from "../assets/background.png";
 import MarqueeText from "./layout/MarqueeText";
@@ -19,84 +20,80 @@ import Carta2 from "./layout/game/CartaGrande";
 import PurchaseAnimation from "./layout/game/PurchaseAnimation"; // Importar el componente de animación
 
 // Componente para la barra de búsqueda y filtros
-const SearchTab = ({ 
-  searchQuery, 
-  setSearchQuery, 
-  selectedTeam, 
-  setSelectedTeam, 
-  selectedPosition, 
-  setSelectedPosition 
-}) => {
+const SearchTab = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTeam, setSelectedTeam] = useState("Equipo");
+  const [selectedPosition, setSelectedPosition] = useState("Posición");
   const [showFilters, setShowFilters] = useState(false);
-
+  
   const equiposEspañoles = [
-    "Real Betis", "Deportivo Alavés", "Getafe CF", "Rayo Vallecano", "RCD Mallorca",
-    "CA Osasuna", "Girona FC", "Athletic Club", "UD Las Palmas", "CD Leganés",
-    "Sevilla FC", "Real Valladolid CF", "Atlético de Madrid", "Real Sociedad",
-    "Villarreal CF", "FC Barcelona", "RCD Espanyol de Barcelona", "RC Celta",
-    "Valencia CF", "Real Madrid"
+    "Real Betis", "Deportivo Alavés", "Getafe CF", "Rayo Vallecano",
+    "RCD Mallorca", "CA Osasuna", "Girona FC", "Athletic Club",
+    "UD Las Palmas", "CD Leganés", "Sevilla FC", "Real Valladolid CF",
+    "Atlético de Madrid", "Real Sociedad", "Villarreal CF", "FC Barcelona",
+    "RCD Espanyol de Barcelona", "RC Celta", "Valencia CF", "Real Madrid"
   ];
-
+  
   const posiciones = ["goalkeeper", "defender", "midfielder", "forward"];
 
   return (
-    <div className="w-full max-w-4xl bg-gradient-to-r from-blue-900/80 via-blue-800/80 to-blue-900/80 rounded-xl p-4 shadow-lg backdrop-blur-sm">
-      <div className="flex flex-col lg:flex-row gap-4 items-center">
-        <div className="relative flex-grow w-full lg:w-auto">
-          <input
-            type="text"
-            placeholder="Buscar cartas..."
-            className="w-full pl-10 pr-4 py-3 bg-white/20 backdrop-blur-md text-white placeholder-white/70 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/70" />
+    <div className="flex justify-center w-full p-4">
+      <div className="w-full max-w-4xl bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 rounded-xl p-6 shadow-xl backdrop-blur-sm border border-blue-700/30">
+        <div className="flex flex-col lg:flex-row gap-4 items-center">
+          <div className="relative flex-grow w-full lg:w-auto">
+            <input
+              type="text"
+              placeholder="Buscar cartas..."
+              className="w-full pl-10 pr-4 py-3 bg-white/20 backdrop-blur-md text-white placeholder-white/70 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/70" />
+          </div>
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 transition-colors text-white px-5 py-3 rounded-lg w-full lg:w-auto shadow-md"
+          >
+            <Filter size={18} />
+            <span>Filtros</span>
+          </button>
         </div>
-
-        <button 
-          onClick={() => setShowFilters(!showFilters)} 
-          className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 transition-colors text-white px-5 py-3 rounded-lg w-full lg:w-auto"
-        >
-          <FaFilter />
-          <span>Filtros</span>
-        </button>
+        
+        {showFilters && (
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 animate-fadeIn">
+            <div>
+              <label className="block text-white mb-2 font-medium">Posición</label>
+              <select
+                value={selectedPosition}
+                onChange={(e) => setSelectedPosition(e.target.value)}
+                className="w-full p-3 bg-white/20 backdrop-blur-md text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 [&>option]:text-black"
+              >
+                <option value="Posición">Todas las posiciones</option>
+                {posiciones.map((posicion) => (
+                  <option key={posicion} value={posicion}>
+                    {posicion}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-white mb-2 font-medium">Equipo</label>
+              <select
+                value={selectedTeam}
+                onChange={(e) => setSelectedTeam(e.target.value)}
+                className="w-full p-3 bg-white/20 backdrop-blur-md text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 [&>option]:text-black"
+              >
+                <option value="Equipo">Todos los equipos</option>
+                {equiposEspañoles.map((equipo) => (
+                  <option key={equipo} value={equipo}>
+                    {equipo}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
       </div>
-
-      {showFilters && (
-        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 animate-fadeIn">
-          <div>
-            <label className="block text-white mb-2 font-medium">Posición</label>
-            <select
-              value={selectedPosition}
-              onChange={(e) => setSelectedPosition(e.target.value)}
-              className="w-full p-3 bg-white/20 backdrop-blur-md text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 [&>option]:text-black"
-            >
-              <option value="Posición">Todas las posiciones</option>
-              {posiciones.map((posicion) => (
-                <option key={posicion} value={posicion}>
-                  {posicion}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-white mb-2 font-medium">Equipo</label>
-            <select
-              value={selectedTeam}
-              onChange={(e) => setSelectedTeam(e.target.value)}
-              className="w-full p-3 bg-white/20 backdrop-blur-md text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 [&>option]:text-black"
-            >
-              <option value="Equipo">Todos los equipos</option>
-              {equiposEspañoles.map((equipo) => (
-                <option key={equipo} value={equipo}>
-                  {equipo}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
@@ -435,16 +432,17 @@ export default function Shop() {
           </div>
         </div>
 
-        {/* Barra de búsqueda y filtros */}
-        <div className="mb-10">
-          <SearchTab
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            selectedTeam={selectedTeam}
-            setSelectedTeam={setSelectedTeam}
-            selectedPosition={selectedPosition}
-            setSelectedPosition={setSelectedPosition}
-          />
+        <div className="flex justify-center">
+          <div className="mb-10">
+            <SearchTab
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              selectedTeam={selectedTeam}
+              setSelectedTeam={setSelectedTeam}
+              selectedPosition={selectedPosition}
+              setSelectedPosition={setSelectedPosition}
+            />
+          </div>
         </div>
 
         {/* Cartas en venta */}
@@ -508,59 +506,65 @@ export default function Shop() {
 
       {/* Modal de compra con confirmación */}
       {showDialog && selectedCard && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-gradient-to-b from-blue-900 to-blue-950 rounded-xl shadow-2xl text-center max-w-md w-full mx-auto border border-blue-500/30 overflow-hidden">
-            <div className="bg-gradient-to-r from-blue-800 to-blue-700 py-3 px-4">
-              <h3 className="text-xl font-bold">Detalles de la Carta</h3>
-            </div>
-            
-            <div className="p-6">
-              {!showPurchaseAnimation ? (
-                // Vista normal del modal de compra
-                <>
-                  <div className="flex justify-center mb-6 transform transition-transform hover:scale-105">
-                    <Carta2 jugador={selectedCard} />
-                  </div>
-                  
-                  <div className="mb-6 text-center">
-                    <p className="text-2xl font-semibold mb-1">{selectedCard.nombre}</p>
-                    <div className="flex justify-center gap-3">
-                      <span className="bg-blue-800/60 rounded-full px-3 py-1 text-sm">{selectedCard.tipo_carta}</span>
-                      <span className="bg-blue-800/60 rounded-full px-3 py-1 text-sm">{selectedCard.posicion}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center justify-center mb-6 bg-blue-800/40 rounded-lg py-3">
-                    <span className="text-xl font-semibold mr-2">Precio: {selectedCard.precio}</span>
-                    <FaCoins className="text-yellow-400 text-xl" />
-                  </div>
-                  
-                  <p className="text-lg mb-8">¿Deseas comprar esta carta?</p>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <button
-                      onClick={handleBuyCard}
-                      className="bg-gradient-to-r from-green-600 to-green-500 px-6 py-3 rounded-lg hover:from-green-500 hover:to-green-400 transition-all font-semibold"
-                    >
-                      Comprar
-                    </button>
-                    <button
-                      onClick={handleCloseDialog}
-                      className="bg-gradient-to-r from-red-600 to-red-500 px-6 py-3 rounded-lg hover:from-red-500 hover:to-red-400 transition-all font-semibold"
-                    >
-                      Cancelar
-                    </button>
-                  </div>
-                </>
-              ) : (
-                // Vista de animación de compra
-                <div className="py-4">
-                  <PurchaseAnimationWithStatus />
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
+              <div 
+                className="bg-gradient-to-b from-blue-900 to-blue-950 rounded-xl shadow-2xl text-center w-full max-w-lg mx-auto border border-blue-500/30 overflow-hidden"
+                style={{maxHeight: "90vh"}} // Limitar altura máxima
+              >
+                <div className="bg-gradient-to-r from-blue-800 to-blue-700 py-3 px-4 sticky top-0 z-10">
+                  <h3 className="text-xl font-bold">Detalles de la Carta</h3>
                 </div>
-              )}
+                
+                <div className="p-4 md:p-6 overflow-y-auto" style={{maxHeight: "calc(90vh - 56px)"}}>
+                  {!showPurchaseAnimation ? (
+                    // Vista normal del modal de compra - ahora con scroll interno
+                    <>
+                      <div className="flex justify-center mb-6 transform transition-transform hover:scale-105 max-w-full">
+                        {/* Contenedor con tamaño máximo para la carta */}
+                        <div className="max-w-xs w-full">
+                          <Carta2 jugador={selectedCard} />
+                        </div>
+                      </div>
+                      
+                      <div className="mb-6 text-center">
+                        <p className="text-xl md:text-2xl font-semibold mb-1">{selectedCard.nombre}</p>
+                        <div className="flex flex-wrap justify-center gap-2 md:gap-3">
+                          <span className="bg-blue-800/60 rounded-full px-3 py-1 text-sm">{selectedCard.tipo_carta}</span>
+                          <span className="bg-blue-800/60 rounded-full px-3 py-1 text-sm">{selectedCard.posicion}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center justify-center mb-6 bg-blue-800/40 rounded-lg py-3">
+                        <span className="text-xl font-semibold mr-2">Precio: {selectedCard.precio}</span>
+                        <FaCoins className="text-yellow-400 text-xl" />
+                      </div>
+                      
+                      <p className="text-lg mb-6">¿Deseas comprar esta carta?</p>
+                      
+                      <div className="grid grid-cols-2 gap-4 px-4">
+                        <button
+                          onClick={handleBuyCard}
+                          className="bg-gradient-to-r from-green-600 to-green-500 px-4 py-3 rounded-lg hover:from-green-500 hover:to-green-400 transition-all font-semibold"
+                        >
+                          Comprar
+                        </button>
+                        <button
+                          onClick={handleCloseDialog}
+                          className="bg-gradient-to-r from-red-600 to-red-500 px-4 py-3 rounded-lg hover:from-red-500 hover:to-red-400 transition-all font-semibold"
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    // Vista de animación de compra
+                    <div className="py-4 flex items-center justify-center min-h-64">
+                      <PurchaseAnimationWithStatus />
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
       )}
 
       {/* Alerta de error (para cuando no hay suficientes adrenacoins) */}

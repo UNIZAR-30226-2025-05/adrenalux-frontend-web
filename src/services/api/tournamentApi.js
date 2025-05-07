@@ -67,6 +67,8 @@ export const tournamentApi = {
       const payload = { nombre, descripcion, premio };
       if (contrasena) payload.contrasena = contrasena;
 
+      console.log(payload)
+
       const response = await api.post("/crear", payload);
       return formatTorneo(response.data.data || response.data);
     } catch (error) {

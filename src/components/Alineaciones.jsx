@@ -202,20 +202,7 @@ export default function Alineaciones() {
         throw new Error("No se encontró el token de autenticación.");
       }
 
-      const nuevaAlineacion = await crearPlantilla(newAlineacionNombre, token);
-      
-      // Si es la primera plantilla, activarla automáticamente
-      if (alineaciones.length === 0) {
-        await activarPartida(nuevaAlineacion.id, token);
-        setPlantillaActivaId(nuevaAlineacion.id);
-        
-        // Actualizar el localStorage con la plantilla activa
-        const userData = JSON.parse(localStorage.getItem("user"));
-        localStorage.setItem("user", JSON.stringify({
-          ...userData,
-          plantilla_activa_id: nuevaAlineacion.id
-        }));
-      }
+      await crearPlantilla(newAlineacionNombre, token);
       
       handleCloseAddModal();
       showAlert('success', `Alineación "${newAlineacionNombre}" creada correctamente`);
