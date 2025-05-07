@@ -1,5 +1,12 @@
 import { useState, useEffect } from "react";
-import { FaExchangeAlt, FaPlus, FaTrash, FaTimes, FaCheck, FaTrophy } from "react-icons/fa";
+import {
+  FaExchangeAlt,
+  FaPlus,
+  FaTrash,
+  FaTimes,
+  FaCheck,
+  FaTrophy,
+} from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import background from "../assets/background.png";
 import BackButton from "../components/layout/game/BackButton";
@@ -12,11 +19,9 @@ import {
   sendFriendRequest,
   acceptFriendRequest,
   declineFriendRequest,
-  deleteFriend, 
+  deleteFriend,
 } from "../services/api/friendApi";
-import {
-  getProfile, 
-} from "../services/api/profileApi"
+import { getProfile } from "../services/api/profileApi";
 
 export default function Amigo() {
   const [currentTab, setCurrentTab] = useState("amigos");
@@ -113,11 +118,11 @@ export default function Amigo() {
 
   const handleDeleteFriend = async () => {
     try {
-      if (!friendToDelete) return; 
+      if (!friendToDelete) return;
       await deleteFriend(friendToDelete.id);
       setAmigos(amigos.filter((amigo) => amigo.id !== friendToDelete.id));
       setCurrentFriends(currentFriends - 1);
-      setShowDeleteConfirmation(false); 
+      setShowDeleteConfirmation(false);
       fetchData();
     } catch (error) {
       console.error("Error al eliminar amigo:", error);
@@ -127,7 +132,9 @@ export default function Amigo() {
   const handleChallenge = (friend) => {
     // Envía desafío al amigo y navega al home
     socketService.sendChallengeRequest(friend.id, user.data.username);
-    navigate("/home", { state: { challengeSent: true, challengedFriend: friend.username } });
+    navigate("/home", {
+      state: { challengeSent: true, challengedFriend: friend.username },
+    });
   };
 
   const renderRow = (item, tab, id) => {
@@ -170,7 +177,10 @@ export default function Amigo() {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={() => {
-                socketService.sendExchangeRequest(item['id'], user.data.username);
+                socketService.sendExchangeRequest(
+                  item["id"],
+                  user.data.username
+                );
                 navigate("/esperando", { state: { jugador: item } });
               }}
               title="Intercambiar"
@@ -182,8 +192,8 @@ export default function Amigo() {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={() => {
-                setFriendToDelete(item); 
-                setShowDeleteConfirmation(true); 
+                setFriendToDelete(item);
+                setShowDeleteConfirmation(true);
               }}
               title="Eliminar"
             >
@@ -233,7 +243,7 @@ export default function Amigo() {
         <BackButton onClick={() => navigate("/home")} />
       </div>
 
-      <motion.div 
+      <motion.div
         className="flex items-center justify-between bg-[#006298] px-6 py-4 mt-12 w-full max-w-[600px] rounded-lg mx-2"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -259,7 +269,7 @@ export default function Amigo() {
         </div>
       </motion.div>
 
-      <motion.div 
+      <motion.div
         className="bg-black/50 mt-6 w-full max-w-[600px] rounded-lg p-4 flex flex-col items-center max-h-[500px] overflow-y-auto mx-2"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -270,15 +280,15 @@ export default function Amigo() {
         ) : (
           <AnimatePresence mode="wait">
             {currentTab === "amigos" && (
-              <motion.div 
+              <motion.div
                 className="w-full"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 key="amigos-tab"
               >
-                {(amigos == null || amigos.length === 0) ? (
-                  <motion.p 
+                {amigos == null || amigos.length === 0 ? (
+                  <motion.p
                     className="text-white text-center py-10"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -291,17 +301,18 @@ export default function Amigo() {
                 )}
               </motion.div>
             )}
-            
+
             {currentTab === "recibidas" && (
-              <motion.div 
+              <motion.div
                 className="w-full"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 key="recibidas-tab"
               >
-                {(solicitudesRecibidas == null || solicitudesRecibidas.length === 0) ? (
-                  <motion.p 
+                {solicitudesRecibidas == null ||
+                solicitudesRecibidas.length === 0 ? (
+                  <motion.p
                     className="text-white text-center py-10"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -310,7 +321,9 @@ export default function Amigo() {
                     No tienes solicitudes de amistad.
                   </motion.p>
                 ) : (
-                  solicitudesRecibidas?.map((sol) => renderRow(sol.sender, "recibidas", sol.id))
+                  solicitudesRecibidas?.map((sol) =>
+                    renderRow(sol.sender, "recibidas", sol.id)
+                  )
                 )}
               </motion.div>
             )}
@@ -329,7 +342,7 @@ export default function Amigo() {
         >
           Amigos
         </motion.button>
-          
+
         <motion.button
           onClick={() => setCurrentTab("recibidas")}
           className={`px-4 py-2 rounded-md ${
@@ -344,20 +357,21 @@ export default function Amigo() {
 
       <AnimatePresence>
         {showDeleteConfirmation && (
-          <motion.div 
+          <motion.div
             className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <motion.div 
+            <motion.div
               className="bg-[#2B5C94] p-6 rounded-lg shadow-lg w-80 mx-2"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
             >
               <h2 className="text-xl font-bold mb-4 text-center">
-                ¿Estás seguro de que deseas eliminar a {friendToDelete?.username}?
+                ¿Estás seguro de que deseas eliminar a{" "}
+                {friendToDelete?.username}?
               </h2>
               <div className="flex justify-around">
                 <motion.button
@@ -384,13 +398,13 @@ export default function Amigo() {
 
       <AnimatePresence>
         {showAddFriendModal && (
-          <motion.div 
+          <motion.div
             className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <motion.div 
+            <motion.div
               className="bg-[#2B5C94] p-6 rounded-lg shadow-lg w-80 mx-2"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
