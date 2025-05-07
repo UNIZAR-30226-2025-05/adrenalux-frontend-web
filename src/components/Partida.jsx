@@ -1,6 +1,6 @@
 /* eslint-disable react/no-unknown-property */
 /* eslint-disable no-case-declarations */
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { socketService } from "../services/websocket/socketService";
 import background from "../assets/backgroundAlineacion.png";
@@ -471,7 +471,7 @@ const Partida = () => {
     setTimeout(() => setShowTurnBanner(false), 1500);
   };*/
 
-  const handleRoundStart = (payload) => {
+  /*const handleRoundStart = (payload) => {
     const turno = payload.dataConTurno;
     if (!turno) return;
 
@@ -503,7 +503,41 @@ const Partida = () => {
 
     setShowTurnBanner(true);
     setTimeout(() => setShowTurnBanner(false), 1500);
-  };
+  };*/
+
+  const handleRoundStart = useCallback((payload) => {
+    const turno = payload?.dataConTurno;
+    if (!turno) return;
+
+    // Si ya estamos bloqueados esperando al "Continuar", encolamos
+    if (waitingNextRoundRef.current) {
+      nextRoundStartRef.current = payload;
+      return;
+    }
+
+    // Procesamos inmediatamente
+    waitingNextRoundRef.current = false;
+    nextRoundStartRef.current = null;
+
+    setCurrentOpponentCard(null);
+    setHighlightedPosition(null);
+    setGameState((prev) => ({
+      ...prev,
+      phase: turno.isPlayerTurn ? "selection" : "waiting",
+      roundNumber: turno.roundNumber,
+      isPlayerTurn: turno.isPlayerTurn,
+      timer: 30,
+      selectedSkill: null,
+      opponentSelection: null,
+      mySelection: null,
+      opponentCards: prev.opponentCards.length
+        ? prev.opponentCards
+        : opponentCardsRef.current,
+    }));
+
+    setShowTurnBanner(true);
+    setTimeout(() => setShowTurnBanner(false), 1500);
+  }, []);
 
   // Arreglo para handleOpponentSelection: Guardamos la información de la carta seleccionada
   const handleOpponentSelection = (data) => {
@@ -1203,7 +1237,17 @@ const Partida = () => {
                 // 1) levantamos el bloqueo para que el próximo onRoundStart se procese
                 waitingNextRoundRef.current = false;
 
-                // 2) pasamos a "waiting" a la espera del servidor
+                // 2) si ya hemos acabado la ronda 11, vamos a "ended"
+                if (gameState.roundNumber >= 11) {
+                  setGameState((prev) => ({
+                    ...prev,
+                    phase: "ended",
+                    // aquí puedes setear winner o scores finales si hiciera falta
+                  }));
+                  return;
+                }
+
+                // 3) pasamos a "waiting" a la espera del servidor
                 setGameState((prev) => ({
                   ...prev,
                   phase: "waiting",
