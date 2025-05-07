@@ -31,7 +31,8 @@ const formatTorneo = (torneo) => ({
   maxParticipantes: torneo.maxParticipantes || 8,
   requiereContraseña: !!torneo.contrasena,
   creadorId: torneo.creador_id,
-  fechaInicio: torneo.fecha_inicio ? new Date(torneo.fecha_inicio) : null
+  fechaInicio: torneo.fecha_inicio ? new Date(torneo.fecha_inicio) : null,
+  ganador_id: torneo.ganador_id ?? null,
 });
 
 export const tournamentApi = {
@@ -172,7 +173,6 @@ export const tournamentApi = {
       });
 
       const data = response.data.data || response.data;
-
       return data.map(item => ({
         id: item.infoTorneo.torneo_id,
         nombre: item.infoTorneo.torneo.nombre,
@@ -183,7 +183,8 @@ export const tournamentApi = {
         maxParticipantes: item.infoTorneo.torneo.maxParticipantes || 8,
         requiereContraseña: !!item.infoTorneo.torneo.contrasena,
         creadorId: item.infoTorneo.torneo.creador_id,
-        fechaInicio: item.infoTorneo.torneo.fecha_inicio ? new Date(item.infoTorneo.torneo.fecha_inicio) : null
+        fechaInicio: item.infoTorneo.torneo.fecha_inicio ? new Date(item.infoTorneo.torneo.fecha_inicio) : null,
+        ganador_id: item.infoTorneo.torneo.ganador_id ?? null,
       }));
 
     } catch (error) {

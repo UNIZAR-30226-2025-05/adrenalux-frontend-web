@@ -76,7 +76,10 @@ const Torneo = () => {
         try {
           const jugados = await tournamentApi.obtenerTorneosJugador();
           if (Array.isArray(jugados) && jugados.length > 0) {
-            verDetalles(jugados[0].id);
+          const pendiente = jugados.find(t => t.ganador_id == null);
+            if (pendiente) {
+              verDetalles(pendiente.id);
+            }
           }
         } catch (err) {
           console.error("Error al obtener torneos jugados:", err);
@@ -103,7 +106,7 @@ const Torneo = () => {
     const coincideBusqueda = torneo.nombre.toLowerCase().includes(state.filtros.busqueda.toLowerCase());
     const estaDisponible = !state.filtros.soloDisponibles || 
       (torneo.participantes < torneo.maxParticipantes && torneo.estado === "pendiente");
-    return coincideBusqueda && estaDisponible;
+    return coincideBusqueda && estaDisponible && torneo.ganador_id == null;
   });
 
   const isUserInTournament = useCallback((torneo) => {
@@ -191,11 +194,16 @@ const Torneo = () => {
       
       await tournamentApi.iniciarTorneo(state.torneoSeleccionado.id);
       
-      const detalles = await tournamentApi.obtenerDetallesTorneo(state.torneoSeleccionado.id);
+      const [detalles, partidas] = await Promise.all([
+        tournamentApi.obtenerDetallesTorneo(state.torneoSeleccionado.id),
+        tournamentApi.obtenerPartidasTorneo(state.torneoSeleccionado.id)
+      ]);
+
       setState(prev => ({ 
         ...prev, 
         torneoSeleccionado: {
           ...detalles,
+          partidas: partidas,
           participanteActual: isUserInTournament(detalles)
         },
         loading: { ...prev.loading, action: false },
@@ -256,12 +264,25 @@ const Torneo = () => {
         ...prev, 
         loading: { ...prev.loading, action: true, torneoId } 
       }));
-      const detalles = await tournamentApi.obtenerDetallesTorneo(torneoId);
+      const [detalles, partidas] = await Promise.all([
+        tournamentApi.obtenerDetallesTorneo(torneoId),
+        tournamentApi.obtenerPartidasTorneo(torneoId)
+      ]);
+
+      if (detalles.ganador_id) {
+        setState(prev => ({
+          ...prev,
+          torneoSeleccionado: null,
+          loading: { ...prev.loading, action: false, torneoId: null }
+        }));
+        return;
+      }
       
       setState(prev => ({ 
         ...prev, 
         torneoSeleccionado: {
           ...detalles,
+          partidas: partidas,
           participanteActual: isUserInTournament(detalles)
         },
         error: null
@@ -277,6 +298,144 @@ const Torneo = () => {
         loading: { ...prev.loading, action: false, torneoId: null } 
       }));
     }
+  };
+
+  const organizeMatchesIntoRounds = (partidas, participantCount) => {
+    const sortedMatches = [...(partidas || [])].sort((a, b) => 
+      new Date(a.fecha) - new Date(b.fecha));
+    
+    const rounds = { quarters: [], semis: [], final: [] };
+    let remainingMatches = [...sortedMatches];
+  
+    if (participantCount >= 8) {
+      rounds.quarters = remainingMatches.splice(0, 4);
+    }
+  
+    if (participantCount >= 4) {
+      const semiCount = participantCount >= 8 ? 2 : 2;
+      rounds.semis = remainingMatches.splice(0, semiCount);
+    }
+  
+    rounds.final = remainingMatches;
+  
+    return rounds;
+  };
+
+  const MatchesSection = ({ partidas, participantCount, participants }) => {
+    const rounds = organizeMatchesIntoRounds(partidas, participantCount);
+
+    if (!partidas || partidas.length === 0) {
+      return (
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-gray-600 rounded w-1/3"></div>
+          <div className="space-y-2">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="h-20 bg-gray-600 rounded"></div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <>
+        {rounds.quarters.length > 0 && (
+          <div className="mb-6">
+            <h4 className="text-md font-semibold text-yellow-400 mb-2">
+              Cuartos de Final
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {rounds.quarters.map(match => (
+                <MatchCard 
+                  key={match.id} 
+                  match={match} 
+                  participants={participants} 
+                />
+              ))}
+            </div>
+          </div>
+        )}
+        
+        {rounds.semis.length > 0 && (
+          <div className="mb-6">
+            <h4 className="text-md font-semibold text-yellow-400 mb-2">
+              Semifinales
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {rounds.semis.map(match => (
+                <MatchCard 
+                  key={match.id} 
+                  match={match} 
+                  participants={participants} 
+                />
+              ))}
+            </div>
+          </div>
+        )}
+        
+        {rounds.final.length > 0 && (
+          <div className="mb-6">
+            <h4 className="text-md font-semibold text-yellow-400 mb-2">
+              Final
+            </h4>
+            <div className="grid grid-cols-1 gap-4">
+              {rounds.final.map(match => (
+                <MatchCard 
+                  key={match.id} 
+                  match={match} 
+                  participants={participants} 
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </>
+    );
+  };
+
+  const MatchCard = ({ match, participants }) => {
+    const findParticipant = (id) => 
+      participants?.find(p => p.id === id || p.user_id === id);
+    
+    const player1 = findParticipant(match.user1_id);
+    const player2 = findParticipant(match.user2_id);
+    const winner = findParticipant(match.ganador_id);
+  
+    const formatFecha = (fecha) => {
+      if (!fecha) return 'Fecha no definida';
+      const date = new Date(fecha);
+      return date.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    };
+  
+    return (
+      <div className="bg-gray-700 rounded-lg p-4 border border-gray-600 hover:border-yellow-400 transition-colors">
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-sm text-gray-300">{formatFecha(match.fecha)}</span>
+          {winner && (
+            <span className="text-xs bg-green-800 text-green-200 px-2 py-1 rounded">
+              Finalizada
+            </span>
+          )}
+        </div>
+        <div className="flex items-center justify-around">
+          <div className={`text-center ${winner?.id === player1?.id ? 'text-green-400' : 'text-white'}`}>
+            <p className="font-medium">{player1?.nombre || 'Por definir'}</p>
+            {player1 && <span className="text-xs text-gray-400">Lv. {player1.nivel}</span>}
+          </div>
+          <span className="mx-2 text-yellow-400">vs</span>
+          <div className={`text-center ${winner?.id === player2?.id ? 'text-green-400' : 'text-white'}`}>
+            <p className="font-medium">{player2?.nombre || 'Por definir'}</p>
+            {player2 && <span className="text-xs text-gray-400">Lv. {player2.nivel}</span>}
+          </div>
+        </div>
+      </div>
+    );
   };
 
   const CardTorneo = ({ torneo }) => {
@@ -425,7 +584,7 @@ const Torneo = () => {
             </div>
           )}
           
-          {state.torneoSeleccionado ? (
+          {state.torneoSeleccionado && !state.torneoSeleccionado.ganador_id ? (
             <div className="bg-gray-700 rounded-lg p-6 border border-gray-600">
               <div className="grid md:grid-cols-2 gap-6 mb-6">
                 <div className="bg-gray-600 p-4 rounded-lg">
@@ -437,7 +596,7 @@ const Torneo = () => {
                     <p><span className="font-medium">Estado:</span> {state.torneoSeleccionado.estado === "en_curso" ? "En curso" : "Pendiente"}</p>
                     <p><span className="font-medium">Premio:</span> {state.torneoSeleccionado.premio}</p>
                     <p><span className="font-medium">Participantes:</span> {state.torneoSeleccionado.participantes?.length || 0}/{state.torneoSeleccionado.maxParticipantes}</p>
-                    {state.torneoSeleccionado.fechaInicio && (
+                    {state.torneoSeleccionado.estado == 'en_curso' && (
                       <p><span className="font-medium">Inicio:</span> {new Date(state.torneoSeleccionado.fechaInicio).toLocaleString()}</p>
                     )}
                   </div>
@@ -469,25 +628,48 @@ const Torneo = () => {
                   </div>
                 </div>
               </div>
+
+              {state.torneoSeleccionado.estado == 'en_curso' && (  
+                <div className="mt-6">
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                    <FaTrophy className="mr-2 text-yellow-400" /> 
+                    Partidas Planeadas
+                  </h3>
+                  
+                  {state.torneoSeleccionado.partidas?.length > 0 ? (
+                    <MatchesSection 
+                      partidas={state.torneoSeleccionado.partidas}
+                      participantCount={state.torneoSeleccionado.participantes?.length || 0}
+                      participants={state.torneoSeleccionado.participantes || []}
+                    />
+                  ) : (
+                    <p className="text-gray-400">No hay partidas programadas todavía.</p>
+                  )}
+                </div>
+              )}
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
-                {state.torneoSeleccionado?.participanteActual && (
-                  <button
-                    onClick={() => manejarAbandono(state.torneoSeleccionado.id)}
-                    className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-white font-medium"
-                    disabled={state.loading.action}
-                  >
-                    {state.loading.action ? (
-                      <FaSpinner className="animate-spin" />
-                    ) : (
-                      <>
-                        <FaSignOutAlt /> Abandonar Torneo
-                      </>
-                    )}
-                  </button>
-                )}
+              {state.torneoSeleccionado.estado !== 'en_curso' && (
+                <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
+                  {state.torneoSeleccionado?.participanteActual && (
+                    <button
+                      onClick={() => manejarAbandono(state.torneoSeleccionado.id)}
+                      className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-white font-medium"
+                      disabled={state.loading.action}
+                    >
+                      {state.loading.action ? (
+                        <FaSpinner className="animate-spin" />
+                      ) : (
+                        <>
+                          <FaSignOutAlt /> Abandonar Torneo
+                        </>
+                      )}
+                    </button>
+                  )}
 
-                {user && state.torneoSeleccionado && (user.id === state.torneoSeleccionado.creadorId) && (
+                  {user && 
+                  state.torneoSeleccionado && 
+                  (user.id === state.torneoSeleccionado.creadorId) && 
                   !state.torneoSeleccionado.torneo_en_curso && (
                     <button
                       onClick={manejarInicio}
@@ -503,8 +685,9 @@ const Torneo = () => {
                         </>
                       )}
                     </button>
-                  )
-                )}
+                  )}
+                </div>
+              )}
               </div>
             </div>
           ) : (
