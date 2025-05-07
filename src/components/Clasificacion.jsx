@@ -215,8 +215,8 @@ export default function ClasificacionJugadores() {
 
             {/* Table container with glass effect */}
             <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl overflow-hidden shadow-lg mb-6">
-              <div className="overflow-auto max-h-[60vh]">
-                <table className="min-w-full divide-y divide-gray-700">
+            <div className="max-h-[60vh] overflow-y-auto scrollbar-none">
+            <table className="min-w-full divide-y divide-gray-700">
                   <thead className="bg-gradient-to-r from-purple-900 to-blue-900">
                     <tr>
                       {[

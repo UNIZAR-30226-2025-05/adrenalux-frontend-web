@@ -137,7 +137,7 @@ const Ajustes = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 overflow-y-auto bg-cover bg-center"
+      className="fixed inset-0 overflow-y-auto bg-cover bg-center scrollbar-none"
       style={{
         backgroundImage: `url(${background})`,
         backgroundAttachment: "fixed",
@@ -366,7 +366,7 @@ const Ajustes = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-sm z-50"
+            className="fixed inset-0 overflow-y-auto bg-cover bg-center scrollbar-none"
           >
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
