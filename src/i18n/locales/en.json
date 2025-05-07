@@ -1,0 +1,81 @@
+{
+  "settings": {
+    "title": "Settings",
+    "theme": {
+      "title": "Change Theme",
+      "light": "☀️ Light Mode",
+      "dark": "🌙 Dark Mode"
+    },
+    "sound": {
+      "title": "Sound Settings",
+      "music": "Music",
+      "volume": "Volume: {{value}}%"
+    },
+    "language": {
+      "title": "Change Language",
+      "es": "Spanish",
+      "en": "English",
+      "fr": "French"
+    },
+    "buttons": {
+      "logout": "Logout",
+      "aboutUs": "About Us",
+      "close": "Close"
+    }
+  },
+  "aboutUs": {
+    "title": "About Us",
+    "content": "App created by group 05-Carol Shaw."
+  },
+  "navigation": {
+    "home": "Home",
+    "collection": "Collection",
+    "shop": "Shop",
+    "tournament": "Tournaments",
+    "settings": "Settings",
+    "profile": "Profile",
+    "lineups": "Lineups",
+    "achievements": "Achievements",
+    "classification": "Classification",
+    "friends": "Friends"
+  },
+  "game": {
+    "waiting": "Waiting for player...",
+    "searching": "Searching for player...",
+    "pausedGames": "Paused Games",
+    "match": "Match",
+    "exchange": "Exchange"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "username": "Username",
+    "googleLogin": "Login with Google",
+    "forgotPassword": "Forgot your password?",
+    "noAccount": "Don't have an account? Register",
+    "hasAccount": "Already have an account? Login"
+  },
+  "cards": {
+    "opening": "Card Opening",
+    "collection": "My Collection",
+    "notAvailable": "Card not available",
+    "forSale": "Cards for sale"
+  },
+  "common": {
+    "back": "Back",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "edit": "Edit",
+    "delete": "Delete",
+    "search": "Search",
+    "loading": "Loading...",
+    "error": "An error has occurred",
+    "success": "Operation successful",
+    "play": "Play",
+    "actions": "Actions"
+  }
+}

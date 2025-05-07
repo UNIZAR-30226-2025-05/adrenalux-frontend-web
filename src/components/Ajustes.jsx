@@ -1,39 +1,57 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; 
-import { logout } from "../services/api/authApi"; // Importar la función logout
-import BackButton from './layout/game/BackButton';
-import background from '../assets/background.png';
-import { getToken } from "../services/api/authApi";
-
-import { changeMusicVolume } from '../utils/soundManager';
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { motion, AnimatePresence } from "framer-motion";
+import { logout, getToken } from "../services/api/authApi";
+import { useLanguage } from "../context/LanguageProvider";
+import BackButton from "./layout/game/BackButton";
+import background from "../assets/background.png";
+import { changeMusicVolume } from "../utils/soundManager";
+import {
+  FaVolumeUp,
+  FaVolumeMute,
+  FaSun,
+  FaMoon,
+  FaGlobe,
+  FaInfoCircle,
+  FaSignOutAlt,
+  FaTimes,
+} from "react-icons/fa";
+import { GiCrossedSwords } from "react-icons/gi";
 
 const Ajustes = () => {
-  const navigate = useNavigate(); // Obtener la función de navegación
+  const navigate = useNavigate();
   const token = getToken();
+  const { t } = useTranslation();
+  const { currentLanguage, changeLanguage } = useLanguage();
 
-  // Estados iniciales cargados desde localStorage o valores por defecto
   const [musicVolume, setMusicVolume] = useState(
     parseInt(localStorage.getItem("musicVolume")) || 50
   );
-  const [language, setLanguage] = useState(localStorage.getItem("language") || "es");
+  const [language, setLanguage] = useState(currentLanguage || "es");
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
   const [showAboutUs, setShowAboutUs] = useState(false);
+  const [isHovered, setIsHovered] = useState(null);
+  const [showScreen, setShowScreen] = useState(false);
 
-  // Efecto para guardar en localStorage cuando los valores cambian
+  useEffect(() => {
+    const timer = setTimeout(() => setShowScreen(true), 500);
+    return () => clearTimeout(timer);
+  }, []);
+
   useEffect(() => {
     localStorage.setItem("musicVolume", musicVolume);
-    changeMusicVolume(musicVolume / 100);  // Actualiza el volumen de la música usando Howler.js
+    changeMusicVolume(musicVolume / 100);
   }, [musicVolume]);
 
   useEffect(() => {
-    localStorage.setItem("language", language);
-  }, [language]);
+    changeLanguage(language);
+  }, [language, changeLanguage]);
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") || "dark"; // Por defecto "dark"
+    const savedTheme = localStorage.getItem("theme") || "dark";
     setTheme(savedTheme);
-  
-    // Aplicar el tema al body
+
     if (savedTheme === "light") {
       document.documentElement.classList.remove("dark");
     } else {
@@ -47,13 +65,11 @@ const Ajustes = () => {
     }
   }, [token, navigate]);
 
-  // Función para manejar el cambio de tema
   const toggleTheme = () => {
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme);
-  
-    // Aplicar el tema a la raíz (documento HTML)
+
     if (newTheme === "dark") {
       document.documentElement.classList.add("dark");
     } else {
@@ -61,22 +77,15 @@ const Ajustes = () => {
     }
   };
 
-  // Función para manejar el clic en el botón de volver
   const handleBackClick = () => {
     navigate("/home");
   };
 
-  const getSliderStyle = (value) => ({
-    background: `linear-gradient(to right, #4299e1 0%, #4299e1 ${value}%, #4a5568 ${value}%, #4a5568 100%)`,
-  });
-
-  // Función para cerrar sesión
   const handleLogout = async () => {
     try {
-      const success = await logout(); // Llamar a la función de cierre de sesión
-
+      const success = await logout();
       if (success) {
-        navigate("/login"); // Redirigir al login tras cerrar sesión
+        navigate("/login");
       } else {
         throw new Error("Error al cerrar sesión en el servidor");
       }
@@ -86,108 +95,333 @@ const Ajustes = () => {
     }
   };
 
+  const handleLanguageChange = (newLang) => {
+    setLanguage(newLang);
+  };
+
+  const renderLanguageButton = (lang, label, flag) => {
+    const isActive = language === lang;
+    return (
+      <motion.button
+        onClick={() => handleLanguageChange(lang)}
+        onHoverStart={() => setIsHovered(lang)}
+        onHoverEnd={() => setIsHovered(null)}
+        className={`relative overflow-hidden px-6 py-4 rounded-xl flex items-center justify-center transition-all duration-300 ${
+          isActive
+            ? "bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-lg"
+            : "bg-gray-700 hover:bg-gray-600 text-gray-200 shadow-md"
+        }`}
+        whileHover={{ y: -3 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        {isActive && (
+          <motion.div
+            className="absolute inset-0 bg-white opacity-10"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.1 }}
+            transition={{
+              repeat: Infinity,
+              repeatType: "reverse",
+              duration: 1.5,
+            }}
+          />
+        )}
+        <span className="text-2xl mr-3">{flag}</span>
+        <span className="font-medium text-lg">{label}</span>
+      </motion.button>
+    );
+  };
+
   return (
-    <div className="fixed inset-0 overflow-y-auto bg-cover bg-center" style={{ backgroundImage: `url(${background})` }}>
-      <div className="relative w-full min-h-screen flex flex-col items-center pt-24 pb-8 px-4">
-        {/* Botón de retroceso */}
-        <div className="absolute left-4 top-24 z-10">
-          <BackButton onClick={handleBackClick} />
-        </div>
-  
-        {/* Contenedor de ajustes - modificado para evitar desbordamiento */}
-        <div className="w-full max-w-4xl bg-gray-300 dark:bg-gray-900 bg-opacity-90 p-6 rounded-lg shadow-lg overflow-hidden">
-          <h1 className="text-black dark:text-white text-3xl font-bold mb-6 text-center">Ajustes</h1>
-  
-          {/* Sección de tema */}
-          <div className="mb-6">
-            <h2 className="text-black dark:text-white text-xl font-semibold mb-3">Cambiar tema</h2>
-            <button
-              onClick={toggleTheme}
-              className="w-full bg-gray-700 text-white py-3 px-4 rounded-lg flex justify-between items-center"
-            >
-              <span>{theme === "light" ? "☀️ Modo Claro" : "🌙 Modo Oscuro"}</span>
-              <span className="text-xl">{theme === "light" ? "🌞" : "🌙"}</span>
-            </button>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 overflow-y-auto bg-cover bg-center"
+      style={{
+        backgroundImage: `url(${background})`,
+        backgroundAttachment: "fixed",
+      }}
+    >
+      <div className="absolute inset-0 bg-black bg-opacity-60" />
+
+      {showScreen && (
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          className="relative w-full min-h-screen flex flex-col items-center pt-24 pb-8 px-4 z-10"
+        >
+          {/* Back button */}
+          <div className="absolute left-6 top-24 z-10">
+            <BackButton
+              onClick={handleBackClick}
+              className="hover:scale-110 transition-transform duration-200"
+            />
           </div>
-  
-          {/* Ajustes de sonido */}
-          <div className="mb-6">
-            <h2 className="text-black dark:text-white text-xl font-semibold mb-3">Ajustes de sonido</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-black dark:text-white mb-1">Música</label>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={musicVolume}
-                  onChange={(e) => setMusicVolume(e.target.value)}
-                  style={getSliderStyle(musicVolume)}
-                  className="w-full h-2 rounded-full appearance-none cursor-pointer"
-                />
-                <p className="text-black dark:text-white text-sm mt-1">Volumen: {musicVolume}%</p>
+
+          {/* Main settings container */}
+          <div className="relative bg-gradient-to-br from-gray-900 to-gray-800 p-8 rounded-xl border-2 border-purple-500 shadow-2xl w-full max-w-4xl">
+            {/* Decorative elements */}
+            <div className="absolute -top-3 -left-3 w-6 h-6 bg-purple-500 rounded-full"></div>
+            <div className="absolute -bottom-3 -right-3 w-6 h-6 bg-purple-500 rounded-full"></div>
+            <div className="absolute -top-3 -right-3 w-6 h-6 bg-purple-500 rounded-full"></div>
+            <div className="absolute -bottom-3 -left-3 w-6 h-6 bg-purple-500 rounded-full"></div>
+
+            {/* Title */}
+            <div className="flex items-center justify-center mb-10">
+              <GiCrossedSwords className="text-3xl text-yellow-400 mr-3" />
+              <motion.h2
+                className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-yellow-300"
+                animate={{
+                  textShadow: "0 0 8px rgba(216, 180, 254, 0.6)",
+                }}
+                transition={{
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                  duration: 1.5,
+                }}
+              >
+                {t("settings.title").toUpperCase()}
+              </motion.h2>
+              <GiCrossedSwords className="text-3xl text-yellow-400 ml-3 transform rotate-180" />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Left column */}
+              <div className="space-y-8">
+                {/* Theme section */}
+                <div className="bg-gray-800 bg-opacity-80 p-6 rounded-xl border border-purple-500 relative overflow-hidden">
+                  <div className="absolute -top-4 -right-4 w-24 h-24 bg-purple-500 rounded-full opacity-10"></div>
+                  <h2 className="text-white text-2xl font-bold mb-6 flex items-center">
+                    {theme === "light" ? (
+                      <FaSun className="text-yellow-400 mr-3" />
+                    ) : (
+                      <FaMoon className="text-indigo-300 mr-3" />
+                    )}
+                    {t("settings.theme.title")}
+                  </h2>
+                  <motion.button
+                    onClick={toggleTheme}
+                    whileHover={{ y: -3 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white py-5 px-6 rounded-xl flex justify-between items-center transition-all duration-300 shadow-lg hover:shadow-xl"
+                  >
+                    <span className="text-xl font-bold">
+                      {theme === "light"
+                        ? t("settings.theme.light")
+                        : t("settings.theme.dark")}
+                    </span>
+                    <motion.span
+                      className="text-3xl"
+                      animate={{
+                        rotate: isHovered === "theme" ? [0, 15, -15, 0] : 0,
+                        scale: isHovered === "theme" ? 1.1 : 1,
+                      }}
+                      transition={{ duration: 0.5 }}
+                      onHoverStart={() => setIsHovered("theme")}
+                      onHoverEnd={() => setIsHovered(null)}
+                    >
+                      {theme === "light" ? "🌞" : "🌙"}
+                    </motion.span>
+                  </motion.button>
+                </div>
+
+                {/* Sound settings */}
+                <div className="bg-gray-800 bg-opacity-80 p-6 rounded-xl border border-purple-500 relative overflow-hidden">
+                  <div className="absolute -bottom-4 -left-4 w-24 h-24 bg-blue-500 rounded-full opacity-10"></div>
+                  <h2 className="text-white text-2xl font-bold mb-6 flex items-center">
+                    {musicVolume > 0 ? (
+                      <FaVolumeUp className="text-green-400 mr-3" />
+                    ) : (
+                      <FaVolumeMute className="text-red-400 mr-3" />
+                    )}
+                    {t("settings.sound.title")}
+                  </h2>
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block text-white text-lg mb-4 font-medium">
+                        {t("settings.sound.music")}
+                      </label>
+                      <div className="flex items-center space-x-4">
+                        <span className="text-2xl text-gray-300">
+                          {musicVolume > 0 ? "🔈" : "🔇"}
+                        </span>
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={musicVolume}
+                          onChange={(e) => setMusicVolume(e.target.value)}
+                          className="w-full h-3 bg-gray-700 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-gradient-to-b [&::-webkit-slider-thumb]:from-purple-400 [&::-webkit-slider-thumb]:to-purple-600"
+                        />
+                        <span className="text-2xl text-gray-300">🔊</span>
+                      </div>
+                      <motion.p
+                        className="text-purple-300 text-base mt-3 text-center font-medium"
+                        animate={{
+                          scale: [1, 1.05, 1],
+                          textShadow: "0 0 8px rgba(192, 132, 252, 0.6)",
+                        }}
+                        transition={{
+                          repeat: Infinity,
+                          repeatType: "reverse",
+                          duration: 2,
+                        }}
+                      >
+                        {t("settings.sound.volume", { value: musicVolume })}
+                      </motion.p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right column */}
+              <div className="space-y-8">
+                {/* Language selection */}
+                <div className="bg-gray-800 bg-opacity-80 p-6 rounded-xl border border-purple-500 relative overflow-hidden">
+                  <div className="absolute -top-4 -left-4 w-20 h-20 bg-green-500 rounded-full opacity-10"></div>
+                  <h2 className="text-white text-2xl font-bold mb-6 flex items-center">
+                    <FaGlobe className="text-blue-400 mr-3" />
+                    {t("settings.language.title")}
+                  </h2>
+                  <div className="grid grid-cols-1 gap-4">
+                    {renderLanguageButton(
+                      "es",
+                      t("settings.language.es"),
+                      "🇪🇸"
+                    )}
+                    {renderLanguageButton(
+                      "en",
+                      t("settings.language.en"),
+                      "🇬🇧"
+                    )}
+                    {renderLanguageButton(
+                      "fr",
+                      t("settings.language.fr"),
+                      "🇫🇷"
+                    )}
+                  </div>
+                </div>
+
+                {/* Action buttons */}
+                <div className="bg-gray-800 bg-opacity-80 p-6 rounded-xl border border-purple-500 relative overflow-hidden">
+                  <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-red-500 rounded-full opacity-10"></div>
+                  <h2 className="text-white text-2xl font-bold mb-6 flex items-center">
+                    <GiCrossedSwords className="text-yellow-400 mr-3" />
+                    {t("common.actions")}
+                  </h2>
+                  <div className="flex flex-col gap-5">
+                    <motion.button
+                      className="relative overflow-hidden bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 text-white py-4 px-6 rounded-xl flex items-center justify-center shadow-lg"
+                      onClick={() => setShowAboutUs(true)}
+                      whileHover={{ y: -3 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <FaInfoCircle className="h-7 w-7 mr-3 text-yellow-300" />
+                      <span className="font-bold text-lg">
+                        {t("settings.buttons.aboutUs")}
+                      </span>
+                    </motion.button>
+                    <motion.button
+                      className="relative overflow-hidden bg-gradient-to-r from-red-600 to-pink-700 hover:from-red-700 hover:to-pink-800 text-white py-4 px-6 rounded-xl flex items-center justify-center shadow-lg"
+                      onClick={handleLogout}
+                      whileHover={{ y: -3 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <FaSignOutAlt className="h-7 w-7 mr-3 text-yellow-300" />
+                      <span className="font-bold text-lg">
+                        {t("settings.buttons.logout")}
+                      </span>
+                    </motion.button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-  
-          {/* Cambiar idioma */}
-          <div className="mb-6">
-            <h2 className="text-black dark:text-white text-xl font-semibold mb-3">Cambiar idioma</h2>
-            <div className="relative">
-              <select 
-                className="block w-full bg-gray-700 border border-gray-600 text-white py-3 px-4 pr-8 rounded-lg"
-                onChange={(e) => setLanguage(e.target.value)}
-              >
-                <option>Español</option>
-                <option>Inglés</option>
-                <option>Francés</option>
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
-                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-  
-          {/* Botones inferiores */}
-          <div className="flex flex-col sm:flex-row justify-between gap-4">
-            <button
-              className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg"
-              onClick={handleLogout}
-            >
-              Cerrar Sesión
-            </button>
-            <button
-              className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg"
-              onClick={() => setShowAboutUs(true)}
-            >
-              Acerca de nosotros
-            </button>
-          </div>
-        </div>
-      </div>
-  
-      {/* Modal "Acerca de nosotros" */}
-      {showAboutUs && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg w-11/12 max-w-md">
-            <h2 className="text-black dark:text-white text-2xl font-bold mb-4">Acerca de nosotros</h2>
-            <p className="text-black dark:text-white mb-6">
-              Información sobre la aplicación y el equipo de desarrollo.
-            </p>
-            <div className="flex justify-center">
-              <button
-                className="bg-red-600 hover:bg-red-700 text-white py-2 px-6 rounded-lg"
-                onClick={() => setShowAboutUs(false)}
-              >
-                Cerrar
-              </button>
-            </div>
-          </div>
-        </div>
+
+          {/* Background decorative elements */}
+          <motion.div
+            className="absolute -z-10 w-full h-full top-0 left-0"
+            animate={{
+              background: [
+                "radial-gradient(circle at 20% 30%, rgba(124, 58, 237, 0.15) 0%, transparent 20%)",
+                "radial-gradient(circle at 80% 70%, rgba(124, 58, 237, 0.15) 0%, transparent 20%)",
+                "radial-gradient(circle at 50% 20%, rgba(124, 58, 237, 0.15) 0%, transparent 20%)",
+              ],
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              repeatType: "reverse",
+            }}
+          />
+        </motion.div>
       )}
-    </div>
+
+      {/* About Us Modal */}
+      <AnimatePresence>
+        {showAboutUs && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-sm z-50"
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              className="bg-gray-900 border-2 border-purple-500 p-8 rounded-xl w-11/12 max-w-lg shadow-2xl relative"
+            >
+              {/* Decorative elements */}
+              <div className="absolute -top-3 -left-3 w-6 h-6 bg-purple-500 rounded-full"></div>
+              <div className="absolute -bottom-3 -right-3 w-6 h-6 bg-purple-500 rounded-full"></div>
+
+              <motion.button
+                className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors duration-200"
+                onClick={() => setShowAboutUs(false)}
+                whileHover={{ rotate: 90, scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              ></motion.button>
+
+              <div className="text-center mb-6">
+                <motion.h2
+                  className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 text-3xl font-bold mb-2"
+                  animate={{
+                    textShadow: "0 0 8px rgba(216, 180, 254, 0.6)",
+                  }}
+                  transition={{
+                    repeat: Infinity,
+                    repeatType: "reverse",
+                    duration: 1.5,
+                  }}
+                >
+                  {t("aboutUs.title")}
+                </motion.h2>
+                <div className="w-1/3 h-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mx-auto mb-4"></div>
+              </div>
+
+              <p className="text-gray-300 text-lg mb-8 leading-relaxed">
+                {t("aboutUs.content")}
+              </p>
+
+              <div className="flex justify-center">
+                <motion.button
+                  className="bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 text-white py-3 px-8 rounded-xl font-bold shadow-lg"
+                  onClick={() => setShowAboutUs(false)}
+                  whileHover={{ y: -3 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {t("settings.buttons.close")}
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 

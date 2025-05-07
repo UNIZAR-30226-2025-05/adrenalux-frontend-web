@@ -1,0 +1,81 @@
+{
+  "settings": {
+    "title": "Ajustes",
+    "theme": {
+      "title": "Cambiar tema",
+      "light": "☀️ Modo Claro",
+      "dark": "🌙 Modo Oscuro"
+    },
+    "sound": {
+      "title": "Ajustes de sonido",
+      "music": "Música",
+      "volume": "Volumen: {{value}}%"
+    },
+    "language": {
+      "title": "Cambiar idioma",
+      "es": "Español",
+      "en": "Inglés",
+      "fr": "Francés"
+    },
+    "buttons": {
+      "logout": "Cerrar Sesión",
+      "aboutUs": "Acerca de nosotros",
+      "close": "Cerrar"
+    }
+  },
+  "aboutUs": {
+    "title": "Acerca de nosotros",
+    "content": "App creada por el grupo 05-Carol Shaw."
+  },
+  "navigation": {
+    "home": "Inicio",
+    "collection": "Colección",
+    "shop": "Tienda",
+    "tournament": "Torneos",
+    "settings": "Ajustes",
+    "profile": "Perfil",
+    "lineups": "Alineaciones",
+    "achievements": "Logros",
+    "classification": "Clasificación",
+    "friends": "Amigos"
+  },
+  "game": {
+    "waiting": "Esperando jugador...",
+    "searching": "Buscando jugador...",
+    "pausedGames": "Partidas Pausadas",
+    "match": "Partida",
+    "exchange": "Intercambio"
+  },
+  "auth": {
+    "login": "Iniciar sesión",
+    "register": "Registrarse",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "username": "Nombre de usuario",
+    "googleLogin": "Iniciar sesión con Google",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "noAccount": "¿No tienes cuenta? Regístrate",
+    "hasAccount": "¿Ya tienes cuenta? Inicia sesión"
+  },
+  "cards": {
+    "opening": "Apertura de sobres",
+    "collection": "Mi colección",
+    "notAvailable": "Carta no disponible",
+    "forSale": "Cartas en venta"
+  },
+  "common": {
+    "back": "Volver",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "search": "Buscar",
+    "loading": "Cargando...",
+    "error": "Ha ocurrido un error",
+    "success": "Operación exitosa",
+    "play": "Jugar",
+    "actions": "Acciones"
+  }
+}

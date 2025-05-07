@@ -72,17 +72,13 @@ class SocketService {
    * --------------------------------------------------------- */
   async handleMatchEnd(data) {
     try {
-      const profile = await getProfile();
-      const myId = String(profile?.data?.id);
-      if (!myId) return;
-
-      const payload = this.normalizaDatosFinal(
-        data.scores,
-        data.puntosChange,
-        myId
-      );
-
-      // Esperamos a que el callback exista (máx 2 s)
+      // ya tienes data.scores, data.puntosChange, data.winner…
+      const payload = {
+        scores: data.scores,
+        puntosChange: data.puntosChange,
+        winner: data.winner,
+        isDraw: data.isDraw,
+      };
       await this.waitForFunction(
         () => typeof this.onMatchEnd === "function",
         2000
@@ -370,9 +366,23 @@ class SocketService {
     console.log("Estado del matchmaking:", data);
   }
 
-  handleMatchFound(data) {
+  /*handleMatchFound(data) {
     console.log("Partida encontrada:", data);
     this.navigate(`/partida/${encodeURIComponent(data.matchId)}`);
+  }*/
+
+  handleMatchFound(data) {
+    console.log("Partida encontrada:", data);
+
+    // 1) First, let the component show the UI
+    if (typeof this.onMatchFound === "function") {
+      this.onMatchFound(data);
+    }
+
+    // 2) Only after a delay do we actually navigate
+    setTimeout(() => {
+      this.navigate(`/partida/${encodeURIComponent(data.matchId)}`);
+    }, 5000); // 3 seconds → adjust as you like
   }
 
   async handleRoundStart(data) {
@@ -397,7 +407,7 @@ class SocketService {
 
       await this.waitForFunction(
         () => typeof this.onRoundStart === "function",
-        2000
+        5000
       );
 
       this.showTurnNotification(

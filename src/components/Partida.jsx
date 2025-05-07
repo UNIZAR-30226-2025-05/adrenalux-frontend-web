@@ -18,6 +18,8 @@ import { motion } from "framer-motion";
 import ModalWrapper from "../components/layout/game/ModalWrapper";
 
 const Partida = () => {
+  const nextRoundStartRef = useRef(null);
+
   const waitingNextRoundRef = useRef(false);
   const { matchId } = useParams();
   const navigate = useNavigate();
@@ -407,7 +409,7 @@ const Partida = () => {
 
   const [showTurnBanner, setShowTurnBanner] = useState(false);
 
-  const handleRoundStart = (data) => {
+  /*const handleRoundStart = (data) => {
     // Si seguimos en “result” bloqueamos este evento
     if (waitingNextRoundRef.current) return;
 
@@ -418,7 +420,7 @@ const Partida = () => {
     // Pasar a selección y resetear mySelection
     setGameState((prev) => ({
       ...prev,
-      phase: "selection",
+      phase: dataConTurno.isPlayerTurn ? "selection" : "waiting",
       roundNumber: data.dataConTurno.roundNumber,
       isPlayerTurn: data.dataConTurno.isPlayerTurn,
       timer: 30,
@@ -432,6 +434,73 @@ const Partida = () => {
     }));
 
     // Mostrar banner brevemente
+    setShowTurnBanner(true);
+    setTimeout(() => setShowTurnBanner(false), 1500);
+  };*/
+
+  /*const handleRoundStart = ({ dataConTurno } = {}) => {
+    // si no viene o seguimos en “result”, no hacemos nada
+    if (!dataConTurno || waitingNextRoundRef.current) return;
+
+    // limpiar cualquier carta u posición pendiente
+    setCurrentOpponentCard(null);
+    setHighlightedPosition(null);
+
+    // bloquear para que no procese un nuevo start hasta que hagas “Continuar”
+    waitingNextRoundRef.current = false;
+
+    // pasamos a selección solamente si es tu turno, si no, a waiting
+    setGameState((prev) => ({
+      ...prev,
+      phase: dataConTurno.isPlayerTurn ? "selection" : "waiting",
+      roundNumber: dataConTurno.roundNumber,
+      isPlayerTurn: dataConTurno.isPlayerTurn,
+      timer: 30,
+      selectedSkill: null,
+      opponentSelection: null,
+      // si nunca ha llegado carta de oponente, recupera del ref
+      opponentCards:
+        prev.opponentCards.length > 0
+          ? prev.opponentCards
+          : opponentCardsRef.current,
+      mySelection: null, // limpiamos selección anterior
+    }));
+
+    // banner de turno
+    setShowTurnBanner(true);
+    setTimeout(() => setShowTurnBanner(false), 1500);
+  };*/
+
+  const handleRoundStart = (payload) => {
+    const turno = payload.dataConTurno;
+    if (!turno) return;
+
+    // Si estoy mostrando el resultado, encolo y salgo
+    if (gameState.phase === "result") {
+      nextRoundStartRef.current = payload;
+      return;
+    }
+
+    // Si no, borro cualquier start pendiente y proceso normalmente
+    nextRoundStartRef.current = null;
+
+    setCurrentOpponentCard(null);
+    setHighlightedPosition(null);
+
+    setGameState((prev) => ({
+      ...prev,
+      phase: turno.isPlayerTurn ? "selection" : "waiting",
+      roundNumber: turno.roundNumber,
+      isPlayerTurn: turno.isPlayerTurn,
+      timer: 30,
+      selectedSkill: null,
+      opponentSelection: null,
+      mySelection: null,
+      opponentCards: prev.opponentCards.length
+        ? prev.opponentCards
+        : opponentCardsRef.current,
+    }));
+
     setShowTurnBanner(true);
     setTimeout(() => setShowTurnBanner(false), 1500);
   };
@@ -507,6 +576,7 @@ const Partida = () => {
       // Añadir esta carta del oponente al estado
       opponentSelectedCard: opponentCard,
       opponentSelectedSkill: data.data.skill,
+      phase: "selection",
     }));
   };
   const handleRoundResult = (data) => {
@@ -551,7 +621,7 @@ const Partida = () => {
       opponentSelectedSkill: opponentSkill,
     }));
 
-    waitingNextRoundRef.current = false;
+    waitingNextRoundRef.current = true;
     // ya listo para procesar el próximo onRoundStart
   };
 
@@ -855,6 +925,13 @@ const Partida = () => {
         );
 
       case "selection":
+        if (!gameState.isPlayerTurn) {
+          return (
+            <ModalWrapper style={centeredModalStyle}>
+              <h2>Turno del rival…</h2>
+            </ModalWrapper>
+          );
+        }
         return (
           <>
             {showTurnBanner && (
@@ -1133,6 +1210,10 @@ const Partida = () => {
                   selectedCard: null,
                   selectedSkill: null,
                 }));
+                if (nextRoundStartRef.current) {
+                  handleRoundStart(nextRoundStartRef.current);
+                  nextRoundStartRef.current = null;
+                }
               }}
             >
               Continuar
