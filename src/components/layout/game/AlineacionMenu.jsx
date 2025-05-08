@@ -2,24 +2,14 @@ import { useState } from "react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import FondoAlineacion from "../../../assets/backgroundAlineacion.png";
-import { FaTrash, FaHeart } from "react-icons/fa";
+import { FaTrash, FaHeart, FaEdit } from "react-icons/fa";
 import { activarPartida } from "../../../services/api/alineacionesApi";
 import { getToken } from "../../../services/api/authApi";
 
 export default function AlineacionMenu({ nombre, favorito, onDelete, id, esActiva, onActivar, screenSize = 'lg' }) {
-  const [showAlert, setShowAlert] = useState(false);
   const [showActiveAlert, setShowActiveAlert] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-
-  const handleConfirm = () => {
-    onDelete(); 
-    setShowAlert(false);
-  };
-
-  const handleCancel = () => {
-    setShowAlert(false);
-  };
 
   const handleEdit = () => {
     navigate("/alineacionesEditar", { state: { id, nombre } });
@@ -44,110 +34,124 @@ export default function AlineacionMenu({ nombre, favorito, onDelete, id, esActiv
     if (esActiva) {
       setShowActiveAlert(true);
     } else {
-      setShowAlert(true);
-    }
-  };
-
-  // Estilos responsivos para el contenedor de la tarjeta
-  const getCardStyles = () => {
-    const baseStyles = "bg-white dark:bg-black rounded-lg opacity-80 flex justify-between p-3 sm:p-4 transition-all duration-300 hover:shadow-lg hover:opacity-90";
-    
-    // Altura responsive
-    const heightStyle = "h-24 sm:h-28 md:h-32"; 
-    
-    // Ancho responsive - ajustado a layout grid en el componente padre
-    const widthStyle = "w-full max-w-xs"; 
-    
-    return `${baseStyles} ${heightStyle} ${widthStyle}`;
-  };
-
-  // Tamaño de iconos responsive
-  const getIconSize = () => {
-    switch(screenSize) {
-      case 'sm': return 'text-lg';
-      case 'md': return 'text-lg';
-      default: return 'text-xl';
+      onDelete();
     }
   };
 
   return (
     <div className="w-full flex justify-center">
-      {/* Alineación Menu */}
-      <div className={`${getCardStyles()} ${esActiva ? 'ring-2 ring-green-500' : ''}`}>
-        <div className="flex flex-col justify-start w-full">
-          <p className="text-black dark:text-white font-medium text-sm sm:text-base truncate pr-2">{nombre}</p>
-
-          <button
-            onClick={handleEdit}
-            className="w-full mt-2 rounded-lg overflow-hidden bg-transparent border-none focus:outline-none transition-transform duration-300 hover:scale-105 outline-none"
-          >
-            <img
-              src={FondoAlineacion}
-              alt="Fondo"
-              className="w-full h-12 sm:h-14 md:h-16 object-cover"
-            />
-          </button>
+      {/* Card Container */}
+      <div 
+        className={`
+          w-full max-w-xs bg-gradient-to-br from-white to-gray-100
+          dark:from-gray-800 dark:to-gray-900 rounded-xl 
+          shadow-md hover:shadow-xl transition-all duration-300
+          p-3 sm:p-4 flex flex-col h-auto
+          ${esActiva ? 'ring-2 ring-green-500 dark:ring-green-400' : ''}
+        `}
+      >
+        {/* Header con nombre y estado */}
+        <div className="flex justify-between items-center mb-2">
+          <h3 className="text-black dark:text-white font-semibold text-sm sm:text-base md:text-lg 
+                         truncate max-w-[80%]" title={nombre}>
+            {nombre}
+          </h3>
+          {esActiva && (
+            <span className="bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">
+              Activa
+            </span>
+          )}
         </div>
 
-        <div className="flex flex-col justify-end items-end space-y-2 space-x-1 sm:space-x-2">
-          {/* Botón Favorito */}
-          <button
-            onClick={handleActivar}
-            disabled={isLoading}
-            className={`${esActiva ? "text-green-500" : favorito === 1 ? "text-yellow-500 hover:text-white" : "text-white hover:text-yellow-500"} ${isLoading ? "opacity-50 cursor-not-allowed" : ""} ${getIconSize()} transition-colors duration-300`}
-            aria-label={esActiva ? "Alineación activa" : "Activar alineación"}
-          >
-            <FaHeart />
-          </button>
+        {/* Preview Container */}
+        <div className="relative overflow-hidden rounded-lg flex-grow mb-2 group">
+          <img
+            src={FondoAlineacion}
+            alt="Vista previa de alineación"
+            className="w-full h-16 sm:h-20 md:h-24 object-cover transition-transform duration-300 
+                       group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 
+                          flex justify-center items-center transition-all duration-300 opacity-0 
+                          group-hover:opacity-100">
+            <button
+              onClick={handleEdit}
+              className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full 
+                         transition-all duration-300 transform scale-90 group-hover:scale-100"
+              aria-label="Editar alineación"
+            >
+              <FaEdit className="text-xs sm:text-sm md:text-base" />
+            </button>
+          </div>
+        </div>
 
-          {/* Botón Eliminar */}
-          <button
-            className={`${esActiva ? "text-gray-400 cursor-not-allowed" : "text-red-500 hover:text-red-700"} ${getIconSize()} transition-colors duration-300`}
-            onClick={handleDeleteClick}
-            aria-label="Eliminar alineación"
-          >
-            <FaTrash />
-          </button>
+        {/* Footer con acciones */}
+        <div className="flex justify-between items-center mt-auto">
+          <span className={`text-xs sm:text-sm ${favorito === 1 ? 'text-yellow-500' : 'text-gray-500'}`}>
+            {favorito === 1 ? 'Favorita' : ''}
+          </span>
+          
+          <div className="flex space-x-2 sm:space-x-3">
+            {/* Botón Activar */}
+            <button
+              onClick={handleActivar}
+              disabled={isLoading || esActiva}
+              className={`
+                p-1.5 sm:p-2 rounded-full transition-all duration-300
+                ${esActiva 
+                  ? "bg-green-100 text-green-500 dark:bg-green-900 dark:text-green-300 cursor-default" 
+                  : "bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-300 hover:bg-yellow-100 hover:text-yellow-500"}
+                ${isLoading ? "opacity-50 cursor-not-allowed" : ""}
+              `}
+              aria-label={esActiva ? "Alineación activa" : "Activar alineación"}
+            >
+              <FaHeart className="text-xs sm:text-sm md:text-base" />
+            </button>
+
+            {/* Botón Eliminar */}
+            <button
+              onClick={handleDeleteClick}
+              disabled={esActiva}
+              className={`
+                p-1.5 sm:p-2 rounded-full transition-all duration-300
+                ${esActiva
+                  ? "bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500 cursor-not-allowed"
+                  : "bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-300 hover:bg-red-100 hover:text-red-500"}
+              `}
+              aria-label="Eliminar alineación"
+            >
+              <FaTrash className="text-xs sm:text-sm md:text-base" />
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Alerta de Confirmación para Eliminar */}
-      {showAlert && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-20 p-4">
-          <div className="bg-white dark:bg-[#1C1A1A] p-4 sm:p-6 rounded-lg shadow-lg text-center text-white w-full max-w-xs sm:max-w-sm">
-            <p className="text-black dark:text-white mb-4 text-base sm:text-lg">
-              ¿Quieres eliminar la alineación <strong className="break-words">{nombre}</strong>?
-            </p>
-            <div className="flex justify-center gap-3 sm:gap-4">
-              <button
-                className="px-3 py-2 sm:px-4 rounded-lg text-white bg-[#F62C2C] hover:opacity-90 transition-opacity"
-                onClick={handleConfirm}
-              >
-                Sí
-              </button>
-              <button
-                className="px-3 py-2 sm:px-4 rounded-lg text-white bg-[#44FE23] hover:opacity-90 transition-opacity"
-                onClick={handleCancel}
-              >
-                No
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Alerta de Plantilla Activa */}
+      {/* Modal de Alerta */}
       {showActiveAlert && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-20 p-4">
-          <div className="bg-white dark:bg-[#1C1A1A] p-4 sm:p-6 rounded-lg shadow-lg text-center text-white w-full max-w-xs sm:max-w-sm">
-            <p className="text-black dark:text-white mb-4 text-base sm:text-lg">
-              No se puede eliminar la plantilla activa
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-20 p-4"
+             onClick={(e) => {
+               if (e.target === e.currentTarget) {
+                 setShowActiveAlert(false);
+               }
+             }}>
+          <div className="bg-white dark:bg-gray-800 p-5 sm:p-6 rounded-xl shadow-xl 
+                          text-center w-full max-w-xs sm:max-w-sm animate-fade-in"
+               onClick={(e) => e.stopPropagation()}>
+            <div className="text-red-500 mb-3 flex justify-center">
+              <FaTrash size={24} />
+            </div>
+            <h3 className="text-black dark:text-white font-medium mb-2 text-lg">
+              Acción no permitida
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm sm:text-base">
+              No se puede eliminar la plantilla activa. Activa otra plantilla primero.
             </p>
             <button
-              className="px-3 py-2 sm:px-4 rounded-lg text-white bg-blue-500 hover:opacity-90 transition-opacity"
+              className="w-full py-2 rounded-lg text-white bg-blue-500 hover:bg-blue-600 
+                         transition-colors font-medium text-sm sm:text-base"
               onClick={() => setShowActiveAlert(false)}
             >
-              Aceptar
+              Entendido
             </button>
           </div>
         </div>

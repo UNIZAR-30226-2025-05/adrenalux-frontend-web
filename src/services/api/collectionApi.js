@@ -22,10 +22,15 @@ export const getCollection = async () => {
 export const filterCards = async (params) => {
   try {
     if (params.rareza) {
-      params.rareza =
-        params.rareza.charAt(0).toUpperCase() +
-        params.rareza.slice(1).toLowerCase();
+      if (params.rareza.toUpperCase() === "LUXURYXI") {
+        params.rareza = "Luxury XI";
+      } else {
+        params.rareza =
+          params.rareza.charAt(0).toUpperCase() +
+          params.rareza.slice(1).toLowerCase();
+      }
     }
+
     const response = await axios.get(`${API_URL}/filtrarCartas`, {
       headers: getAuthHeaders(),
       params,
@@ -37,3 +42,4 @@ export const filterCards = async (params) => {
     throw error;
   }
 };
+

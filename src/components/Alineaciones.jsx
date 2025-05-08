@@ -219,6 +219,13 @@ export default function Alineaciones() {
   };
 
   const handleOpenDeleteModal = (plantillaId) => {
+    // Verificar si la plantilla es la activa
+    const isActive = plantillaId === plantillaActivaId;
+    if (isActive) {
+      showAlert('warning', "No se puede eliminar la plantilla activa");
+      return;
+    }
+
     const plantilla = alineaciones.find(a => a.id === plantillaId);
     setPlantillaToDelete(plantilla);
     setShowDeleteModal(true);
@@ -227,6 +234,13 @@ export default function Alineaciones() {
   const handleCloseDeleteModal = () => {
     setShowDeleteModal(false);
     setPlantillaToDelete(null);
+  };
+
+  // Añadir un manejador para clics fuera del modal
+  const handleOutsideClick = (e) => {
+    if (e.target === e.currentTarget) {
+      handleCloseDeleteModal();
+    }
   };
 
   const handleDeletePlantilla = async () => {
@@ -238,6 +252,9 @@ export default function Alineaciones() {
       }
 
       await eliminarPlantilla(plantillaToDelete.id, token);
+      
+      // Guarda el nombre de la alineación antes de eliminarla del estado
+      const deletedName = plantillaToDelete.nombre;
       
       // Si la plantilla eliminada era la activa, limpiar el estado
       if (plantillaActivaId === plantillaToDelete.id) {
@@ -254,8 +271,9 @@ export default function Alineaciones() {
       setAlineaciones((prevAlineaciones) =>
         prevAlineaciones.filter((alineacion) => alineacion.id !== plantillaToDelete.id)
       );
+      
       handleCloseDeleteModal();
-      showAlert('success', `Alineación "${plantillaToDelete.nombre}" eliminada correctamente`);
+      showAlert('success', `Alineación "${deletedName}" eliminada correctamente`);
     } catch (error) {
       console.error("Error al eliminar la alineación:", error);
       showAlert('error', "Hubo un error al eliminar la alineación");
@@ -356,7 +374,8 @@ export default function Alineaciones() {
               {alineaciones.map((alineacion) => (
                 <div 
                   key={alineacion.id} 
-                  className="w-full transition-all duration-300 hover:scale-105"
+                  className="w-full transition-all duration-300 hover:scale-105 animate-fadeIn"
+                  style={{ animationDelay: `${alineacion.id * 0.05}s` }}
                 >
                   <AlineacionMenu
                     nombre={alineacion.nombre}
@@ -370,25 +389,50 @@ export default function Alineaciones() {
                 </div>
               ))}
 
-              {/* Botón para añadir nueva alineación */}
-              <button
-                className="w-full max-w-xs sm:max-w-sm h-32 bg-white dark:bg-black rounded-lg opacity-80 
-                  flex justify-between p-4 transition-all duration-300 hover:opacity-100 hover:shadow-lg 
-                  hover:scale-105 hover:shadow-green-300/20"
-                onClick={handleOpenAddModal}
-                disabled={isLoading}
-              >
-                <div className="flex flex-col justify-start w-full">
-                  <p className="text-black dark:text-white font-medium">Añadir nueva alineación</p>
-                  <div className="w-full h-16 mt-2 rounded-lg overflow-hidden">
+              {/* Botón para añadir nueva alineación - Actualizado con el mismo estilo de AlineacionMenu */}
+              <div className="w-full flex justify-center animate-fadeIn" style={{ animationDelay: `${alineaciones.length * 0.05 + 0.1}s` }}>
+                <button
+                  className="w-full max-w-xs bg-gradient-to-br from-white to-gray-100
+                        dark:from-gray-800 dark:to-gray-900 rounded-xl 
+                        shadow-md hover:shadow-xl transition-all duration-300
+                        p-3 sm:p-4 flex flex-col h-auto
+                        border-2 border-dashed border-gray-300 dark:border-gray-600
+                        hover:border-green-500 dark:hover:border-green-400
+                        group"
+                  onClick={handleOpenAddModal}
+                  disabled={isLoading}
+                >
+                  <div className="flex justify-center items-center mb-2">
+                    <h3 className="text-black dark:text-white font-semibold text-sm sm:text-base md:text-lg">
+                      Añadir nueva alineación
+                    </h3>
+                  </div>
+                  
+                  <div className="relative overflow-hidden rounded-lg flex-grow mb-2 group-hover:ring-2 group-hover:ring-green-500">
                     <img
                       src={FondoAlineacion}
-                      alt="Fondo"
-                      className="w-full h-full object-cover"
+                      alt="Fondo para nueva alineación"
+                      className="w-full h-16 sm:h-20 md:h-24 object-cover transition-transform duration-300 
+                                group-hover:scale-105 filter brightness-90"
                     />
+                    <div className="absolute inset-0 flex justify-center items-center">
+                      <div className="bg-black bg-opacity-40 rounded-full p-2 sm:p-3 transform transition-transform duration-300
+                                    group-hover:scale-110 group-hover:bg-green-500 group-hover:bg-opacity-70">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                            className="w-6 h-6 sm:w-8 sm:h-8 text-white">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </button>
+                  
+                  <div className="flex justify-center items-center mt-auto">
+                    <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 group-hover:text-green-500">
+                      Crea una nueva alineación personalizada
+                    </span>
+                  </div>
+                </button>
+              </div>
             </>
           )}
         </div>
@@ -396,55 +440,111 @@ export default function Alineaciones() {
 
       {/* Modal para añadir nueva alineación - mejorado con animaciones */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-20 p-4 animate-fadeIn">
-          <div className="bg-[#1C1A1A] p-4 sm:p-6 rounded-lg shadow-lg text-center text-white w-full max-w-xs sm:max-w-sm animate-scaleIn">
-            <p className="mb-4 text-base sm:text-lg font-bold">Nombre de la nueva alineación</p>
-            <input
-              type="text"
-              value={newAlineacionNombre}
-              onChange={(e) => setNewAlineacionNombre(e.target.value)}
-              className="w-full p-2 mb-1 bg-gray-800 text-white rounded border border-gray-700 focus:border-green-500 focus:ring focus:ring-green-500/20 transition-all"
-              placeholder="Introduce el nombre (mín. 4 caracteres)"
-              disabled={isLoading}
-              autoFocus
-            />
-            <p className="text-xs text-gray-400 mb-4 text-left">El nombre debe tener al menos 4 caracteres y ser único</p>
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-20 p-4 animate-fadeIn backdrop-blur-sm"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              handleCloseAddModal();
+            }
+          }}
+        >
+          <div 
+            className="bg-gradient-to-br from-gray-900 to-black p-5 sm:p-6 rounded-xl shadow-lg shadow-green-500/10 
+                      text-center text-white w-full max-w-xs sm:max-w-sm animate-slideIn"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                  className="w-6 h-6 text-white">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+              </svg>
+            </div>
+            
+            <h3 className="mb-4 text-lg sm:text-xl font-bold">Nueva alineación</h3>
+            
+            <div className="relative mb-4">
+              <input
+                type="text"
+                value={newAlineacionNombre}
+                onChange={(e) => setNewAlineacionNombre(e.target.value)}
+                className="w-full p-3 bg-gray-800 text-white rounded-lg border border-gray-700 
+                          focus:border-green-500 focus:ring focus:ring-green-500/20 transition-all
+                          pr-10"
+                placeholder="Nombre de la alineación"
+                disabled={isLoading}
+                autoFocus
+              />
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                    className={`w-5 h-5 ${newAlineacionNombre.length >= 4 ? 'text-green-500' : 'text-gray-500'}`}>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                        d={newAlineacionNombre.length >= 4 ? "M5 13l4 4L19 7" : "M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"} />
+                </svg>
+              </div>
+            </div>
+            
+            <p className="text-xs text-gray-400 mb-5 text-left">
+              El nombre debe tener al menos 4 caracteres y ser único
+            </p>
+            
             <div className="flex justify-center gap-3 sm:gap-4">
               <button
-                className="px-3 py-2 sm:px-4 rounded-lg text-white bg-[#F62C2C] hover:opacity-90 disabled:opacity-50 transition-all hover:bg-red-600"
+                className="px-4 py-2 sm:px-5 rounded-lg text-white bg-gray-700 hover:bg-gray-600 
+                          disabled:opacity-50 transition-all flex-grow"
                 onClick={handleCloseAddModal}
                 disabled={isLoading}
               >
                 Cancelar
               </button>
               <button
-                className="px-3 py-2 sm:px-4 rounded-lg text-white bg-[#44FE23] hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center min-w-20"
+                className={`px-4 py-2 sm:px-5 rounded-lg text-white 
+                          ${newAlineacionNombre.length >= 4 
+                            ? 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700' 
+                            : 'bg-gray-600 cursor-not-allowed'}
+                          disabled:opacity-50 transition-all flex-grow flex items-center justify-center`}
                 onClick={handleAddAlineacion}
-                disabled={isLoading}
+                disabled={isLoading || newAlineacionNombre.length < 4}
               >
                 {isLoading ? (
                   <>
                     <Loader2 className="animate-spin mr-2 w-4 h-4" />
                     <span>Creando...</span>
                   </>
-                ) : "Crear"}
+                ) : "Crear alineación"}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Modal para confirmar eliminación - mejorado con animaciones */}
+      {/* Modal único para confirmar eliminación - mejorado con animaciones */}
       {showDeleteModal && plantillaToDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-20 p-4 animate-fadeIn">
-          <div className="bg-[#1C1A1A] p-4 sm:p-6 rounded-lg shadow-lg text-center text-white w-full max-w-xs sm:max-w-sm animate-scaleIn">
-            <XCircle className="w-12 h-12 text-red-500 mx-auto mb-3" />
-            <p className="mb-4 text-base sm:text-lg">
-              ¿Quieres eliminar la alineación <strong className="break-words">{plantillaToDelete.nombre}</strong>?
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-20 p-4 animate-fadeIn backdrop-blur-sm"
+          onClick={handleOutsideClick}
+        >
+          <div 
+            className="bg-gradient-to-br from-gray-900 to-black p-5 sm:p-6 rounded-xl shadow-lg shadow-red-500/10 
+                       text-center text-white w-full max-w-xs sm:max-w-sm animate-slideIn"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-12 h-12 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <XCircle className="w-6 h-6 text-white" />
+            </div>
+            
+            <h3 className="text-lg sm:text-xl font-bold mb-2">Eliminar alineación</h3>
+            
+            <p className="mb-5 text-sm sm:text-base text-gray-300">
+              ¿Estás seguro de que quieres eliminar la alineación <strong className="break-words text-white">{plantillaToDelete.nombre}</strong>?
+              <br />
+              <span className="text-xs text-gray-400 mt-1 block">Esta acción no se puede deshacer</span>
             </p>
+            
             <div className="flex justify-center gap-3 sm:gap-4">
               <button
-                className="px-3 py-2 sm:px-4 rounded-lg text-white bg-[#F62C2C] hover:opacity-90 disabled:opacity-50 transition-all hover:bg-red-600 flex items-center justify-center min-w-16"
+                className="px-4 py-2 sm:px-5 rounded-lg text-white bg-gradient-to-r from-red-500 to-red-600 
+                          hover:from-red-600 hover:to-red-700 disabled:opacity-50 transition-all flex-grow 
+                          flex items-center justify-center"
                 onClick={handleDeletePlantilla}
                 disabled={isLoading}
               >
@@ -453,14 +553,15 @@ export default function Alineaciones() {
                     <Loader2 className="animate-spin mr-2 w-4 h-4" />
                     <span>Eliminando...</span>
                   </>
-                ) : "Sí"}
+                ) : "Eliminar"}
               </button>
               <button
-                className="px-3 py-2 sm:px-4 rounded-lg text-white bg-[#44FE23] hover:opacity-90 disabled:opacity-50 transition-all hover:bg-green-600"
+                className="px-4 py-2 sm:px-5 rounded-lg text-white bg-gray-700 hover:bg-gray-600 
+                          disabled:opacity-50 transition-all flex-grow"
                 onClick={handleCloseDeleteModal}
                 disabled={isLoading}
               >
-                No
+                Cancelar
               </button>
             </div>
           </div>
@@ -479,12 +580,31 @@ export default function Alineaciones() {
           to { transform: scale(1); opacity: 1; }
         }
         
+        @keyframes slideIn {
+          from { transform: translateY(20px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes pulseGlow {
+          0% { box-shadow: 0 0 0 0 rgba(68, 254, 35, 0.4); }
+          70% { box-shadow: 0 0 0 10px rgba(68, 254, 35, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(68, 254, 35, 0); }
+        }
+        
         .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out;
+          animation: fadeIn 0.3s ease-out forwards;
         }
         
         .animate-scaleIn {
           animation: scaleIn 0.3s ease-out;
+        }
+        
+        .animate-slideIn {
+          animation: slideIn 0.4s ease-out;
+        }
+        
+        .animate-pulseGlow {
+          animation: pulseGlow 1.5s infinite;
         }
       `}</style>
     </div>

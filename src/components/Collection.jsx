@@ -172,7 +172,7 @@ export default function Collection({ onBack }) {
     switch (tipo.toLowerCase()) {
       case "megaluxury":
         return 5;
-      case "luxuryxi":
+      case "luxury xi":
         return 4;
       case "luxury":
         return 3;
@@ -273,6 +273,7 @@ export default function Collection({ onBack }) {
       const equipos = await getEquipos();
       setTeams(equipos);
       const raritiesData = await getRaridades();
+      console.log(raritiesData)
       setRarities(raritiesData);
       const posData = await getPosiciones();
       setPositions(posData.equipos || []);
@@ -293,6 +294,7 @@ export default function Collection({ onBack }) {
 
   const handleRarityClick = async (rarityKey) => {
     try {
+      console.log(rarityKey)
       const filtered = await filterCards({ rareza: rarityKey });
       updateCollection(filtered);
       setShowIndexModal(false);

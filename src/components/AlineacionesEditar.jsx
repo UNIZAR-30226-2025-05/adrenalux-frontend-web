@@ -9,6 +9,98 @@ import { actualizarPlantilla, obtenerCartasDePlantilla, agregarCartasPlantilla }
 import { getToken } from "../services/api/authApi";
 import { getCollection } from "../services/api/collectionApi";
 
+// Estilos para animaciones
+const styles = {
+  loadingBarAnimation: {
+    animation: 'loadingBar 2s ease-in-out infinite',
+  },
+  bounceAnimation: {
+    animation: 'bounce 1s infinite',
+  },
+  pulseAnimation: {
+    animation: 'pulse 1.5s ease-in-out infinite',
+  },
+  keyframes: `
+    @keyframes loadingBar {
+      0% { width: 0%; }
+      50% { width: 70%; }
+      100% { width: 95%; }
+    }
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(-10%);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+      }
+      50% {
+        transform: translateY(0);
+        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+      }
+    }
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.5;
+        transform: scale(0.95);
+      }
+    }
+  `
+};
+
+const LoadingScreen = () => {
+  // Arreglo de puntos para animar
+  const [dots, setDots] = useState(1);
+  
+  // Efecto para animar los puntos suspensivos
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDots(prev => prev < 3 ? prev + 1 : 1);
+    }, 500);
+    
+    return () => clearInterval(interval);
+  }, []);
+  
+  return (
+    <div className="fixed inset-0 flex justify-center items-center bg-cover bg-center" 
+         style={{ backgroundImage: `url(${background})` }}>
+      {/* Insertamos los keyframes usando un elemento style */}
+      <style>{styles.keyframes}</style>
+      
+      <div className="bg-black bg-opacity-70 rounded-xl p-6 sm:p-10 max-w-md w-full mx-4 flex flex-col items-center">
+        {/* Animación de pelota de fútbol */}
+        <div className="mb-6 relative">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white flex items-center justify-center"
+               style={styles.bounceAnimation}>
+            <div className="w-14 h-14 sm:w-18 sm:h-18 rounded-full border-4 border-black relative overflow-hidden">
+              {/* Patrón de pentágonos/hexágonos simplificado */}
+              <div className="absolute top-1/4 left-1/4 w-1/2 h-1/2 bg-black transform rotate-45"></div>
+              <div className="absolute top-1/2 left-0 w-1/3 h-1/3 bg-black transform -rotate-12"></div>
+              <div className="absolute bottom-0 right-1/4 w-1/3 h-1/3 bg-black transform rotate-30"></div>
+            </div>
+          </div>
+          
+          {/* Sombra animada */}
+          <div className="w-12 h-3 bg-black bg-opacity-30 rounded-full absolute -bottom-4 left-1/2 transform -translate-x-1/2"
+               style={styles.pulseAnimation}></div>
+        </div>
+        
+        <h2 className="text-white text-xl sm:text-2xl font-bold mb-2">Cargando alineación</h2>
+        <p className="text-gray-300 text-base sm:text-lg text-center">
+          Preparando jugadores{'.'.repeat(dots)}
+        </p>
+        
+        {/* Barra de progreso animada */}
+        <div className="w-full max-w-xs bg-gray-700 rounded-full h-2.5 mt-6 overflow-hidden">
+          <div className="bg-green-500 h-2.5 rounded-full"
+               style={styles.loadingBarAnimation}></div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function AlineacionEditar() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -230,11 +322,26 @@ export default function AlineacionEditar() {
   };
 
   if (loading) {
-    return <div className="text-white text-center mt-10 px-4">Cargando jugadores...</div>;
+    return <LoadingScreen />;
   }
 
   if (error && error !== "404") {
-    return <div className="text-red-500 text-center mt-10 px-4">Error: {error}</div>;
+    return (
+      <div className="fixed inset-0 flex justify-center items-center bg-cover bg-center" 
+           style={{ backgroundImage: `url(${background})` }}>
+        <div className="bg-black bg-opacity-70 rounded-xl p-6 max-w-md w-full mx-4 text-center">
+          <div className="text-red-500 text-3xl mb-4">⚠️</div>
+          <h2 className="text-white text-xl font-bold mb-2">Error</h2>
+          <p className="text-red-400">{error}</p>
+          <button 
+            onClick={() => navigate("/alineaciones")}
+            className="mt-6 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+          >
+            Volver a alineaciones
+          </button>
+        </div>
+      </div>
+    );
   }
 
   const getGridCols = () => {
