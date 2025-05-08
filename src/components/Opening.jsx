@@ -12,17 +12,31 @@ const Opening = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const token = getToken();
-  const { openedCards, selectedCard } = location.state;
+  const { openedCards, selectedCard } = location.state || {};
 
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isOpening, setIsOpening] = useState(true);
   const [animationStep, setAnimationStep] = useState(0);
   const [showContinue, setShowContinue] = useState(false);
   const [envelopeAnimation, setEnvelopeAnimation] = useState(false);
+  const [pageEntered, setPageEntered] = useState(false);
+
+  // Page entrance animation trigger
+  useEffect(() => {
+    // Short delay before starting entrance animation
+    setTimeout(() => {
+      setPageEntered(true);
+    }, 100);
+  }, []);
 
   useEffect(() => {
     if (!token) {
       navigate("/");
+    }
+
+    if (!openedCards) {
+      navigate("/home");
+      return;
     }
 
     // Manejar la secuencia de animación para cartas especiales
@@ -49,6 +63,8 @@ const Opening = () => {
   };
 
   const getEnvelopeImage = () => {
+    if (!selectedCard) return SobreComun;
+    
     switch (selectedCard.tipo) {
       case "Sobre Master Lux":
         return SobreEpico;
@@ -64,24 +80,36 @@ const Opening = () => {
   const handleOpenEnvelope = () => {
     setEnvelopeAnimation(true);
     
-    // Iniciar la secuencia de apertura
+    // Iniciar la secuencia de apertura con animación mejorada
     setTimeout(() => {
       setIsOpening(false);
-    }, 600);
+    }, 1000);
   };
 
   const handleContinue = () => {
-    navigate("/grid", { state: { openedCards } });
+    // Animate exit before navigating
+    setPageEntered(false);
+    
+    setTimeout(() => {
+      navigate("/grid", { state: { openedCards } });
+    }, 500);
   };
 
-  const currentCard = openedCards[currentCardIndex];
+  const currentCard = openedCards ? openedCards[currentCardIndex] : null;
   const isSpecialType = ["Megaluxury", "Luxury XI"].includes(currentCard?.tipo_carta);
 
-  // Variantes de animación para diferentes elementos
+  // Variantes de animación mejoradas para diferentes elementos
+  const pageVariants = {
+    initial: { opacity: 0, scale: 1.1 },
+    animate: { opacity: 1, scale: 1 },
+    exit: { opacity: 0, scale: 0.9 }
+  };
+
   const envelopeVariants = {
     initial: { scale: 0.8, opacity: 0, y: 50 },
-    animate: { scale: 1, opacity: 1, y: 0 },
-    exit: { scale: 1.2, opacity: 0, y: -100 }
+    animate: { scale: 1, opacity: 1, y: 0, rotate: 0 },
+    hover: { scale: 1.05, y: -5, transition: { duration: 0.2 } },
+    exit: { scale: 1.2, opacity: 0, y: -100, rotate: 5 }
   };
 
   const cardRevealVariants = {
@@ -102,10 +130,39 @@ const Opening = () => {
     whileHover: { scale: 1.05, transition: { duration: 0.2 } }
   };
 
+  // Particulas para la animación de apertura
+  const generateParticles = () => {
+    return Array.from({ length: 20 }).map((_, i) => (
+      <motion.div
+        key={i}
+        className="absolute rounded-full bg-purple-500"
+        style={{
+          width: Math.random() * 10 + 5,
+          height: Math.random() * 10 + 5,
+          top: "50%",
+          left: "50%",
+        }}
+        initial={{ x: 0, y: 0, opacity: 1 }}
+        animate={{
+          x: (Math.random() - 0.5) * 400,
+          y: (Math.random() - 0.5) * 400,
+          opacity: 0,
+          scale: Math.random() * 0.5 + 0.5
+        }}
+        transition={{ duration: 1 + Math.random() }}
+      />
+    ));
+  };
+
   return (
-    <div
+    <motion.div
       className="fixed inset-0 flex flex-col justify-center items-center bg-cover bg-center"
       style={{ backgroundImage: `url(${background})` }}
+      variants={pageVariants}
+      initial="initial"
+      animate={pageEntered ? "animate" : "initial"}
+      exit="exit"
+      transition={{ duration: 0.6 }}
     >
       <AnimatePresence mode="wait">
         {isOpening ? (
@@ -123,17 +180,38 @@ const Opening = () => {
               alt="Sobre"
               className="w-80 h-140 rounded-lg shadow-2xl cursor-pointer"
               onClick={handleOpenEnvelope}
-              whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
+              whileHover="hover"
               animate={envelopeAnimation ? { 
                 scale: [1, 1.1, 1.1, 0],
                 rotateY: [0, 0, 180, 180],
                 opacity: [1, 1, 0.8, 0]
               } : {}}
               transition={envelopeAnimation ? { 
-                duration: 0.8,
+                duration: 1,
                 times: [0, 0.3, 0.6, 1] 
               } : {}}
             />
+            
+            {/* Efecto de brillo alrededor del sobre */}
+            {!envelopeAnimation && (
+              <motion.div
+                className="absolute -inset-4 rounded-xl"
+                style={{ 
+                  background: "radial-gradient(circle, rgba(131,2,206,0.3) 0%, rgba(0,0,0,0) 70%)",
+                  zIndex: -1 
+                }}
+                animate={{ 
+                  scale: [1, 1.1, 1],
+                  opacity: [0.5, 0.8, 0.5]
+                }}
+                transition={{ 
+                  duration: 2,
+                  repeat: Infinity,
+                  repeatType: "reverse" 
+                }}
+              />
+            )}
+            
             {!envelopeAnimation && (
               <motion.div 
                 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-lg font-bold"
@@ -144,6 +222,9 @@ const Opening = () => {
                 Toca para abrir
               </motion.div>
             )}
+            
+            {/* Partículas cuando se abre el sobre */}
+            {envelopeAnimation && generateParticles()}
           </motion.div>
         ) : (
           <div className="flex flex-col items-center">
@@ -254,7 +335,7 @@ const Opening = () => {
           </div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 };
 

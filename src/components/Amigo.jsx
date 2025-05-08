@@ -132,9 +132,7 @@ export default function Amigo() {
   const handleChallenge = (friend) => {
     // Envía desafío al amigo y navega al home
     socketService.sendChallengeRequest(friend.id, user.data.username);
-    navigate("/home", {
-      state: { challengeSent: true, challengedFriend: friend.username },
-    });
+    navigate("/esperando", { state: { jugador: friend } });
   };
 
   const renderRow = (item, tab, id) => {

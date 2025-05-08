@@ -669,7 +669,7 @@ export default function Collection({ onBack }) {
           
           <div className="flex justify-center mb-4 sm:mb-6">
             <div className="relative w-32 h-44 sm:w-40 sm:h-56 md:w-44 md:h-60 card-shine">
-              <Carta2 jugador={selectedCard} responsive={true} />
+              <Carta2 jugador={selectedCard} container="modal" />
             </div>
           </div>
           
