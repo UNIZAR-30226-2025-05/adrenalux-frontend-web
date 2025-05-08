@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from "react"; 
 import { useNavigate } from "react-router-dom";
 import BackButton from "../components/layout/game/BackButton";
 import background from "../assets/background.png";
@@ -65,10 +65,9 @@ const Profile = () => {
 
   const handleSave = async () => {
     try {
-      if (updateProfile({ username: newUsername })) {
-        const data = await getProfile();
-        setInfoUser(data);
-      }
+      await updateProfile({ username: newUsername });
+      const data = await getProfile();
+      setInfoUser(data);
       setIsEditing(false);
     } catch (error) {
       console.error("Error al actualizar el perfil:", error);
@@ -90,10 +89,9 @@ const Profile = () => {
 
   const handleSaveAvatar = async () => {
     try {
-      if (updateProfile({ avatar: selectedAvatar })) {
-        const data = await getProfile();
-        setInfoUser(data);
-      }
+      await updateProfile({ avatar: selectedAvatar });
+      const data = await getProfile();
+      setInfoUser(data);
       setIsEditingAvatar(false);
     } catch (error) {
       console.error("Error al actualizar el avatar:", error);
@@ -159,7 +157,7 @@ const Profile = () => {
           </>
         )}
 
-        <div className="mt-4 flex flex-col items-center bg-black/60 rounded-full px-10 py-2">
+        <div className="mt-4 flex flex-col items-center bg-black/60 rounded-full px-10 py-2 shadow-md">
           <div className="flex items-center space-x-2">
             <span className="text-lg font-bold">{username}</span>
             <FaPen
@@ -172,13 +170,14 @@ const Profile = () => {
             <span className="text-sm">ID:</span>
             <span className="text-xs font-light">{friendCode}</span>
             <button
-              className="text-lg hover:text-gray-300 transition"
-              onClick={() => {
-                navigator.clipboard.writeText(friendCode);
-              }}
-            >
-              <FiCopy />
-            </button>
+            className="text-lg text-black hover:text-blue-700 transition"
+            onClick={() => {
+              navigator.clipboard.writeText(friendCode);
+            }}
+          >
+            <FiCopy />
+          </button>
+
           </div>
         </div>
 
@@ -193,19 +192,20 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Sección de partidas */}
-        <div className="mt-8 w-full max-w-md bg-black/60 rounded-lg p-4">
-          <h2 className="text-center text-xl font-semibold mb-4">
+        <div className="mt-8 w-full max-w-xl bg-black/70 rounded-lg p-4 shadow-lg">
+          <h2 className="text-center text-xl font-semibold mb-4 text-blue-100">
             Últimas Partidas
           </h2>
           {partidas.length > 0 ? (
-            <div className="max-h-64 overflow-y-auto space-y-3 pr-2">
+            <div className="max-h-96 overflow-y-auto space-y-3 pr-2 scrollbar-none">
               {partidas.map((partida, index) => (
                 <div
                   key={index}
-                  className={`flex justify-between items-center rounded-md px-4 py-2 ${
-                    partida.isWin ? "bg-green-900/20" : "bg-red-900/20"
-                  }`}
+                  className={`flex justify-between items-center rounded-md px-4 py-3 ${
+                    partida.isWin ? "bg-green-900/30" : "bg-red-900/30"
+                  } border-l-4 ${
+                    partida.isWin ? "border-green-400" : "border-red-400"
+                  } hover:bg-opacity-50 transition-all duration-200`}
                 >
                   <div className="flex items-center space-x-2">
                     {partida.isWin ? (
@@ -235,27 +235,25 @@ const Profile = () => {
           )}
         </div>
 
-        {/* Botón de Logros */}
-        <div className="mt-6 w-full max-w-md">
+        <div className="mt-16 w-full max-w-xl">
           <button
             onClick={handleLogrosClick}
-            className="w-full px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+            className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-800 text-white rounded-lg hover:from-purple-700 hover:to-purple-900 transition-all shadow-lg font-medium transform hover:-translate-y-0.5"
           >
             Logros
           </button>
         </div>
       </div>
 
-      {/* Modal de edición de username */}
       {isEditing && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
-          <div className="bg-gray-800 rounded-lg p-6 w-80">
+          <div className="bg-gray-800 rounded-lg p-6 w-80 shadow-xl">
             <h2 className="text-xl font-semibold mb-4 text-center">
               Editar Username
             </h2>
             <input
               type="text"
-              className="w-full p-2 rounded bg-gray-700 text-white focus:outline-none mb-4"
+              className="w-full p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
               value={newUsername}
               onChange={(e) => setNewUsername(e.target.value)}
             />
@@ -277,10 +275,9 @@ const Profile = () => {
         </div>
       )}
 
-      {/* Modal de selección de avatar */}
       {isEditingAvatar && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
-          <div className="bg-gray-800 rounded-lg p-6 w-96">
+          <div className="bg-gray-800 rounded-lg p-6 w-96 shadow-xl">
             <h2 className="text-xl font-semibold mb-4 text-center">
               Seleccionar Avatar
             </h2>
@@ -292,7 +289,7 @@ const Profile = () => {
                     selectedAvatar === avatar
                       ? "border-2 border-blue-500"
                       : "border-2 border-transparent"
-                  }`}
+                  } hover:bg-gray-700 transition-all`}
                   onClick={() => handleAvatarSelect(avatar)}
                 >
                   <img
