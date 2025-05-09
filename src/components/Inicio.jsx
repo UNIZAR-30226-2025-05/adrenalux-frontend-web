@@ -11,14 +11,15 @@ const Inicio = () => {
   const token = getToken();
 
   useEffect(() => {
-    if(token){
+    if (token) {
       navigate("/home");
     }
-    const originalClass = document.body.className;
-    document.body.className = 'bg-gradient-to-b from-gray-900 to-black';
+    document.documentElement.classList.add('bg-black');
+    document.body.className = 'bg-gradient-to-b from-gray-900 to-black overflow-x-hidden';
     
     return () => {
-      document.body.className = originalClass;
+      document.documentElement.classList.remove('bg-black');
+      document.body.className = '';
     };
   }, [token, navigate]);
 
@@ -51,7 +52,7 @@ const Inicio = () => {
       initial="hidden"
       animate="visible"
       variants={containerVariants}
-      className="h-screen flex flex-col text-white relative overflow-x-hidden"
+      className="flex flex-col text-white relative min-h-screen w-full max-w-full bg-black" // Añadir bg-black aquí
     >
       {/* Navbar */}
       <header className="fixed top-0 left-0 w-full px-4 py-4 md:px-8 md:py-6 flex justify-between items-center z-50 backdrop-blur-2xl bg-black/30 border-b border-white/10">
@@ -84,8 +85,8 @@ const Inicio = () => {
         </nav>
       </header>
       
-      <main className='flex-1 bg-gradient-to-b from-gray-900 to-black'>
-        <div className="relative px-4 md:px-8 lg:px-16">
+      <main className="flex-1 bg-gradient-to-b from-gray-900 to-black w-full max-w-full">
+        <div className="relative px-4 md:px-8 lg:px-16 w-full max-w-full">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-16">
 
             <motion.section 
@@ -142,7 +143,7 @@ const Inicio = () => {
               <img
                 src={pantallaPrincipal}
                 alt="Sobres de cartas TCG"
-                className="h-auto object-cover"
+                className="w-full max-w-full h-auto object-cover"
                 loading="lazy"
               />
             </motion.div>
@@ -152,7 +153,7 @@ const Inicio = () => {
 
       {/* Footer */}
       <footer className="w-full border-t border-white/10 bg-black/90 backdrop-blur-lg mt-auto">
-        <div className="px-4 md:px-8 py-8 flex flex-col md:flex-row justify-between items-center gap-6 text-sm">
+        <div className="max-w-screen-xl mx-auto px-4 md:px-8 py-8 flex flex-col md:flex-row justify-between items-center gap-6 text-sm">
           <div className="flex gap-4">
             <a href="/politica" className="hover:text-blue-400 transition-colors">Política</a>
             <a href="/terminos" className="hover:text-purple-400 transition-colors">Términos</a>
@@ -173,14 +174,14 @@ const Inicio = () => {
           </div>
         </div>
       </footer>
-      
 
-      <div className="fixed inset-0 -z-50">
+      {/* Background gradient circles */}
+      <div className="fixed inset-0 -z-50 overflow-hidden">
         <div className="absolute top-20 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-float" />
         <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-float animation-delay-2000" />
       </div>
     </motion.div>
   );
-}
+};
 
 export default Inicio;

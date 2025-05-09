@@ -12,11 +12,16 @@ export const playMusic = (src) => {
   if (sounds['bg']) {
     sounds['bg'].stop();
   }
+
+  // Obtener el volumen guardado o usar 0.5 como valor por defecto
+  const savedVolume = parseFloat(localStorage.getItem('musicVolume')) || 0.5;
+
   sounds['bg'] = new Howl({
     src: [src],
     loop: true,
-    volume: 0.5,  // Volumen inicial
+    volume: savedVolume,  // Volumen inicial desde localStorage
   });
+
   sounds['bg'].play();
 };
 
@@ -32,6 +37,6 @@ export const changeMusicVolume = (volume) => {
   if (sounds['bg']) {
     sounds['bg'].volume(volume);
   }
+  // Guardar el volumen en localStorage
+  localStorage.setItem('musicVolume', volume);
 };
-
-
