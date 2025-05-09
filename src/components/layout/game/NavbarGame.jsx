@@ -14,8 +14,11 @@ import {
 import { GiCrossedSwords } from "react-icons/gi";
 import SobreComun from "../../../assets/SobreComun.png";
 import { abrirSobreGratis } from "../../../services/api/cardApi";
+import { useTranslation } from "react-i18next";
 
 export default function NavbarGame() {
+  const { t } = useTranslation();
+
   const [infoUser, setInfoUser] = useState(null);
   const [countdown, setCountdown] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -65,7 +68,7 @@ export default function NavbarGame() {
   }, [infoUser]);
 
   const avatar = infoUser?.data?.avatar || "./assets/profile_1.png";
-  const username = infoUser?.data?.username || "Cargando...";
+  const username = infoUser?.data?.username || t("navigation.loading");
   const level = infoUser?.data?.level || 1;
   const experiencia = infoUser?.data?.experience || 0;
   const xpMax = infoUser?.data?.xpMax || 1;
@@ -205,7 +208,7 @@ export default function NavbarGame() {
                       : "bg-gradient-to-r from-purple-700 to-purple-900"
                   }`}
                 >
-                  Abrir
+                  {t("navigation.open")}
                 </motion.button>
                 <img
                   src={SobreComun}
@@ -310,7 +313,7 @@ export default function NavbarGame() {
               onClick={handleAbrirSobreGratis}
               className="bg-gradient-to-r from-purple-700 to-purple-900 text-white text-xs px-2 py-1 rounded-lg"
             >
-              Abrir
+              {t("navigation.open")}
             </motion.button>
           )}
         </div>
@@ -367,7 +370,10 @@ export default function NavbarGame() {
                 onClick={handleProfileClick}
                 className="bg-gray-800 border border-purple-500 text-white py-3 px-4 rounded-lg flex items-center justify-center hover:bg-purple-700 transition-colors duration-300"
               >
-                <span className="text-base font-bold">Perfil</span>
+                <span className="text-base font-bold">
+                  {" "}
+                  {t("navigation.profile")}
+                </span>
               </motion.button>
               <motion.button
                 whileHover={{ scale: 1.03 }}
@@ -376,7 +382,10 @@ export default function NavbarGame() {
                 className="bg-gray-800 border border-purple-500 text-white py-3 px-4 rounded-lg flex items-center justify-center hover:bg-purple-700 transition-colors duration-300"
               >
                 <FaUsers className="text-xl mr-2 text-purple-400" />
-                <span className="text-base font-bold">Amigos</span>
+                <span className="text-base font-bold">
+                  {" "}
+                  {t("navigation.friends")}
+                </span>
               </motion.button>
               <motion.button
                 whileHover={{ scale: 1.03 }}
@@ -385,7 +394,10 @@ export default function NavbarGame() {
                 className="bg-gray-800 border border-purple-500 text-white py-3 px-4 rounded-lg flex items-center justify-center col-span-2 hover:bg-purple-700 transition-colors duration-300"
               >
                 <FaCog size={28} className="text-purple-400" />
-                <span className="text-base font-bold">Ajustes</span>
+                <span className="text-base font-bold">
+                  {" "}
+                  {t("navigation.settings")}
+                </span>
               </motion.button>
             </div>
           </motion.div>

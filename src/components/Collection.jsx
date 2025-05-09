@@ -19,31 +19,40 @@ import {
 } from "../services/api/teamsApi";
 
 import circle from "../assets/circle.png";
+import { useTranslation } from "react-i18next";
 
 // Enhanced Alert Component for Sale Success
 const SaleAlert = ({ player, price, visible, onClose }) => {
+  const { t } = useTranslation();
+
   return (
-    <div className={`fixed bottom-8 right-8 transition-all duration-500 transform ${visible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'} z-50`}>
+    <div
+      className={`fixed bottom-8 right-8 transition-all duration-500 transform ${
+        visible ? "translate-y-0 opacity-100" : "translate-y-20 opacity-0"
+      } z-50`}
+    >
       <div className="bg-gradient-to-r from-green-800 to-green-600 rounded-lg shadow-lg p-4 w-80 border border-green-500">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center">
             <div className="bg-green-500 rounded-full p-1 mr-2">
               <Check size={16} />
             </div>
-            <h3 className="text-white font-bold text-lg">¡Puesto en venta exitoso!</h3>
+            <h3 className="text-white font-bold text-lg">
+              {t("collection.sell")}
+            </h3>
           </div>
-          <button 
-            className="text-white hover:text-green-200 transition-colors" 
+          <button
+            className="text-white hover:text-green-200 transition-colors"
             onClick={onClose}
           >
             <X size={18} />
           </button>
         </div>
-        
+
         <div className="flex items-center bg-black bg-opacity-20 rounded-lg p-3 mb-3">
           <div className="relative mr-3">
-            <img 
-              src={player?.photo || "/api/placeholder/100/100"} 
+            <img
+              src={player?.photo || "/api/placeholder/100/100"}
               alt={player?.nombre || "Player"}
               className="w-12 h-12 rounded-full object-cover border-2 border-white"
             />
@@ -51,20 +60,20 @@ const SaleAlert = ({ player, price, visible, onClose }) => {
               <ChevronUp size={12} />
             </div>
           </div>
-          
+
           <div className="flex-1">
             <p className="text-white font-bold">{player?.nombre || "Player"}</p>
             <p className="text-green-200 text-sm">{player?.equipo || "Team"}</p>
           </div>
-          
+
           <div className="flex items-center bg-yellow-500 px-2 py-1 rounded">
             <DollarSign size={14} className="mr-1" />
             <span className="font-bold">{price}</span>
           </div>
         </div>
-        
+
         <div className="text-center text-green-100 text-sm">
-          La carta ha sido puesta en venta exitosamente
+          {t("collection.sell2")}
         </div>
       </div>
     </div>
@@ -75,33 +84,42 @@ SaleAlert.propTypes = {
   player: PropTypes.object,
   price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   visible: PropTypes.bool,
-  onClose: PropTypes.func
+  onClose: PropTypes.func,
 };
 
 // Añade este componente después del SaleAlert, alrededor de la línea 67
 const WithdrawAlert = ({ player, visible, onClose }) => {
+  const { t } = useTranslation();
+
   return (
-    <div className={`fixed bottom-8 right-8 transition-all duration-500 transform ${visible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'} z-50`}>
+    <div
+      className={`fixed bottom-8 right-8 transition-all duration-500 transform ${
+        visible ? "translate-y-0 opacity-100" : "translate-y-20 opacity-0"
+      } z-50`}
+    >
       <div className="bg-gradient-to-r from-blue-800 to-blue-600 rounded-lg shadow-lg p-4 w-80 border border-blue-500">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center">
             <div className="bg-blue-500 rounded-full p-1 mr-2">
               <Check size={16} />
             </div>
-            <h3 className="text-white font-bold text-lg">¡Retirada exitosa!</h3>
+            <h3 className="text-white font-bold text-lg">
+              {" "}
+              {t("collection.with")}
+            </h3>
           </div>
-          <button 
-            className="text-white hover:text-blue-200 transition-colors" 
+          <button
+            className="text-white hover:text-blue-200 transition-colors"
             onClick={onClose}
           >
             <X size={18} />
           </button>
         </div>
-        
+
         <div className="flex items-center bg-black bg-opacity-20 rounded-lg p-3 mb-3">
           <div className="relative mr-3">
-            <img 
-              src={player?.photo || "/api/placeholder/100/100"} 
+            <img
+              src={player?.photo || "/api/placeholder/100/100"}
               alt={player?.nombre || "Player"}
               className="w-12 h-12 rounded-full object-cover border-2 border-white"
             />
@@ -109,15 +127,15 @@ const WithdrawAlert = ({ player, visible, onClose }) => {
               <ChevronUp size={12} />
             </div>
           </div>
-          
+
           <div className="flex-1">
             <p className="text-white font-bold">{player?.nombre || "Player"}</p>
             <p className="text-blue-200 text-sm">{player?.equipo || "Team"}</p>
           </div>
         </div>
-        
+
         <div className="text-center text-blue-100 text-sm">
-          La carta ha sido retirada del mercado exitosamente
+          {t("collection.with2")}
         </div>
       </div>
     </div>
@@ -127,10 +145,12 @@ const WithdrawAlert = ({ player, visible, onClose }) => {
 WithdrawAlert.propTypes = {
   player: PropTypes.object,
   visible: PropTypes.bool,
-  onClose: PropTypes.func
+  onClose: PropTypes.func,
 };
 
 export default function Collection({ onBack }) {
+  const { t } = useTranslation();
+
   const [isFlipped, setIsFlipped] = useState(false);
   const [cards, setCards] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -147,19 +167,19 @@ export default function Collection({ onBack }) {
   const [alertPrice, setAlertPrice] = useState(0);
   const [showWithdrawAlert, setShowWithdrawAlert] = useState(false);
   const [withdrawPlayer, setWithdrawPlayer] = useState(null);
-  
+
   // Responsive state for grid layout
   const [screenSize, setScreenSize] = useState({
-    isXs: false,  // < 640px (Mobile)
-    isSm: false,  // 640px - 768px (Small tablets)
-    isMd: false,  // 768px - 1024px (Tablets)
-    isLg: false,  // 1024px - 1280px (Small laptops)
-    isXl: true,   // > 1280px (Desktops and above)
+    isXs: false, // < 640px (Mobile)
+    isSm: false, // 640px - 768px (Small tablets)
+    isMd: false, // 768px - 1024px (Tablets)
+    isLg: false, // 1024px - 1280px (Small laptops)
+    isXl: true, // > 1280px (Desktops and above)
   });
-  
+
   // Animation ref for card transition
   const cardGridRef = useRef(null);
-  
+
   // Default cards per page (will be adjusted based on screen size)
   const [cardsPerPage, setCardsPerPage] = useState(18);
   const token = getToken();
@@ -184,12 +204,12 @@ export default function Collection({ onBack }) {
   const getImageSrc = (filename) => {
     return images[`../assets/${filename}`]?.default;
   };
-  
+
   // Handle screen size detection and updates
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
-      
+
       // Update screen size state
       setScreenSize({
         isXs: width < 640,
@@ -198,7 +218,7 @@ export default function Collection({ onBack }) {
         isLg: width >= 1024 && width < 1280,
         isXl: width >= 1280,
       });
-      
+
       // Adjust cards per page based on screen size
       if (width < 640) {
         setCardsPerPage(4); // 2x2 grid for mobile
@@ -212,17 +232,17 @@ export default function Collection({ onBack }) {
         setCardsPerPage(18); // 6x3 grid for desktops (original layout)
       }
     };
-    
+
     // Initial sizing
     handleResize();
-    
+
     // Add resize listener
-    window.addEventListener('resize', handleResize);
-    
+    window.addEventListener("resize", handleResize);
+
     // Cleanup
-    return () => window.removeEventListener('resize', handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
-  
+
   useEffect(() => {
     fetchCollection();
     if (!token) {
@@ -255,10 +275,10 @@ export default function Collection({ onBack }) {
       }));
       setCards(mappedData);
       setCurrentPage(1);
-      
+
       // Add subtle animation to cards appearing
       if (cardGridRef.current) {
-        cardGridRef.current.classList.add('fade-in');
+        cardGridRef.current.classList.add("fade-in");
       }
     } catch (error) {
       console.error("Error al cargar la colección:", error);
@@ -273,7 +293,7 @@ export default function Collection({ onBack }) {
       const equipos = await getEquipos();
       setTeams(equipos);
       const raritiesData = await getRaridades();
-      console.log(raritiesData)
+      console.log(raritiesData);
       setRarities(raritiesData);
       const posData = await getPosiciones();
       setPositions(posData.equipos || []);
@@ -294,7 +314,7 @@ export default function Collection({ onBack }) {
 
   const handleRarityClick = async (rarityKey) => {
     try {
-      console.log(rarityKey)
+      console.log(rarityKey);
       const filtered = await filterCards({ rareza: rarityKey });
       updateCollection(filtered);
       setShowIndexModal(false);
@@ -302,7 +322,7 @@ export default function Collection({ onBack }) {
       console.error("Error al filtrar por rareza:", error);
     }
   };
-  
+
   const handlePositionClick = async (position) => {
     try {
       const filtered = await filterCards({ posicion: position.nombre });
@@ -334,17 +354,17 @@ export default function Collection({ onBack }) {
       cantidad: card.cantidad,
       mercadoCartaId: card.mercadoCartaId || null,
     }));
-    
+
     // Add transition effect to card grid
     if (cardGridRef.current) {
-      cardGridRef.current.classList.add('fade-out');
+      cardGridRef.current.classList.add("fade-out");
       setTimeout(() => {
         setCards(mappedData);
         setCurrentPage(1);
         setTimeout(() => {
           if (cardGridRef.current) {
-            cardGridRef.current.classList.remove('fade-out');
-            cardGridRef.current.classList.add('fade-in');
+            cardGridRef.current.classList.remove("fade-out");
+            cardGridRef.current.classList.add("fade-in");
           }
         }, 50);
       }, 300);
@@ -366,49 +386,53 @@ export default function Collection({ onBack }) {
     if (screenSize.isLg) return 4; // Small laptops: 4 columns
     return 6; // Desktop: 6 columns (original layout with 2 sides of 3 columns)
   };
-  
+
   // Split cards for display in responsive grid
   const getGridLayout = () => {
     const columnCount = getColumnCount();
-    
+
     // For large screens, maintain the original 2-sided layout
     if (screenSize.isXl) {
       const leftCardsCount = visibleCards.slice(0, 9).length;
       const rightCardsCount = visibleCards.slice(9, 18).length;
-      
+
       const leftRangeStart = startIndex + 1;
       const leftRangeEnd = startIndex + leftCardsCount;
       const rightRangeStart = leftRangeEnd + 1;
       const rightRangeEnd = startIndex + leftCardsCount + rightCardsCount;
-      
+
       return {
         isTwoSided: true,
         leftCards: visibleCards.slice(0, 9),
         rightCards: visibleCards.slice(9, 18),
         leftRange: `${leftRangeStart}-${leftRangeEnd}`,
-        rightRange: rightCardsCount > 0 ? `${rightRangeStart}-${rightRangeEnd}` : null,
+        rightRange:
+          rightCardsCount > 0 ? `${rightRangeStart}-${rightRangeEnd}` : null,
       };
     }
-    
+
     // For smaller screens, use a single grid layout
     return {
       isTwoSided: false,
       allCards: visibleCards,
-      range: `${startIndex + 1}-${Math.min(startIndex + visibleCards.length, cards.length)}`,
+      range: `${startIndex + 1}-${Math.min(
+        startIndex + visibleCards.length,
+        cards.length
+      )}`,
       columnCount,
     };
   };
-  
+
   const gridLayout = getGridLayout();
 
   const handlePrevPage = () => {
     if (cardGridRef.current) {
-      cardGridRef.current.classList.add('slide-right');
+      cardGridRef.current.classList.add("slide-right");
       setTimeout(() => {
         setCurrentPage((prev) => Math.max(prev - 1, 1));
         setTimeout(() => {
           if (cardGridRef.current) {
-            cardGridRef.current.classList.remove('slide-right');
+            cardGridRef.current.classList.remove("slide-right");
           }
         }, 50);
       }, 300);
@@ -416,15 +440,15 @@ export default function Collection({ onBack }) {
       setCurrentPage((prev) => Math.max(prev - 1, 1));
     }
   };
-  
+
   const handleNextPage = () => {
     if (cardGridRef.current) {
-      cardGridRef.current.classList.add('slide-left');
+      cardGridRef.current.classList.add("slide-left");
       setTimeout(() => {
         setCurrentPage((prev) => Math.min(prev + 1, totalPages));
         setTimeout(() => {
           if (cardGridRef.current) {
-            cardGridRef.current.classList.remove('slide-left');
+            cardGridRef.current.classList.remove("slide-left");
           }
         }, 50);
       }, 300);
@@ -438,47 +462,46 @@ export default function Collection({ onBack }) {
     setPrice("");
     setShowModal(true);
   };
-  
+
   // Confirmar venta con animación mejorada
   const handleConfirmSale = async () => {
     if (!price || isNaN(price) || price <= 0) {
       alert("Por favor, ingresa un precio válido.");
       return;
     }
-    
+
     try {
       setLoading(true); // Show loading state
-      
+
       await publicarCarta(selectedCard.id, price);
-      
+
       const updatedCard = {
         ...selectedCard,
         enVenta: true,
         precio: price,
         mercadoCartaId: selectedCard.id,
       };
-      
+
       setCards((prevCards) =>
         prevCards.map((c) => (c.id === selectedCard.id ? updatedCard : c))
       );
-      
+
       // Set alert data
       setAlertPlayer(updatedCard);
       setAlertPrice(price);
-      
+
       // Close modal first
       setShowModal(false);
-      
+
       // Wait a moment to show success alert
       setTimeout(() => {
         setShowAlert(true);
-        
+
         // Auto-hide alert after 5 seconds
         setTimeout(() => {
           setShowAlert(false);
         }, 5000);
       }, 600);
-      
     } catch (error) {
       console.error("Error al poner la carta en venta:", error);
       alert("Hubo un error al poner la carta en venta.");
@@ -491,9 +514,9 @@ export default function Collection({ onBack }) {
   const handleRetirarCarta = async () => {
     try {
       setLoading(true);
-      
+
       await retirarCarta(selectedCard.id);
-      
+
       setCards((prevCards) =>
         prevCards.map((c) =>
           c.id === selectedCard.id
@@ -501,23 +524,23 @@ export default function Collection({ onBack }) {
             : c
         )
       );
-      
+
       // Guardar la carta retirada
       setWithdrawPlayer(selectedCard);
-      
+
       // Cerrar el modal primero
       setShowModal(false);
-      
+
       // Mostrar la alerta de retirada después de un momento
       setTimeout(() => {
         setShowWithdrawAlert(true);
-        
+
         // Auto-ocultar después de 5 segundos
         setTimeout(() => {
           setShowWithdrawAlert(false);
         }, 5000);
       }, 600);
-      
+
       // Mantener la notificación del navegador como fallback
       if ("Notification" in window && Notification.permission === "granted") {
         new Notification("Carta retirada del mercado", {
@@ -525,7 +548,6 @@ export default function Collection({ onBack }) {
           icon: selectedCard.photo || "/assets/default.png",
         });
       }
-      
     } catch (error) {
       console.error("Error al retirar la carta:", error);
       alert("Hubo un error al retirar la carta.");
@@ -533,16 +555,16 @@ export default function Collection({ onBack }) {
       setLoading(false);
     }
   };
-  
+
   const handleBackClick = () => {
     if (onBack) onBack();
     else navigate("/home");
   };
-  
+
   // Add CSS styles for animations
   useEffect(() => {
     // Create style element for our animations
-    const styleEl = document.createElement('style');
+    const styleEl = document.createElement("style");
     styleEl.textContent = `
       @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px); }
@@ -618,7 +640,7 @@ export default function Collection({ onBack }) {
       }
     `;
     document.head.appendChild(styleEl);
-    
+
     return () => {
       // Cleanup
       document.head.removeChild(styleEl);
@@ -630,20 +652,18 @@ export default function Collection({ onBack }) {
     return (
       <div
         key={card.id}
-        onClick={
-          card.disponible ? () => handleCardClick(card) : undefined
-        }
+        onClick={card.disponible ? () => handleCardClick(card) : undefined}
         className={`
           cursor-${card.disponible ? "pointer" : "not-allowed"}
           bg-black/40 rounded p-2 flex flex-col items-center justify-center 
-          ${card.disponible ? "hover:bg-black/70 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1" : "opacity-70"}
+          ${
+            card.disponible
+              ? "hover:bg-black/70 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1"
+              : "opacity-70"
+          }
         `}
       >
-        {card.disponible ? (
-          <Carta jugador={card} />
-        ) : (
-          <Carta3 jugador={card} />
-        )}
+        {card.disponible ? <Carta jugador={card} /> : <Carta3 jugador={card} />}
         <div className="mt-1 text-center text-xs">
           <p>{card.tipo_carta}</p>
           <p>{card.posicion}</p>
@@ -655,12 +675,14 @@ export default function Collection({ onBack }) {
   // Modal for card details and selling - versión responsive
   const renderCardModal = () => {
     if (!showModal || !selectedCard) return null;
-    
+
     return (
       <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 backdrop-blur-sm animate-fadeIn p-2 sm:p-4 overflow-y-auto">
         <div className="bg-gradient-to-b from-gray-900 to-black p-4 sm:p-6 rounded-lg shadow-2xl max-w-md mx-auto border border-gray-700 w-full">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg sm:text-xl font-bold text-white">Detalle de la carta</h3>
+            <h3 className="text-lg sm:text-xl font-bold text-white">
+              {t("shop.info")}
+            </h3>
             <button
               onClick={() => setShowModal(false)}
               className="text-gray-400 hover:text-white transition-colors"
@@ -668,34 +690,46 @@ export default function Collection({ onBack }) {
               <X size={20} />
             </button>
           </div>
-          
+
           <div className="flex justify-center mb-4 sm:mb-6">
             <div className="relative w-32 h-44 sm:w-40 sm:h-56 md:w-44 md:h-60 card-shine">
               <Carta2 jugador={selectedCard} container="modal" />
             </div>
           </div>
-          
+
           <div className="space-y-3 sm:space-y-4">
             <div className="bg-black/40 p-2 sm:p-3 rounded-lg">
               <div className="flex justify-between items-center mb-2">
-                <span className="font-medium text-gray-300 text-sm sm:text-base">Nombre:</span>
-                <span className="font-bold text-sm sm:text-base">{selectedCard.nombre}</span>
+                <span className="font-medium text-gray-300 text-sm sm:text-base">
+                  {t("standing.name")}:
+                </span>
+                <span className="font-bold text-sm sm:text-base">
+                  {selectedCard.nombre}
+                </span>
               </div>
               <div className="flex justify-between items-center mb-2">
-                <span className="font-medium text-gray-300 text-sm sm:text-base">Equipo:</span>
-                <span className="text-sm sm:text-base">{selectedCard.equipo}</span>
+                <span className="font-medium text-gray-300 text-sm sm:text-base">
+                  {t("shop.team")}:
+                </span>
+                <span className="text-sm sm:text-base">
+                  {selectedCard.equipo}
+                </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="font-medium text-gray-300 text-sm sm:text-base">Posición:</span>
-                <span className="text-sm sm:text-base">{selectedCard.posicion}</span>
+                <span className="font-medium text-gray-300 text-sm sm:text-base">
+                  {t("shop.position")}:
+                </span>
+                <span className="text-sm sm:text-base">
+                  {selectedCard.posicion}
+                </span>
               </div>
             </div>
-            
+
             {selectedCard.enVenta ? (
               <div className="space-y-3">
                 <div className="bg-yellow-800/40 p-2 sm:p-3 rounded-lg border border-yellow-700/50">
                   <p className="text-yellow-300 text-center font-medium text-sm sm:text-base">
-                    Esta carta ya está en venta
+                    {t("collection.notAvailable")}
                   </p>
                 </div>
                 <button
@@ -703,15 +737,20 @@ export default function Collection({ onBack }) {
                   className="w-full bg-red-600 hover:bg-red-700 transition-colors p-2 sm:p-3 rounded-lg font-medium text-sm sm:text-base"
                   disabled={loading}
                 >
-                  {loading ? "Retirando..." : "Retirar del mercado"}
+                  {loading ? t("collection.take") : t("collection.take2")}
                 </button>
               </div>
             ) : (
               <div className="space-y-3">
                 <div className="bg-black/40 p-2 sm:p-3 rounded-lg">
-                  <label className="block text-gray-300 mb-1 text-sm sm:text-base">Precio de venta:</label>
+                  <label className="block text-gray-300 mb-1 text-sm sm:text-base">
+                    {t("collection.price")}
+                  </label>
                   <div className="relative">
-                    <DollarSign size={16} className="absolute top-2 sm:top-3 left-3 text-yellow-500" />
+                    <DollarSign
+                      size={16}
+                      className="absolute top-2 sm:top-3 left-3 text-yellow-500"
+                    />
                     <input
                       type="number"
                       value={price}
@@ -727,11 +766,11 @@ export default function Collection({ onBack }) {
                   disabled={loading}
                 >
                   {loading ? (
-                    <span>Publicando...</span>
+                    <span> {t("collection.published")}</span>
                   ) : (
                     <>
                       <DollarSign size={16} className="sm:w-5 sm:h-5" />
-                      <span>Poner en venta</span>
+                      <span>{t("collection.sell3")}</span>
                     </>
                   )}
                 </button>
@@ -746,12 +785,14 @@ export default function Collection({ onBack }) {
   // Index modal for filtering
   const renderIndexModal = () => {
     if (!showIndexModal) return null;
-    
+
     return (
       <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 backdrop-blur-sm animate-fadeIn p-4 overflow-y-auto">
         <div className="bg-gradient-to-b from-gray-900 to-black p-6 rounded-lg shadow-2xl w-full max-w-2xl mx-auto border border-gray-700 my-8">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-2xl font-bold text-white">Índice de Cartas</h3>
+            <h3 className="text-2xl font-bold text-white">
+              {t("collection.index")}
+            </h3>
             <button
               onClick={() => setShowIndexModal(false)}
               className="text-gray-400 hover:text-white transition-colors"
@@ -759,11 +800,13 @@ export default function Collection({ onBack }) {
               <X size={24} />
             </button>
           </div>
-          
+
           <div className="space-y-6">
             {/* Equipos */}
             <div>
-              <h4 className="text-lg font-semibold mb-3 text-gray-200">Equipos</h4>
+              <h4 className="text-lg font-semibold mb-3 text-gray-200">
+                {t("shop.team")}
+              </h4>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                 {teams.map((team) => (
                   <button
@@ -781,10 +824,12 @@ export default function Collection({ onBack }) {
                 ))}
               </div>
             </div>
-            
+
             {/* Raridades */}
             <div>
-              <h4 className="text-lg font-semibold mb-3 text-gray-200">Rareza</h4>
+              <h4 className="text-lg font-semibold mb-3 text-gray-200">
+                {t("collection.rarity")}
+              </h4>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                 {Object.entries(rarities).map(([key, rarity]) => (
                   <button
@@ -793,19 +838,23 @@ export default function Collection({ onBack }) {
                     className="bg-black/40 hover:bg-black/70 transition-all duration-300 p-3 rounded flex items-center space-x-2 border border-transparent hover:border-gray-700"
                   >
                     <div className="flex">
-                      {Array.from({ length: rarityToStars(key) }).map((_, i) => (
-                        <FaStar key={i} className="text-yellow-500" />
-                      ))}
+                      {Array.from({ length: rarityToStars(key) }).map(
+                        (_, i) => (
+                          <FaStar key={i} className="text-yellow-500" />
+                        )
+                      )}
                     </div>
                     <span>{key}</span>
                   </button>
                 ))}
               </div>
             </div>
-            
+
             {/* Posiciones */}
             <div>
-              <h4 className="text-lg font-semibold mb-3 text-gray-200">Posición</h4>
+              <h4 className="text-lg font-semibold mb-3 text-gray-200">
+                {t("shop.position")}
+              </h4>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                 {positions.map((pos) => (
                   <button
@@ -833,14 +882,16 @@ export default function Collection({ onBack }) {
         <BackButton onClick={handleBackClick} />
       </div>
 
-      <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 md:mb-6 text-shadow">Colección</h1>
+      <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 md:mb-6 text-shadow">
+        {t("collection.title")}
+      </h1>
 
       {/* Index button */}
       <button
         onClick={handleOpenIndexModal}
         className="bg-black/50 px-3 py-2 md:px-4 md:py-2 rounded-md hover:bg-black transition-all duration-300 mb-4 hover:shadow-lg border border-gray-700 text-sm md:text-base"
       >
-        Índice
+        {t("collection.index")}
       </button>
 
       {/* Range indicator */}
@@ -865,7 +916,7 @@ export default function Collection({ onBack }) {
         >
           <FaChevronLeft size={screenSize.isXs ? 16 : 20} />
         </button>
-        
+
         {/* Responsive card grid layouts */}
         {loading ? (
           <div className="flex justify-center items-center h-64">
@@ -883,18 +934,18 @@ export default function Collection({ onBack }) {
           </div>
         ) : (
           // Responsive single grid for smaller screens
-          <div 
-            className={`grid grid-cols-${gridLayout.columnCount} gap-2 mx-auto px-2`} 
+          <div
+            className={`grid grid-cols-${gridLayout.columnCount} gap-2 mx-auto px-2`}
             ref={cardGridRef}
-            style={{ 
-              display: 'grid', 
-              gridTemplateColumns: `repeat(${gridLayout.columnCount}, minmax(0, 1fr))` 
+            style={{
+              display: "grid",
+              gridTemplateColumns: `repeat(${gridLayout.columnCount}, minmax(0, 1fr))`,
             }}
           >
             {gridLayout.allCards.map(renderCard)}
           </div>
         )}
-        
+
         <button
           onClick={handleNextPage}
           disabled={currentPage === totalPages}
@@ -903,7 +954,7 @@ export default function Collection({ onBack }) {
           <FaChevronRight size={screenSize.isXs ? 16 : 20} />
         </button>
       </div>
-      
+
       {/* Pagination indicators */}
       <div className="mt-4 flex items-center justify-center space-x-1">
         {Array.from({ length: Math.min(totalPages, 5) }).map((_, index) => {
@@ -918,34 +969,36 @@ export default function Collection({ onBack }) {
           } else {
             pageToShow = currentPage - 2 + index;
           }
-          
+
           return (
             <button
               key={pageToShow}
               onClick={() => setCurrentPage(pageToShow)}
               className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                currentPage === pageToShow ? "bg-white w-4" : "bg-gray-500 hover:bg-gray-300"
+                currentPage === pageToShow
+                  ? "bg-white w-4"
+                  : "bg-gray-500 hover:bg-gray-300"
               }`}
               aria-label={`Page ${pageToShow}`}
             />
           );
         })}
       </div>
-      
+
       {/* Card modal */}
       {renderCardModal()}
-      
+
       {/* Index modal */}
       {renderIndexModal()}
-      
+
       {/* Success alert for sales */}
-      <SaleAlert 
+      <SaleAlert
         player={alertPlayer}
         price={alertPrice}
         visible={showAlert}
         onClose={() => setShowAlert(false)}
       />
-      <WithdrawAlert 
+      <WithdrawAlert
         player={withdrawPlayer}
         visible={showWithdrawAlert}
         onClose={() => setShowWithdrawAlert(false)}

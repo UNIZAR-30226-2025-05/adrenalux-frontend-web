@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"; 
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import BackButton from "../components/layout/game/BackButton";
 import background from "../assets/background.png";
@@ -6,6 +6,7 @@ import { FaTimes, FaCheck, FaPen } from "react-icons/fa";
 import { FiCopy } from "react-icons/fi";
 import { getProfile, updateProfile } from "../services/api/profileApi";
 import { getToken } from "../services/api/authApi";
+import { useTranslation } from "react-i18next";
 
 const Profile = () => {
   const token = getToken();
@@ -15,6 +16,7 @@ const Profile = () => {
   const [newUsername, setNewUsername] = useState("");
   const [isEditingAvatar, setIsEditingAvatar] = useState(false);
   const [selectedAvatar, setSelectedAvatar] = useState("");
+  const { t } = useTranslation();
 
   const navigate = useNavigate();
 
@@ -122,7 +124,7 @@ const Profile = () => {
         </div>
 
         {loading ? (
-          <p className="text-lg">Cargando perfil...</p>
+          <p className="text-lg">{t("profile.loading")}</p>
         ) : (
           <>
             <div className="relative w-32 h-32 flex items-center justify-center">
@@ -149,7 +151,9 @@ const Profile = () => {
               </div>
             </div>
             <div className="mt-4 text-center">
-              <p className="text-xl font-semibold">NvL {level}</p>
+              <p className="text-xl font-semibold">
+                {t("profile.level")} {level}
+              </p>
               <p className="text-sm text-gray-200">
                 {experiencia} / {xpMax} XP
               </p>
@@ -167,34 +171,38 @@ const Profile = () => {
           </div>
 
           <div className="flex items-center space-x-2 mt-2">
-            <span className="text-sm">ID:</span>
+            <span className="text-sm">{t("profile.id")}</span>
             <span className="text-xs font-light">{friendCode}</span>
             <button
-            className="text-lg text-black hover:text-blue-700 transition"
-            onClick={() => {
-              navigator.clipboard.writeText(friendCode);
-            }}
-          >
-            <FiCopy />
-          </button>
-
+              className="text-lg text-black hover:text-blue-700 transition"
+              onClick={() => {
+                navigator.clipboard.writeText(friendCode);
+              }}
+            >
+              <FiCopy />
+            </button>
           </div>
         </div>
 
         <div className="flex items-center space-x-4 mt-2">
           <div className="flex items-center space-x-1">
             <FaCheck className="text-green-400" />
-            <span className="text-sm">Ganados: {winCount}</span>
+            <span className="text-sm">
+              {t("profile.wins", { count: winCount })}
+            </span>
           </div>
           <div className="flex items-center space-x-1">
             <FaTimes className="text-red-400" />
-            <span className="text-sm">Perdidos: {lossCount}</span>
+            <span className="text-sm">
+              {" "}
+              {t("profile.losses", { count: lossCount })}
+            </span>
           </div>
         </div>
 
         <div className="mt-8 w-full max-w-xl bg-black/70 rounded-lg p-4 shadow-lg">
           <h2 className="text-center text-xl font-semibold mb-4 text-blue-100">
-            Últimas Partidas
+            {t("profile.lastMatches")}
           </h2>
           {partidas.length > 0 ? (
             <div className="max-h-96 overflow-y-auto space-y-3 pr-2 scrollbar-none">
@@ -219,11 +227,13 @@ const Profile = () => {
                       }`}
                     >
                       {partida.result ||
-                        (partida.isWin ? "Victoria" : "Derrota")}
+                        (partida.isWin
+                          ? t("profile.victory")
+                          : t("profile.defeat"))}
                     </span>
                     <span className="text-sm">
-                      {partida.username || "Jugador"} vs{" "}
-                      {partida.rival || "Rival"}
+                      {partida.username || t("profile.player")} vs{" "}
+                      {partida.rival || t("profile.rival")}
                     </span>
                   </div>
                   <span className="font-semibold">{partida.score}</span>
@@ -231,7 +241,7 @@ const Profile = () => {
               ))}
             </div>
           ) : (
-            <p className="text-center">No hay partidas registradas.</p>
+            <p className="text-center">{t("profile.noMatches")}</p>
           )}
         </div>
 
@@ -240,7 +250,7 @@ const Profile = () => {
             onClick={handleLogrosClick}
             className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-800 text-white rounded-lg hover:from-purple-700 hover:to-purple-900 transition-all shadow-lg font-medium transform hover:-translate-y-0.5"
           >
-            Logros
+            {t("profile.achievements")}{" "}
           </button>
         </div>
       </div>
@@ -249,7 +259,7 @@ const Profile = () => {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
           <div className="bg-gray-800 rounded-lg p-6 w-80 shadow-xl">
             <h2 className="text-xl font-semibold mb-4 text-center">
-              Editar Username
+              {t("profile.editing.title")}{" "}
             </h2>
             <input
               type="text"
@@ -262,13 +272,13 @@ const Profile = () => {
                 className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-500 transition"
                 onClick={handleSave}
               >
-                Guardar
+                {t("profile.save")}
               </button>
               <button
                 className="px-4 py-2 bg-red-600 rounded hover:bg-red-500 transition"
                 onClick={handleCancel}
               >
-                Cancelar
+                {t("profile.cancel")}
               </button>
             </div>
           </div>
@@ -279,7 +289,7 @@ const Profile = () => {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
           <div className="bg-gray-800 rounded-lg p-6 w-96 shadow-xl">
             <h2 className="text-xl font-semibold mb-4 text-center">
-              Seleccionar Avatar
+              {t("profile.avatar.select")}
             </h2>
             <div className="grid grid-cols-4 gap-4">
               {avatars.map((avatar, index) => (
@@ -305,13 +315,13 @@ const Profile = () => {
                 className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-500 transition"
                 onClick={handleSaveAvatar}
               >
-                Guardar
+                {t("profile.avatar.save")}
               </button>
               <button
                 className="px-4 py-2 bg-red-600 rounded hover:bg-red-500 transition"
                 onClick={handleCancelAvatar}
               >
-                Cancelar
+                {t("profile.avatar.cancel")}
               </button>
             </div>
           </div>

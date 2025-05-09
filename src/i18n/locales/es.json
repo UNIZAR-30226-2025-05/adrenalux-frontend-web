@@ -37,45 +37,228 @@
     "lineups": "Alineaciones",
     "achievements": "Logros",
     "classification": "Clasificación",
-    "friends": "Amigos"
+    "friends": "Amigos",
+    "loading": "Cargando...",
+    "open": "abrir"
   },
-  "game": {
-    "waiting": "Esperando jugador...",
-    "searching": "Buscando jugador...",
-    "pausedGames": "Partidas Pausadas",
-    "match": "Partida",
-    "exchange": "Intercambio"
+  "squad": {
+    "title": "Mis aliniaciones",
+    "loading": "Cargando alineaciones...",
+    "add": "Añadir nueva alineación",
+    "create": "Crea una nueva alineación personalizada",
+    "cancel": "Cancelar",
+    "delete2": "Eliminar",
+    "deleting": "Eliminando...",
+    "warning2": "Esta acción no se puede deshacer ",
+    "warning": "¿Estás seguro de que quieres eliminar la alineación",
+    "delete": "Eliminar alineación",
+    "creating": "Creando...",
+    "created": "Crear alineación",
+    "condition": "El nombre debe tener al menos 4 caracteres y ser único",
+    "new": "Nueva alineación"
+  },
+  "standing": {
+    "loading": "Cargando clasificacion...",
+    "back": "Volver",
+    "played": "Jugados",
+    "won": "Ganados",
+    "lost": "Perdidos",
+    "points": "Puntos",
+    "title": "RANKING DE JUGADORES",
+    "standing": "Posicion",
+    "name": "Nombre",
+    "suggestion": "Consejo: Haz click en un jugador para ver sus estadísticas detalladas",
+    "me": "TÚ"
+  },
+  "shop": {
+    "filter": "Filtros",
+    "position": "Posicion",
+    "reastPos": "Todas las posiciones",
+    "team": "Equipo",
+    "reastTeam": "Todos los equipos",
+    "error": "No tienes suficientes Adrenacoins para comprar esta carta.",
+    "error2": "Hubo un error al comprar la carta.",
+    "title": "Tienda",
+    "error3": "No hay cartas premium disponibles hoy",
+    "selling": "Cartas en Venta",
+    "error4": "No hay cartas disponibles con estos filtros",
+    "loading2": "Cargar más cartas",
+    "view": "Ver todas las cartas en venta",
+    "info": "Detalles de la Carta",
+
+    "price": "Precio",
+    "question": "¿Deseas comprar esta carta?",
+    "buy": "Comprar",
+    "cancel": "Cancelar",
+    "loading": "Cargando tienda..."
   },
   "auth": {
+    "title": "Inicio de sesión",
+    "title2": "Iniciar sesión con tu cuenta",
     "login": "Iniciar sesión",
     "register": "Registrarse",
     "email": "Correo electrónico",
     "password": "Contraseña",
     "confirmPassword": "Confirmar contraseña",
     "username": "Nombre de usuario",
-    "googleLogin": "Iniciar sesión con Google",
+    "googleLogin": "Continuar con Google",
     "forgotPassword": "¿Olvidaste tu contraseña?",
     "noAccount": "¿No tienes cuenta? Regístrate",
-    "hasAccount": "¿Ya tienes cuenta? Inicia sesión"
+    "hasAccount": "¿Ya tienes cuenta? Inicia sesión",
+    "emailPlaceholder": "Correo electrónico",
+    "passwordPlaceholder": "Contraseña",
+    "errors": {
+      "emailRequired": "El correo es obligatorio.",
+      "emailInvalid": "El correo no es válido.",
+      "passwordRequired": "La contraseña es obligatoria.",
+      "passwordLength": "La contraseña debe tener al menos 6 caracteres.",
+      "generalError": "Error en las credenciales",
+      "serverError": "Error en la conexión con el servidor"
+    }
   },
-  "cards": {
-    "opening": "Apertura de sobres",
-    "collection": "Mi colección",
+  "collection": {
+    "sell": "¡Puesto en venta exitoso!",
+    "sell2": "La carta ha sido puesta en venta exitosamente",
+    "sell3": "Poner en venta",
+
+    "title": "Colección",
     "notAvailable": "Carta no disponible",
-    "forSale": "Cartas en venta"
+    "with": "¡Retirada exitosa!",
+    "with2": "La carta ha sido retirada del mercado exitosamente",
+    "price": "Precio de venta:",
+    "published": "Publicando...",
+    "take": "Retirando",
+    "take2": "Retirar del mercado",
+    "index": "Índice de Cartas",
+    "index2": "Índice",
+
+    "rarity": "Rareza"
   },
-  "common": {
-    "back": "Volver",
+  "game": {
+    "error": "No tienes ninguna plantilla activa",
+    "selection": "Selecciona modalidad",
+    "sel1": "Partida rápida",
+    "sel2": "Reanudar partida",
+
+    "cancel": "Cancelar",
+    "play": "Jugar",
+
+    "squad": "Alineaciones"
+  },
+  "paused": {
+    "title": "PARTIDAS PAUSADAS",
+    "loading": "Cargando partidas...",
+    "error1": "No tienes ninguna partida pausada.",
+    "error2": "Cuando pauses una partida, aparecerá aquí.",
+
+    "match": "Partida",
+    "state": "Estado",
+    "state2": "Pausada",
+
+    "turn": "Turno",
+    "points": "Puntuación",
+    "error3": "Fecha no disponible",
+    "return": "Reanudar",
+    "back": "Volver atrás"
+  },
+  "matchmaking": {
+    "searching": "Buscando rival...",
+    "searchingNearby": "Buscando oponentes cercanos...",
+    "analyzingSkill": "Analizando niveles de habilidad...",
+    "checkingConnections": "Verificando conexiones estables...",
+    "negotiating": "Negociando condiciones de batalla...",
+    "matchFound": "¡Partida encontrada! Preparando arena...",
+    "status": "Estado de búsqueda",
+    "time": "Tiempo",
+    "mode": "Modo",
+    "cancelSearch": "Cancelar búsqueda",
+    "preparing": "Preparando partida...",
+    "waitingOpponent": "Buscando...",
+    "opponent": "Oponente",
+    "you": "TÚ",
+    "level": "Nivel",
+    "tips": {
+      "priority": "Consejo: Los jugadores con mejor conexión tienen prioridad en el emparejamiento",
+      "startingSoon": "La partida comenzará en breve..."
+    }
+  },
+  "profile": {
+    "title": "Perfil",
+    "loading": "Cargando perfil...",
+    "level": "NvL",
+    "experience": "{{exp}} / {{max}} XP",
+    "editUsername": "Editar Nombre de Usuario",
+    "editAvatar": "Seleccionar Avatar",
     "save": "Guardar",
     "cancel": "Cancelar",
-    "confirm": "Confirmar",
-    "edit": "Editar",
+    "wins": "Ganados: {{count}}",
+    "losses": "Perdidos: {{count}}",
+    "lastMatches": "Últimas Partidas",
+    "noMatches": "No hay partidas registradas.",
+    "victory": "Victoria",
+    "defeat": "Derrota",
+    "id": "ID:",
+    "player": "Jugador",
+    "rival": "Rival",
+
+    "copy": "Copiar",
+    "achievements": "Logros",
+    "editing": {
+      "title": "Editar Username",
+      "placeholder": "Nuevo nombre de usuario"
+    },
+    "avatar": {
+      "select": "Seleccionar Avatar",
+      "save": "Guardar",
+      "cancel": "Cancelar"
+    }
+  },
+  "friend": {
+    "title": "Amigos",
+    "addFriend": "Añadir amigo",
+    "sendRequest": "Enviar solicitud",
+    "cancel": "Cancelar",
+    "requestsReceived": "Solicitudes recibidas",
+    "noFriends": "Aún no tienes amigos.",
+    "noRequests": "No tienes solicitudes de amistad.",
+    "friendCode": "Código de amigo",
+    "enterFriendCode": "Ingresa el código de amigo",
+    "level": "Nivel",
+    "challenge": "Desafiar",
+    "exchange": "Intercambiar",
     "delete": "Eliminar",
-    "search": "Buscar",
-    "loading": "Cargando...",
-    "error": "Ha ocurrido un error",
-    "success": "Operación exitosa",
-    "play": "Jugar",
-    "actions": "Acciones"
+    "confirmDelete": "¿Estás seguro de que deseas eliminar a ",
+    "yes": "Sí",
+    "no": "No",
+    "accept": "Aceptar",
+    "reject": "Rechazar",
+    "sentRequests": "Solicitudes enviadas",
+    "exchange2": "te ha invitado a un intercambio",
+    "friendsCount": "{{current}}/{{max}} amigos",
+    "addFriendModal": {
+      "title": "Ingresa el código de amigo",
+      "placeholder": "Código de amigo"
+    }
+  },
+  "home": {
+    "tournament": "Torneo",
+    "shop": "Tienda",
+    "standing": "Clasificación",
+    "collection": "Colección"
+  },
+  "achievements": {
+    "allUnlocked": "🥳 ¡Has desbloqueado todos los logros!",
+    "title": "🎖 Tus Logros",
+    "noAchievements": {
+      "title": "¡Todavía no tienes logros!",
+      "message": "¿Qué esperas? Empieza tu camino ahora.",
+      "goHome": "Ir al inicio"
+    },
+    "loading": "Cargando tus logros...",
+    "retry": "Reintentar",
+    "rewards": {
+      "type": "+{{reward_type}}",
+      "amount": "+{{reward_amount}} 🪙"
+    }
   }
 }

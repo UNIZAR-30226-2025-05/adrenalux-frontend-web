@@ -14,27 +14,29 @@ import background from "../assets/background.png";
 import { getToken } from "../services/api/authApi";
 import { socketService } from "../services/websocket/socketService";
 import { getProfile } from "../services/api/profileApi";
+import { useTranslation } from "react-i18next";
 
 export default function BuscandoJugador() {
+  const { t } = useTranslation();
+
   const navigate = useNavigate();
   const token = getToken();
   const [showScreen, setShowScreen] = useState(false);
   const [searchTime, setSearchTime] = useState(0);
   const [isHoveringCancel, setIsHoveringCancel] = useState(false);
-  const [searchStatus, setSearchStatus] = useState(
-    "Escaneando redes de juego..."
-  );
+  const [searchStatus, setSearchStatus] = useState(t("matchmaking.searching"));
+
   const [progress, setProgress] = useState(0);
   const [matchFound, setMatchFound] = useState(false);
   const [opponentData, setOpponentData] = useState(null);
   const [playerData, setPlayerData] = useState(null);
 
   const statusMessages = [
-    "Buscando oponentes cercanos...",
-    "Analizando niveles de habilidad...",
-    "Verificando conexiones estables...",
-    "Negociando condiciones de batalla...",
-    "¡Oponente encontrado! Preparando arena...",
+    t("matchmaking.searchingNearby"),
+    t("matchmaking.analyzingSkill"),
+    t("matchmaking.checkingConnections"),
+    t("matchmaking.negotiating"),
+    t("matchmaking.matchFound"),
   ];
 
   // Cargar datos del jugador actual
@@ -62,7 +64,7 @@ export default function BuscandoJugador() {
     // Escuchar evento de partida encontrada
     const matchFoundHandler = (data) => {
       setMatchFound(true);
-      setSearchStatus("¡PARTIDA ENCONTRADA!");
+      setSearchStatus(t("matchmaking.matchFound"));
       setProgress(100);
 
       // Simular datos del oponente (en producción vendrían del socket)
@@ -171,7 +173,9 @@ export default function BuscandoJugador() {
                   duration: 1.5,
                 }}
               >
-                {matchFound ? "PARTIDA ENCONTRADA" : "BUSCANDO RIVAL"}
+                {matchFound
+                  ? t("matchmaking.matchFound")
+                  : t("matchmaking.searching")}
               </motion.h2>
               <GiCrossedSwords className="text-3xl text-yellow-400 ml-3 transform rotate-180" />
             </div>
@@ -240,12 +244,12 @@ export default function BuscandoJugador() {
                         matchFound ? "bg-green-600" : "bg-purple-600"
                       } text-xs font-bold rounded-full`}
                     >
-                      TÚ
+                      {t("matchmaking.you")}
                     </span>
                   </div>
                 </div>
                 <div className="text-sm text-gray-300">
-                  Nivel: {playerData?.level || "..."}
+                  {t("matchmaking.level")}: {playerData?.level || "..."}
                 </div>
               </div>
 
@@ -295,7 +299,7 @@ export default function BuscandoJugador() {
                           delay: 0.3,
                         }}
                       >
-                        OPONENTE
+                        {t("matchmaking.opponent")}
                       </motion.span>
                     )}
                   </div>
@@ -311,12 +315,16 @@ export default function BuscandoJugador() {
             {/* Stats and info */}
             <div className="flex justify-between w-full mb-10 text-base">
               <div className="bg-gray-800 bg-opacity-50 p-4 rounded-xl min-w-[120px] text-center">
-                <div className="text-yellow-400 font-bold mb-2">Tiempo</div>
+                <div className="text-yellow-400 font-bold mb-2">
+                  {t("matchmaking.time")}
+                </div>
                 <div className="text-lg">{formatTime(searchTime)}</div>
               </div>
 
               <div className="bg-gray-800 bg-opacity-50 p-4 rounded-xl min-w-[120px] text-center">
-                <div className="text-blue-400 font-bold mb-2">Modo</div>
+                <div className="text-blue-400 font-bold mb-2">
+                  {t("matchmaking.mode")}
+                </div>
                 <div className="text-lg">1vs1</div>
               </div>
             </div>
@@ -336,7 +344,7 @@ export default function BuscandoJugador() {
                 whileTap={{ scale: 0.95 }}
               >
                 <FaTimes className="mr-2" />
-                CANCELAR BÚSQUEDA
+                {t("matchmaking.cancelSearch")}{" "}
               </motion.button>
             ) : (
               <motion.div
@@ -345,15 +353,15 @@ export default function BuscandoJugador() {
                 transition={{ delay: 0.5 }}
                 className="text-green-400 font-bold text-lg"
               >
-                Preparando partida...
+                {t("matchmaking.preparing")}{" "}
               </motion.div>
             )}
 
             {/* Tips */}
             <div className="mt-6 text-xs text-gray-400">
               {matchFound
-                ? "La partida comenzará en breve..."
-                : "Consejo: Los jugadores con mejor conexión tienen prioridad en el emparejamiento"}
+                ? t("matchmaking.tips.startingSoon")
+                : t("matchmaking.tips.priority")}
             </div>
           </div>
 

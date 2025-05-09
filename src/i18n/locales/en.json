@@ -18,7 +18,7 @@
       "fr": "French"
     },
     "buttons": {
-      "logout": "Logout",
+      "logout": "Log Out",
       "aboutUs": "About Us",
       "close": "Close"
     }
@@ -36,46 +36,221 @@
     "profile": "Profile",
     "lineups": "Lineups",
     "achievements": "Achievements",
-    "classification": "Classification",
-    "friends": "Friends"
+    "classification": "Ranking",
+    "friends": "Friends",
+    "loading": "Loading...",
+    "open": "Open"
   },
-  "game": {
-    "waiting": "Waiting for player...",
-    "searching": "Searching for player...",
-    "pausedGames": "Paused Games",
-    "match": "Match",
-    "exchange": "Exchange"
+  "squad": {
+    "title": "My Lineups",
+    "loading": "Loading lineups...",
+    "add": "Add New Lineup",
+    "create": "Create a New Custom Lineup",
+    "cancel": "Cancel",
+    "delete2": "Delete",
+    "deleting": "Deleting...",
+    "warning2": "This action cannot be undone ",
+    "warning": "Are you sure you want to delete the lineup",
+    "delete": "Delete Lineup",
+    "creating": "Creating...",
+    "created": "Create Lineup",
+    "condition": "The name must have at least 4 characters and be unique",
+    "new": "New Lineup"
+  },
+  "standing": {
+    "loading": "Loading ranking...",
+    "back": "Go Back",
+    "played": "Played",
+    "won": "Won",
+    "lost": "Lost",
+    "points": "Points",
+    "title": "PLAYER RANKING",
+    "standing": "Position",
+    "name": "Name",
+    "suggestion": "Tip: Click on a player to see their detailed stats",
+    "me": "YOU"
+  },
+  "shop": {
+    "filter": "Filters",
+    "position": "Position",
+    "reastPos": "All Positions",
+    "team": "Team",
+    "reastTeam": "All Teams",
+    "error": "You don't have enough Adrenacoins to buy this card.",
+    "error2": "There was an error purchasing the card.",
+    "title": "Shop",
+    "error3": "No premium cards available today",
+    "selling": "Cards for Sale",
+    "error4": "No cards available with these filters",
+    "loading2": "Load More Cards",
+    "view": "View All Cards for Sale",
+    "info": "Card Details",
+    "price": "Price",
+    "question": "Do you want to buy this card?",
+    "buy": "Buy",
+    "cancel": "Cancel",
+    "loading": "Loading shop..."
   },
   "auth": {
-    "login": "Login",
+    "title": "Login",
+    "title2": "Log in with your account",
+    "login": "Log In",
     "register": "Register",
     "email": "Email",
     "password": "Password",
-    "confirmPassword": "Confirm password",
+    "confirmPassword": "Confirm Password",
     "username": "Username",
-    "googleLogin": "Login with Google",
+    "googleLogin": "Continue with Google",
     "forgotPassword": "Forgot your password?",
-    "noAccount": "Don't have an account? Register",
-    "hasAccount": "Already have an account? Login"
+    "noAccount": "Don't have an account? Sign up",
+    "hasAccount": "Already have an account? Log in",
+    "emailPlaceholder": "Email",
+    "passwordPlaceholder": "Password",
+    "errors": {
+      "emailRequired": "Email is required.",
+      "emailInvalid": "Invalid email format.",
+      "passwordRequired": "Password is required.",
+      "passwordLength": "Password must be at least 6 characters.",
+      "generalError": "Invalid credentials.",
+      "serverError": "Server connection error."
+    }
   },
-  "cards": {
-    "opening": "Card Opening",
-    "collection": "My Collection",
+  "collection": {
+    "sell": "Successfully Listed!",
+    "sell2": "The card has been successfully listed for sale.",
+    "sell3": "List for Sale",
+    "title": "Collection",
     "notAvailable": "Card not available",
-    "forSale": "Cards for sale"
+    "with": "Successfully Withdrawn!",
+    "with2": "The card has been successfully withdrawn from the market.",
+    "price": "Sale Price:",
+    "published": "Publishing...",
+    "take": "Withdrawing",
+    "take2": "Withdraw from Market",
+    "index": "Card Index",
+    "index2": "Index",
+    "rarity": "Rarity"
   },
-  "common": {
-    "back": "Back",
+  "game": {
+    "error": "You have no active lineup.",
+    "selection": "Select Mode",
+    "sel1": "Quick Match",
+    "sel2": "Resume Match",
+    "cancel": "Cancel",
+    "play": "Play",
+    "squad": "Lineups"
+  },
+  "paused": {
+    "title": "PAUSED MATCHES",
+    "loading": "Loading matches...",
+    "error1": "You have no paused matches.",
+    "error2": "When you pause a match, it will appear here.",
+    "match": "Match",
+    "state": "State",
+    "state2": "Paused",
+    "turn": "Turn",
+    "points": "Score",
+    "error3": "Date not available",
+    "return": "Resume",
+    "back": "Go Back"
+  },
+  "matchmaking": {
+    "searching": "Searching for opponent...",
+    "searchingNearby": "Searching for nearby opponents...",
+    "analyzingSkill": "Analyzing skill levels...",
+    "checkingConnections": "Checking stable connections...",
+    "negotiating": "Negotiating battle conditions...",
+    "matchFound": "Match found! Preparing arena...",
+    "status": "Search Status",
+    "time": "Time",
+    "mode": "Mode",
+    "cancelSearch": "Cancel Search",
+    "preparing": "Preparing match...",
+    "waitingOpponent": "Searching...",
+    "opponent": "Opponent",
+    "you": "YOU",
+    "level": "Level",
+    "tips": {
+      "priority": "Tip: Players with better connections have matchmaking priority",
+      "startingSoon": "The match will start shortly..."
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "loading": "Loading profile...",
+    "level": "Lvl",
+    "experience": "{{exp}} / {{max}} XP",
+    "editUsername": "Edit Username",
+    "editAvatar": "Select Avatar",
     "save": "Save",
     "cancel": "Cancel",
-    "confirm": "Confirm",
-    "edit": "Edit",
+    "wins": "Wins: {{count}}",
+    "losses": "Losses: {{count}}",
+    "lastMatches": "Last Matches",
+    "noMatches": "No recorded matches.",
+    "victory": "Victory",
+    "defeat": "Defeat",
+    "id": "ID:",
+    "player": "Player",
+    "rival": "Rival",
+    "copy": "Copy",
+    "achievements": "Achievements",
+    "editing": {
+      "title": "Edit Username",
+      "placeholder": "New username"
+    },
+    "avatar": {
+      "select": "Select Avatar",
+      "save": "Save",
+      "cancel": "Cancel"
+    }
+  },
+  "friend": {
+    "title": "Friends",
+    "addFriend": "Add Friend",
+    "sendRequest": "Send Request",
+    "cancel": "Cancel",
+    "requestsReceived": "Received Requests",
+    "noFriends": "You don't have any friends yet.",
+    "noRequests": "You have no friend requests.",
+    "friendCode": "Friend Code",
+    "enterFriendCode": "Enter Friend Code",
+    "level": "Level",
+    "challenge": "Challenge",
+    "exchange": "Exchange",
     "delete": "Delete",
-    "search": "Search",
-    "loading": "Loading...",
-    "error": "An error has occurred",
-    "success": "Operation successful",
-    "play": "Play",
-    "actions": "Actions"
+    "confirmDelete": "Are you sure you want to delete ",
+    "yes": "Yes",
+    "no": "No",
+    "accept": "Accept",
+    "reject": "Reject",
+    "exchange2": "has invited you to an exchange",
+    "sentRequests": "Sent Requests",
+    "friendsCount": "{{current}}/{{max}} friends",
+    "addFriendModal": {
+      "title": "Enter Friend Code",
+      "placeholder": "Friend Code"
+    }
+  },
+  "home": {
+    "tournament": "Tournament",
+    "shop": "Shop",
+    "standing": "Ranking",
+    "collection": "Collection"
+  },
+  "achievements": {
+    "allUnlocked": "🥳 You have unlocked all achievements!",
+    "title": "🎖 Your Achievements",
+    "noAchievements": {
+      "title": "You have no achievements yet!",
+      "message": "What are you waiting for? Start your journey now.",
+      "goHome": "Go to Home"
+    },
+    "loading": "Loading your achievements...",
+    "retry": "Retry",
+    "rewards": {
+      "type": "+{{reward_type}}",
+      "amount": "+{{reward_amount}} 🪙"
+    }
   }
 }

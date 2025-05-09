@@ -9,9 +9,11 @@ import {
   obtenerClasificacionUsuario,
 } from "../services/api/clasificacionApi";
 import background from "../assets/background.png";
+import { useTranslation } from "react-i18next";
 
 export default function ClasificacionJugadores() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [playersRanking, setPlayersRanking] = useState([]);
   const [userRanking, setUserRanking] = useState(null);
@@ -97,7 +99,7 @@ export default function ClasificacionJugadores() {
             duration: 1.5,
           }}
         >
-          Cargando clasificación...
+          {t("standing.loading")}{" "}
         </motion.div>
       </motion.div>
     );
@@ -120,7 +122,7 @@ export default function ClasificacionJugadores() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            Volver
+            {t("standing.back")}
           </motion.button>
         </div>
       </motion.div>
@@ -129,7 +131,7 @@ export default function ClasificacionJugadores() {
 
   const stats = [
     {
-      label: "Jugados",
+      label: t("standing.played"),
       value: selectedPlayer
         ? (selectedPlayer.won || 0) + (selectedPlayer.lost || 0)
         : 0,
@@ -137,19 +139,19 @@ export default function ClasificacionJugadores() {
       icon: "bg-blue-500",
     },
     {
-      label: "Ganados",
+      label: t("standing.won"),
       value: selectedPlayer?.won ?? 0,
       colorBg: "from-green-600 to-green-800",
       icon: "bg-green-500",
     },
     {
-      label: "Perdidos",
+      label: t("standing.lost"),
       value: selectedPlayer?.lost ?? 0,
       colorBg: "from-red-600 to-red-800",
       icon: "bg-red-500",
     },
     {
-      label: "Puntos",
+      label: t("standing.points"),
       value: selectedPlayer?.puntos ?? 0,
       colorBg: "from-yellow-600 to-yellow-800",
       icon: "bg-yellow-500",
@@ -208,24 +210,24 @@ export default function ClasificacionJugadores() {
                   duration: 1.5,
                 }}
               >
-                RANKING DE JUGADORES
+                {t("standing.title")}{" "}
               </motion.h2>
               <GiPodium className="text-3xl text-yellow-400 ml-3 transform rotate-180" />
             </div>
 
             {/* Table container with glass effect */}
             <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl overflow-hidden shadow-lg mb-6">
-            <div className="max-h-[60vh] overflow-y-auto scrollbar-none">
-            <table className="min-w-full divide-y divide-gray-700">
+              <div className="max-h-[60vh] overflow-y-auto scrollbar-none">
+                <table className="min-w-full divide-y divide-gray-700">
                   <thead className="bg-gradient-to-r from-purple-900 to-blue-900">
                     <tr>
                       {[
-                        "Posición",
-                        "Nombre",
-                        "Ganados",
-                        "Jugados",
-                        "Perdidos",
-                        "Puntos",
+                        t("standing.standing"),
+                        t("standing.name"),
+                        t("standing.won"),
+                        t("standing.played"),
+                        t("standing.lost"),
+                        t("standing.points"),
                       ].map((h) => (
                         <th
                           key={h}
@@ -285,7 +287,7 @@ export default function ClasificacionJugadores() {
                             {player.name}
                             {isCurrentUser && (
                               <span className="ml-2 text-xs font-bold bg-yellow-500 text-yellow-900 px-2 py-1 rounded-full">
-                                TÚ
+                                {t("standing.me")}
                               </span>
                             )}
                           </td>
@@ -311,8 +313,7 @@ export default function ClasificacionJugadores() {
 
             {/* Tips */}
             <div className="text-xs text-gray-400 text-center mt-4">
-              Consejo: Haz click en un jugador para ver sus estadísticas
-              detalladas
+              {t("standing.suggestion")}
             </div>
           </div>
 

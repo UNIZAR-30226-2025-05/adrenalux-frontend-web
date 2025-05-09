@@ -1,13 +1,15 @@
 import { FaDice } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export default function CollectionButton() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleClick = () => {
     navigate("/collection");
   };
-  
+
   return (
     <button
       onClick={handleClick}
@@ -17,7 +19,7 @@ export default function CollectionButton() {
     >
       <FaDice className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-2 md:mb-3" />
       <span className="bg-black/80 px-2 py-1 text-xs sm:text-sm rounded-sm whitespace-nowrap">
-        Coleccion
+        {t("home.collection")}
       </span>
     </button>
   );

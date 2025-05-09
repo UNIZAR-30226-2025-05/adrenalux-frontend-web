@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import socketService from "../../../services/websocket/socketService";
+import { useTranslation } from "react-i18next";
 
 export default function NotificacionIntercambio() {
   const [notification, setNotification] = useState(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     socketService.setOnIncomingRequest((data) => {
@@ -35,13 +37,13 @@ export default function NotificacionIntercambio() {
           onClick={handleAccept}
           className="bg-green-500 px-4 py-2 rounded font-bold"
         >
-          Aceptar
+          {t("friend.accept")}
         </button>
         <button
           onClick={handleReject}
           className="bg-gray-800 px-4 py-2 rounded font-bold"
         >
-          Cancelar
+          {t("friend.cancel")}
         </button>
       </div>
     </div>

@@ -17,6 +17,14 @@ import CartaMediana from "../components/layout/game/CartaMediana";
 import { motion } from "framer-motion";
 import ModalWrapper from "../components/layout/game/ModalWrapper";
 
+import { FaPause, FaPlay, FaFlag, FaHome, FaCog } from "react-icons/fa";
+import {
+  GiSwordman,
+  GiSwordsPower,
+  GiSwordWound,
+  GiSwordwoman,
+} from "react-icons/gi";
+
 const Partida = () => {
   const nextRoundStartRef = useRef(null);
 
@@ -913,6 +921,32 @@ const Partida = () => {
     boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
   };
 
+  const menuStyle = {
+    position: "fixed",
+    bottom: "calc(2vh + 64px)",
+    left: "2vw",
+    background: "rgba(15, 23, 42, 0.95)",
+    border: "1px solid rgba(124, 58, 237, 0.5)",
+    borderRadius: "12px",
+    minWidth: "180px",
+    zIndex: 120,
+    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)",
+    overflow: "hidden",
+    backdropFilter: "blur(8px)",
+  };
+
+  const menuItemStyle = {
+    padding: "0.8rem 1.2rem",
+    color: "white",
+    textAlign: "left",
+    width: "100%",
+    borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+    display: "flex",
+    alignItems: "center",
+    gap: "0.8rem",
+    transition: "all 0.2s ease",
+  };
+
   const renderPhase = () => {
     switch (gameState.phase) {
       case "waiting":
@@ -922,42 +956,55 @@ const Partida = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3 }}
+              className="text-center"
             >
-              <h2
-                style={{
-                  fontSize: "clamp(18px, 4vw, 26px)",
-                  color: "white",
-                  marginBottom: "2vh",
-                }}
-              >
+              <div className="relative mb-6">
+                <GiSwordman className="text-5xl text-purple-400 mx-auto" />
+                <motion.div
+                  className="absolute inset-0 rounded-full bg-purple-500 opacity-20"
+                  animate={{ scale: [1, 1.5, 1] }}
+                  transition={{
+                    repeat: Infinity,
+                    duration: 2,
+                    ease: "easeInOut",
+                  }}
+                />
+              </div>
+
+              <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400 mb-2">
                 Esperando al oponente...
               </h2>
-              <p
-                style={{
-                  fontSize: "clamp(16px, 3vw, 22px)",
-                  color: "rgba(255,255,255,0.9)",
-                }}
-              >
-                Ronda {gameState.roundNumber}
+              <p className="text-xl text-gray-300 mb-6">
+                Ronda {gameState.roundNumber}/11
               </p>
-              <div style={{ marginTop: "2rem" }}>
-                <div
-                  className="loader"
-                  style={{
-                    border: "5px solid rgba(255,255,255,0.2)",
-                    borderTop: "5px solid #3b82f6",
-                    borderRadius: "50%",
-                    width: "50px",
-                    height: "50px",
-                    animation: "spin 1s linear infinite",
-                    margin: "0 auto",
+
+              <div className="flex justify-center">
+                <motion.div
+                  className="h-2 bg-purple-900 rounded-full overflow-hidden w-3/4"
+                  initial={{ width: "0%" }}
+                  animate={{ width: "75%" }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    repeatType: "mirror",
                   }}
-                ></div>
+                >
+                  <motion.div
+                    className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
+                    initial={{ x: "-100%" }}
+                    animate={{ x: "100%" }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                  />
+                </motion.div>
               </div>
             </motion.div>
           </ModalWrapper>
         );
-
+      //----------
       case "selection":
         if (!gameState.isPlayerTurn) {
           return (
@@ -987,9 +1034,7 @@ const Partida = () => {
                   textShadow: "0px 2px 8px rgba(0,0,0,0.5)",
                   zIndex: 9999,
                 }}
-              >
-                {gameState.isPlayerTurn ? "¡TU TURNO!" : "Turno del rival"}
-              </motion.div>
+              ></motion.div>
             )}
 
             {/* ——— Indicador de turno ——— */}
@@ -1454,31 +1499,6 @@ const Partida = () => {
           </div>
         </div>
 
-        {isDesktop && (
-          <div
-            style={{
-              alignSelf: "center",
-              margin: "1rem 0",
-              padding: "0.8rem 2rem",
-              borderRadius: "12px",
-              background:
-                gameState.scores.player > gameState.scores.opponent
-                  ? "linear-gradient(90deg,#16a34a,#15803d)"
-                  : gameState.scores.player < gameState.scores.opponent
-                  ? "linear-gradient(90deg,#dc2626,#b91c1c)"
-                  : "linear-gradient(90deg,#eab308,#ca8a04)",
-              color: "white",
-              fontSize: "clamp(1.4rem,2vw,2rem)",
-              fontWeight: "700",
-              boxShadow: "0 4px 12px rgba(0,0,0,.35)",
-              minWidth: "220px",
-              textAlign: "center",
-            }}
-          >
-            {gameState.scores.player} – {gameState.scores.opponent}
-          </div>
-        )}
-
         <div style={contentContainerStyle}>
           {gameState.phase === "selection" && renderPhase()}
         </div>
@@ -1495,23 +1515,37 @@ const Partida = () => {
       </div>
       {/* —— Overlays flotantes, fuera del fondo —— */}
       {showMenu && (
-        <div
-          style={{
-            position: "fixed",
-            bottom: "calc(2vh + 56px)",
-            left: "2vw",
-            backgroundColor: "#1F2937",
-            border: "1px solid #374151",
-            borderRadius: "8px",
-            minWidth: "140px",
-            zIndex: 120,
-            boxShadow: "0 6px 12px rgba(0,0,0,0.3)",
-            overflow: "hidden",
-          }}
+        <motion.div
+          style={menuStyle}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 20 }}
         >
-          <button onClick={handlePause}>Pausar partida</button>
-          <button onClick={handleSurrender}>Rendirse</button>
-        </div>
+          {gameState.phase === "paused" ? (
+            <button
+              onClick={handleResume}
+              style={menuItemStyle}
+              className="hover:bg-emerald-600/50"
+            >
+              <FaPlay /> Reanudar
+            </button>
+          ) : (
+            <button
+              onClick={handlePause}
+              style={menuItemStyle}
+              className="hover:bg-yellow-600/50"
+            >
+              <FaPause /> Pausar
+            </button>
+          )}
+          <button
+            onClick={handleSurrender}
+            style={menuItemStyle}
+            className="hover:bg-red-600/50"
+          >
+            <FaFlag /> Rendirse
+          </button>
+        </motion.div>
       )}
       {/* —— MODALES flotantes, SIEMPRE FUERA del container —— */}
       {["waiting", "paused", "response", "result", "ended"].includes(

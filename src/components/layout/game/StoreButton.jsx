@@ -1,8 +1,10 @@
 import { FaStore } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const StoreButton = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleClick = () => {
     navigate("/shop");
@@ -16,7 +18,9 @@ const StoreButton = () => {
                 hover:scale-105 transition-transform focus:outline-none"
     >
       <FaStore className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-2 md:mb-3" />
-      <span className="bg-black/80 px-2 py-1 text-xs sm:text-sm rounded-sm whitespace-nowrap">Tienda</span>
+      <span className="bg-black/80 px-2 py-1 text-xs sm:text-sm rounded-sm whitespace-nowrap">
+        {t("home.shop")}
+      </span>
     </button>
   );
 };

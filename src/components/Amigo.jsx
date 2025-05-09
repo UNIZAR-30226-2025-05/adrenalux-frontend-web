@@ -22,6 +22,7 @@ import {
   deleteFriend,
 } from "../services/api/friendApi";
 import { getProfile } from "../services/api/profileApi";
+import { useTranslation } from "react-i18next";
 
 export default function Amigo() {
   const [currentTab, setCurrentTab] = useState("amigos");
@@ -39,6 +40,7 @@ export default function Amigo() {
 
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [friendToDelete, setFriendToDelete] = useState(null);
+  const { t } = useTranslation();
 
   const navigate = useNavigate();
 
@@ -247,7 +249,7 @@ export default function Amigo() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h2 className="text-2xl font-bold">Amigos</h2>
+        <h2 className="text-2xl font-bold">{t("friend.title")}</h2>
         <div className="flex items-center space-x-8">
           <p className="text-white text-sm">
             {currentFriends}/{maxFriends}
@@ -259,7 +261,7 @@ export default function Amigo() {
             <button
               className="bg-green-500 hover:bg-green-400 text-white p-2 rounded-full flex items-center justify-center"
               onClick={handleOpenAddFriendModal}
-              title="Añadir amigo"
+              title={t("friend.addFriend")}
             >
               <FaPlus size={16} />
             </button>
@@ -292,7 +294,7 @@ export default function Amigo() {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                   >
-                    Aún no tienes amigos.
+                    {t("friend.noFriends")}{" "}
                   </motion.p>
                 ) : (
                   amigos?.map((amigo) => renderRow(amigo, "amigos"))
@@ -316,7 +318,7 @@ export default function Amigo() {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                   >
-                    No tienes solicitudes de amistad.
+                    {t("friend.noRequests")}{" "}
                   </motion.p>
                 ) : (
                   solicitudesRecibidas?.map((sol) =>
@@ -338,7 +340,7 @@ export default function Amigo() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          Amigos
+          {t("friend.title")}
         </motion.button>
 
         <motion.button
@@ -349,7 +351,8 @@ export default function Amigo() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          Solicitudes recibidas
+          {" "}
+          {t("friend.requestsReceived")}
         </motion.button>
       </div>
 
@@ -368,7 +371,7 @@ export default function Amigo() {
               exit={{ scale: 0.9, opacity: 0 }}
             >
               <h2 className="text-xl font-bold mb-4 text-center">
-                ¿Estás seguro de que deseas eliminar a{" "}
+                {t("friend.confirmDelete")}
                 {friendToDelete?.username}?
               </h2>
               <div className="flex justify-around">
@@ -378,7 +381,7 @@ export default function Amigo() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  Sí
+                  {t("friend.yes")}
                 </motion.button>
                 <motion.button
                   onClick={() => setShowDeleteConfirmation(false)}
@@ -386,7 +389,7 @@ export default function Amigo() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  No
+                  {t("friend.no")}
                 </motion.button>
               </div>
             </motion.div>
@@ -409,14 +412,14 @@ export default function Amigo() {
               exit={{ scale: 0.9, opacity: 0 }}
             >
               <h2 className="text-xl font-bold mb-4 text-center">
-                Ingresa el código de amigo
+                {t("friend.addFriendModal.title")}
               </h2>
               <input
                 type="text"
                 value={newFriendCode}
                 onChange={(e) => setNewFriendCode(e.target.value)}
                 className="w-full px-4 py-2 mb-4 rounded-md text-black bg-white/90"
-                placeholder="Código de amigo"
+                placeholder={t("friend.addFriendModal.placeholder")}
               />
               <div className="flex justify-around">
                 <motion.button
@@ -425,7 +428,7 @@ export default function Amigo() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  Enviar solicitud
+                  {t("friend.sendRequest")}
                 </motion.button>
                 <motion.button
                   onClick={handleCloseAddFriendModal}
@@ -433,7 +436,7 @@ export default function Amigo() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  Cancelar
+                  {t("friend.cancel")}
                 </motion.button>
               </div>
             </motion.div>

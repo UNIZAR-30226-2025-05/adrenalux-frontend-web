@@ -7,12 +7,14 @@ import { socketService } from "../../../services/websocket/socketService";
 import { getProfile } from "../../../services/api/profileApi";
 import { motion, AnimatePresence } from "framer-motion";
 import PropTypes from "prop-types";
+import { useTranslation } from "react-i18next";
 
 export default function PlayButton({ className = "", iconClassName = "" }) {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [showAlert, setShowAlert] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     (async () => {
@@ -53,7 +55,7 @@ export default function PlayButton({ className = "", iconClassName = "" }) {
             className="fixed bottom-28 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-lg border-2 border-purple-500 z-50 flex items-center"
           >
             <GiSwordman className="text-yellow-400 mr-2" />
-            <span>No tienes ninguna plantilla activa</span>
+            <span> {t("game.error")}</span>
             <button
               onClick={() => setShowAlert(false)}
               className="ml-4 text-purple-300 hover:text-white"
@@ -82,7 +84,7 @@ export default function PlayButton({ className = "", iconClassName = "" }) {
               <div className="absolute -bottom-2 -right-2 w-4 h-4 bg-purple-500 rounded-full"></div>
 
               <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-yellow-300 mb-6">
-                Selecciona modalidad
+                {t("game.selection")}
               </h2>
 
               <div className="space-y-4">
@@ -93,7 +95,7 @@ export default function PlayButton({ className = "", iconClassName = "" }) {
                   className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-500 hover:to-purple-700 text-white font-semibold py-3 rounded-lg transition-all shadow-lg"
                 >
                   <FaPlay className="text-yellow-300" />
-                  <span>Partida rápida</span>
+                  <span> {t("game.sel1")}</span>
                 </motion.button>
 
                 <motion.button
@@ -103,7 +105,7 @@ export default function PlayButton({ className = "", iconClassName = "" }) {
                   className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-gray-700 to-gray-900 hover:from-gray-600 hover:to-gray-800 text-white font-semibold py-3 rounded-lg transition-all shadow-lg border border-purple-500/30"
                 >
                   <FaRedo className="text-purple-300" />
-                  <span>Reanudar partida</span>
+                  <span>{t("game.sel2")}</span>
                 </motion.button>
               </div>
 
@@ -114,7 +116,7 @@ export default function PlayButton({ className = "", iconClassName = "" }) {
                 className="mt-6 text-sm text-purple-300 hover:text-white flex items-center justify-center mx-auto"
               >
                 <FaTimes className="mr-1" />
-                Cancelar
+                {t("game.cancel")}
               </motion.button>
             </motion.div>
           </motion.div>
@@ -140,7 +142,7 @@ export default function PlayButton({ className = "", iconClassName = "" }) {
             <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-purple-500 rounded-full opacity-0 group-hover:opacity-100 transition"></div>
           </div>
           <span className="text-xs text-gray-300 group-hover:text-white mt-1">
-            Alineaciones
+            {t("game.squad")}
           </span>
         </button>
 
@@ -154,13 +156,15 @@ export default function PlayButton({ className = "", iconClassName = "" }) {
               "polygon(0% 50%, 10% 0%, 100% 0%, 90% 50%, 100% 100%, 10% 100%)",
           }}
         >
-          <span className="relative z-10">Jugar</span>
+          <span className="relative z-10"> {t("game.play")}</span>
           <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-transparent opacity-0 hover:opacity-100 transition"></div>
         </motion.button>
 
         <button className="flex flex-col items-center justify-center px-4 py-2 hover:bg-purple-900/50 transition group">
           <div className="relative">
-            <FaBolt className={`text-xl text-yellow-400 group-hover:scale-110 transition ${iconClassName}`} />
+            <FaBolt
+              className={`text-xl text-yellow-400 group-hover:scale-110 transition ${iconClassName}`}
+            />
             <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-purple-500 rounded-full opacity-0 group-hover:opacity-100 transition"></div>
           </div>
           <span className="text-xs text-gray-300 group-hover:text-white mt-1">

@@ -4,9 +4,11 @@ import { login } from "../services/api/authApi";
 import background from "../assets/background.png";
 import { googleSignIn } from "../services/api/authApi";
 import GoogleSignInButton from "../components/layout/game/GoogleSignInButton";
+import { useTranslation } from "react-i18next";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -33,15 +35,15 @@ const Login = () => {
     let newErrors = {};
 
     if (!formData.email.trim()) {
-      newErrors.email = "El correo es obligatorio.";
+      newErrors.email = t("auth.errors.emailRequired");
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "El correo no es válido.";
+      newErrors.email = t("auth.errors.emailInvalid");
     }
 
     if (!formData.password.trim()) {
-      newErrors.password = "La contraseña es obligatoria.";
+      newErrors.password = t("auth.errors.passwordRequired");
     } else if (formData.password.length < 6) {
-      newErrors.password = "La contraseña debe tener al menos 6 caracteres.";
+      newErrors.password = t("auth.errors.passwordLength");
     }
 
     setErrors(newErrors);
@@ -97,14 +99,14 @@ const Login = () => {
         {/* Header row with title and Google button - flex items-center makes them vertically aligned */}
         <div className="flex flex-row justify-between items-center mb-4 gap-2">
           <h2 className="text-black dark:text-white text-xl sm:text-2xl font-bold">
-            Inicio de sesión
+            {t("auth.title")}
           </h2>
 
           <GoogleSignInButton onSuccess={handleGoogleSuccess} />
         </div>
 
         <p className="text-black dark:text-white text-sm mb-4">
-          Inicia sesión con tu cuenta
+          {t("auth.title2")}
         </p>
 
         {errors.general && (
@@ -115,7 +117,7 @@ const Login = () => {
           <input
             type="email"
             name="email"
-            placeholder="Correo electrónico"
+            placeholder={t("auth.emailPlaceholder")}
             className={`w-full bg-gray-800 border ${
               errors.email ? "border-red-500" : "border-gray-700"
             } rounded px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500`}
@@ -130,7 +132,7 @@ const Login = () => {
           <input
             type="password"
             name="password"
-            placeholder="Contraseña"
+            placeholder={t("auth.passwordPlaceholder")}
             className={`w-full bg-gray-800 border ${
               errors.password ? "border-red-500" : "border-gray-700"
             } rounded px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500`}
@@ -148,14 +150,14 @@ const Login = () => {
               className="bg-blue-600 hover:bg-blue-500 text-white rounded py-2 px-4 transition duration-300"
               type="submit"
             >
-              Iniciar sesión
+              {t("auth.login")}
             </button>
 
             <button
               className="text-blue-600 hover:text-blue-200 transition duration-300 py-2 bg-gray-300 dark:bg-gray-900"
               type="button"
             >
-              Olvidé mi contraseña
+              {t("auth.forgotPassword")}
             </button>
           </div>
 
@@ -166,7 +168,7 @@ const Login = () => {
               type="button"
               onClick={() => navigate("/register")}
             >
-              No tengo cuenta
+              {t("auth.noAccount")}
             </button>
           </div>
         </form>
