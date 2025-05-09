@@ -23,6 +23,11 @@
       "close": "Close"
     }
   },
+  "common" : {
+    "actions": {
+      "title": "Common actions"
+    }
+  },
   "aboutUs": {
     "title": "About Us",
     "content": "App created by group 05-Carol Shaw."

@@ -23,6 +23,11 @@
       "close": "Cerrar"
     }
   },
+  "common": {
+    "actions": {
+      "title": "Acciones comunes"
+    }
+  },
   "aboutUs": {
     "title": "Acerca de nosotros",
     "content": "App creada por el grupo 05-Carol Shaw."
