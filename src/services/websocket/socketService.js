@@ -72,11 +72,11 @@ class SocketService {
    * --------------------------------------------------------- */
   async handleMatchEnd(data) {
     try {
-      // ya tienes data.scores, data.puntosChange, data.winner…
+      
       const payload = {
         scores: data.scores,
         puntosChange: data.puntosChange,
-        winner: data.winner,
+        winner: data.winnerId,
         isDraw: data.isDraw,
       };
       await this.waitForFunction(
