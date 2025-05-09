@@ -815,7 +815,7 @@ export default function Collection({ onBack }) {
                     className="bg-black/40 hover:bg-black/70 transition-all duration-300 p-2 rounded flex items-center space-x-2 border border-transparent hover:border-gray-700"
                   >
                     <img
-                      src={team.logo || "/api/placeholder/32/32"}
+                      src={team.escudo || "/api/placeholder/32/32"}
                       alt={team.nombre}
                       className="w-6 h-6 object-contain"
                     />
