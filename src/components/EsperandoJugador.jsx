@@ -33,7 +33,6 @@ export default function EsperandoJugador() {
   const [notificationMessage, setNotificationMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [showOptions, setShowOptions] = useState(false);
-  const [playerStatus, setPlayerStatus] = useState("offline");
   const [animateAvatar, setAnimateAvatar] = useState(false);
   const [showInfoPanel, setShowInfoPanel] = useState(false);
   const notificationTimeoutRef = useRef(null);
@@ -77,17 +76,9 @@ export default function EsperandoJugador() {
     }, 3000);
   };
 
-  // Simular actividad del jugador
-  const simulatePlayerActivity = () => {
-    const statuses = ["online", "offline", "away", "busy"];
-    const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
-    setPlayerStatus(randomStatus);
-    
-    if (randomStatus === "online") {
-      showNotificationMessage("¡El jugador está en línea!");
-    }
-    
-    // Animar el avatar
+  // Simular actividad ocasional
+  const simulateActivity = () => {
+    // Animar el avatar ocasionalmente
     setAnimateAvatar(true);
     if (avatarAnimationTimeoutRef.current) {
       clearTimeout(avatarAnimationTimeoutRef.current);
@@ -112,8 +103,8 @@ export default function EsperandoJugador() {
     // Cambiar el tip cada 8 segundos
     const tipTimer = setInterval(changeTip, 8000);
     
-    // Simular actividad del jugador cada 15 segundos
-    const activityTimer = setInterval(simulatePlayerActivity, 15000);
+    // Simular actividad ocasional cada 20 segundos
+    const activityTimer = setInterval(simulateActivity, 20000);
     
     // Mostrar el primer tip después de 5 segundos
     const initialTipTimer = setTimeout(() => {
@@ -124,7 +115,7 @@ export default function EsperandoJugador() {
     const autoResponseTimer = setTimeout(() => {
       // Solo para propósitos de demostración
       if (Math.random() > 0.5) {
-        showNotificationMessage("El jugador está considerando tu solicitud...");
+        showNotificationMessage("Procesando tu solicitud...");
       }
     }, 30000);
 
@@ -145,10 +136,10 @@ export default function EsperandoJugador() {
     };
   }, []);
 
-  // Efecto para simular que el jugador vio la solicitud
+  // Efecto para mostrar mensaje después de un tiempo
   useEffect(() => {
     if (timeElapsed === 10) {
-      showNotificationMessage("El jugador ha visto tu solicitud");
+      showNotificationMessage("Igual el jugador no está en línea");
     }
   }, [timeElapsed]);
 
@@ -179,34 +170,6 @@ export default function EsperandoJugador() {
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
-  // Clase para el indicador de estado del jugador
-  const getStatusClass = () => {
-    switch (playerStatus) {
-      case "online":
-        return "bg-green-500";
-      case "away":
-        return "bg-yellow-500";  
-      case "busy":
-        return "bg-red-500";
-      default:
-        return "bg-gray-500";
-    }
-  };
-
-  // Texto para el estado del jugador
-  const getStatusText = () => {
-    switch (playerStatus) {
-      case "online":
-        return "En línea";
-      case "away":
-        return "Ausente";  
-      case "busy":
-        return "Ocupado";
-      default:
-        return "Desconectado";
-    }
-  };
-
   // Variantes para la animación de la pantalla de carga
   const loadingVariants = {
     hidden: { opacity: 0, scale: 0.8 },
@@ -228,29 +191,31 @@ export default function EsperandoJugador() {
 
   // Componente de pantalla de carga
   const LoadingScreen = () => (
-    <motion.div
-      variants={loadingVariants}
-      initial="hidden"
-      animate="visible"
-      className="relative z-10 bg-gray-800 bg-opacity-90 rounded-xl p-8 shadow-2xl max-w-md w-full mx-4 flex flex-col items-center"
-    >
-      <motion.div variants={loadingItemVariants} className="w-20 h-20 mb-6">
-        <FaSpinner className="animate-spin text-6xl text-blue-400" />
+    <div className="fixed inset-0 flex items-center justify-center z-50">
+      <motion.div
+        variants={loadingVariants}
+        initial="hidden"
+        animate="visible"
+        className="relative bg-gray-800 bg-opacity-90 rounded-xl p-8 shadow-2xl max-w-md w-full mx-4 flex flex-col items-center"
+      >
+        <motion.div variants={loadingItemVariants} className="w-20 h-20 mb-6">
+          <FaSpinner className="animate-spin text-6xl text-blue-400" />
+        </motion.div>
+        <motion.h2 variants={loadingItemVariants} className="text-2xl font-bold text-white mb-4">
+          Conectando con el jugador
+        </motion.h2>
+        <motion.div variants={loadingItemVariants} className="w-full bg-gray-700 h-2 rounded-full overflow-hidden mb-4">
+          <motion.div 
+            className="h-full bg-blue-500"
+            animate={{ width: ["0%", "100%"] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          />
+        </motion.div>
+        <motion.p variants={loadingItemVariants} className="text-gray-300 text-center">
+          Preparando conexión segura
+        </motion.p>
       </motion.div>
-      <motion.h2 variants={loadingItemVariants} className="text-2xl font-bold text-white mb-4">
-        Conectando con el jugador
-      </motion.h2>
-      <motion.div variants={loadingItemVariants} className="w-full bg-gray-700 h-2 rounded-full overflow-hidden mb-4">
-        <motion.div 
-          className="h-full bg-blue-500"
-          animate={{ width: ["0%", "100%"] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-        />
-      </motion.div>
-      <motion.p variants={loadingItemVariants} className="text-gray-300 text-center">
-        Preparando conexión segura
-      </motion.p>
-    </motion.div>
+    </div>
   );
 
   return (
@@ -310,12 +275,7 @@ export default function EsperandoJugador() {
                     ) : (
                       <FaUserAlt size={40} />
                     )}
-                    <div className={`absolute bottom-1 right-1 w-4 h-4 rounded-full border-2 border-gray-800 ${getStatusClass()}`}></div>
                   </motion.div>
-                  <div className="flex items-center justify-center">
-                    <div className={`w-3 h-3 rounded-full ${getStatusClass()} mr-2`}></div>
-                    <span className="text-sm text-gray-300">{getStatusText()}</span>
-                  </div>
                 </div>
                 <h3 className="text-xl font-semibold text-white flex items-center">
                   {jugador.username || jugador.name || "Jugador"}
@@ -609,13 +569,6 @@ export default function EsperandoJugador() {
                   <h4 className="text-sm text-gray-400 mb-1">Detalles del jugador</h4>
                   <p className="text-white">{jugador.username} (Nivel {jugador.nivel})</p>
                 </div>
-                <div className="mb-4">
-                  <h4 className="text-sm text-gray-400 mb-1">Estado del jugador</h4>
-                  <div className="flex items-center">
-                    <div className={`w-3 h-3 rounded-full ${getStatusClass()} mr-2`}></div>
-                    <p className="text-white">{getStatusText()}</p>
-                  </div>
-                </div>
                 <div className="mb-6">
                   <h4 className="text-sm text-gray-400 mb-1">Última actividad</h4>
                   <p className="text-white">{jugador.lastActive}</p>
@@ -647,13 +600,15 @@ export default function EsperandoJugador() {
       <AnimatePresence>
         {showNotification && (
           <motion.div
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
-            className="fixed top-6 left-1/2 transform -translate-x-1/2 bg-gray-800 border border-blue-500 rounded-lg shadow-lg px-4 py-3 z-30 flex items-center"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none"
           >
-            <FaBell className="text-blue-400 mr-3" />
-            <span className="text-white">{notificationMessage}</span>
+            <div className="bg-gray-800 border border-blue-500 rounded-lg shadow-lg px-6 py-4 max-w-sm w-full mx-4 flex items-center pointer-events-auto">
+              <FaBell className="text-blue-400 mr-3 flex-shrink-0 text-xl" />
+              <span className="text-white">{notificationMessage}</span>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

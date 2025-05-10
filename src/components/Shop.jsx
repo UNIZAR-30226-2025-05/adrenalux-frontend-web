@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { FaPlusCircle, FaCoins } from "react-icons/fa";
+import { FaPlusCircle, FaCoins, FaTimes } from "react-icons/fa";
 import { Search, Filter } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import background from "../assets/background.png";
@@ -17,7 +17,7 @@ import {
 import { getProfile } from "../services/api/profileApi";
 import Carta from "./layout/game/CartaMediana";
 import Carta2 from "./layout/game/CartaGrande";
-import PurchaseAnimation from "./layout/game/PurchaseAnimation"; // Importar el componente de animación
+import PurchaseAnimation from "./layout/game/PurchaseAnimation";
 import { useTranslation } from "react-i18next";
 
 // Componente para la barra de búsqueda y filtros
@@ -26,6 +26,7 @@ const SearchTab = () => {
   const [selectedTeam, setSelectedTeam] = useState("Equipo");
   const [selectedPosition, setSelectedPosition] = useState("Posición");
   const [showFilters, setShowFilters] = useState(false);
+  const { t } = useTranslation();
 
   const equiposEspañoles = [
     "Real Betis",
@@ -51,7 +52,13 @@ const SearchTab = () => {
   ];
 
   const posiciones = ["goalkeeper", "defender", "midfielder", "forward"];
-  const { t } = useTranslation();
+
+  // Función para limpiar todos los filtros
+  const clearFilters = () => {
+    setSearchQuery("");
+    setSelectedTeam("Equipo");
+    setSelectedPosition("Posición");
+  };
 
   return (
     <div className="flex justify-center w-full p-4">
@@ -66,14 +73,35 @@ const SearchTab = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/70" />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/70 hover:text-white"
+                aria-label="Clear search"
+              >
+                <FaTimes />
+              </button>
+            )}
           </div>
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 transition-colors text-white px-5 py-3 rounded-lg w-full lg:w-auto shadow-md"
-          >
-            <Filter size={18} />
-            <span> {t("shop.filter")}</span>
-          </button>
+          <div className="flex w-full lg:w-auto gap-2">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 transition-colors text-white px-5 py-3 rounded-lg flex-1 shadow-md"
+            >
+              <Filter size={18} />
+              <span>{t("shop.filter")}</span>
+            </button>
+            
+            {/* Botón de limpiar filtros */}
+            <button
+              onClick={clearFilters}
+              className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-500 transition-colors text-white px-5 py-3 rounded-lg flex-1 shadow-md"
+              aria-label="Clear filters"
+            >
+              <FaTimes size={18} />
+              <span>Limpiar</span>
+            </button>
+          </div>
         </div>
 
         {showFilters && (
@@ -87,7 +115,7 @@ const SearchTab = () => {
                 onChange={(e) => setSelectedPosition(e.target.value)}
                 className="w-full p-3 bg-white/20 backdrop-blur-md text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 [&>option]:text-black"
               >
-                <option value="Posición"> {t("shop.reastPos")}</option>
+                <option value="Posición">{t("shop.reastPos")}</option>
                 {posiciones.map((posicion) => (
                   <option key={posicion} value={posicion}>
                     {posicion}
@@ -104,7 +132,7 @@ const SearchTab = () => {
                 onChange={(e) => setSelectedTeam(e.target.value)}
                 className="w-full p-3 bg-white/20 backdrop-blur-md text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 [&>option]:text-black"
               >
-                <option value="Equipo"> {t("shop.reastTeam")}</option>
+                <option value="Equipo">{t("shop.reastTeam")}</option>
                 {equiposEspañoles.map((equipo) => (
                   <option key={equipo} value={equipo}>
                     {equipo}
@@ -399,8 +427,6 @@ export default function Shop() {
 
   return (
     <div className="relative">
-      {" "}
-      {/* Nuevo contenedor padre */}
       <div
         className="min-h-screen w-screen bg-cover bg-center bg-fixed text-white flex flex-col items-center overflow-hidden"
         style={{
@@ -421,15 +447,17 @@ export default function Shop() {
               <div>
                 <BackButton onClick={handleBackClick} />
               </div>
-              <h1 className="text-3xl md:text-5xl font-bold text-center flex-grow">
+              {/* Ajuste para título más pequeño en móvil para dejar espacio */}
+              <h1 className="text-2xl md:text-5xl font-bold text-center flex-grow px-2">
                 {t("shop.title")}
               </h1>
-              <div className="flex items-center bg-gradient-to-r from-blue-900/90 to-blue-800/90 px-4 py-2 rounded-lg shadow-lg">
-                <span className="text-white text-lg md:text-2xl font-semibold mr-2">
+              {/* Botón de monedas más pequeño en móvil */}
+              <div className="flex items-center bg-gradient-to-r from-blue-900/90 to-blue-800/90 px-2 sm:px-4 py-2 rounded-lg shadow-lg shrink-0">
+                <span className="text-white text-sm md:text-2xl font-semibold mr-1 sm:mr-2">
                   {adrenacoins}
                 </span>
                 <FaCoins className="text-yellow-400 text-lg md:text-2xl" />
-                <button className="ml-3 text-lg md:text-2xl text-green-400 hover:text-green-300 transition transform hover:scale-110">
+                <button className="ml-1 sm:ml-3 text-lg md:text-2xl text-green-400 hover:text-green-300 transition transform hover:scale-110">
                   <FaPlusCircle />
                 </button>
               </div>
@@ -438,7 +466,7 @@ export default function Shop() {
 
           <div className="w-full max-w-7xl px-4 pt-8 pb-24">
             {/* Sección de "Luxuris del día" */}
-            <div className="bg-gradient-to-br from-blue-900/90 via-blue-800/90 to-blue-700/90 py-8 px-6 rounded-xl shadow-2xl mb-12 backdrop-blur-sm">
+            <div className="bg-gradient-to-br from-blue-900/90 via-blue-800/90 to-blue-700/90 py-8 px-4 sm:px-6 rounded-xl shadow-2xl mb-12 backdrop-blur-sm">
               <div
                 className="relative overflow-hidden w-full h-12 flex items-center justify-center mb-8"
                 style={{
@@ -451,7 +479,7 @@ export default function Shop() {
                 <MarqueeText text="★ LUXURIS DEL DÍA ★" />
               </div>
 
-              <div className="flex flex-wrap justify-center gap-6 md:gap-8 lg:gap-12">
+              <div className="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-8 lg:gap-12">
                 {luxurisCards.length > 0 ? (
                   luxurisCards.map((card) => (
                     <div
@@ -473,7 +501,7 @@ export default function Shop() {
             </div>
 
             <div className="flex justify-center">
-              <div className="mb-10">
+              <div className="mb-10 w-full">
                 <SearchTab
                   searchQuery={searchQuery}
                   setSearchQuery={setSearchQuery}
@@ -496,17 +524,18 @@ export default function Shop() {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                {/* Ajuste al grid para mejor visualización en móvil */}
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
                   {cards.length > 0 ? (
                     cards.slice(0, visibleCount).map((card) => (
                       <div
                         key={card.id}
-                        className="cursor-pointer transform transition-all hover:scale-105 bg-blue-900/30 rounded-lg p-3 backdrop-blur-sm hover:bg-blue-800/40"
+                        className="cursor-pointer transform transition-all hover:scale-105 bg-blue-900/30 rounded-lg p-2 sm:p-3 backdrop-blur-sm hover:bg-blue-800/40"
                         onClick={() => handleCardClick(card, false)}
                       >
                         <Carta jugador={card} />
-                        <div className="flex items-center justify-center mt-3 bg-blue-700/50 rounded-lg px-3 py-2">
-                          <span className="text-lg font-semibold">
+                        <div className="flex items-center justify-center mt-2 sm:mt-3 bg-blue-700/50 rounded-lg px-2 sm:px-3 py-1 sm:py-2">
+                          <span className="text-base sm:text-lg font-semibold">
                             {card.precio}
                           </span>
                           <FaCoins className="ml-2 text-yellow-400" />
@@ -538,7 +567,7 @@ export default function Shop() {
                     onClick={() => navigate("/cards-for-sale")}
                     className="bg-gradient-to-r from-indigo-700 to-purple-600 px-6 py-3 rounded-lg hover:from-indigo-600 hover:to-purple-500 transition-all shadow-lg flex items-center gap-2"
                   >
-                    <span> {t("shop.view")}</span>
+                    <span>{t("shop.view")}</span>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="h-5 w-5"
@@ -562,7 +591,7 @@ export default function Shop() {
             <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
               <div
                 className="bg-gradient-to-b from-blue-900 to-blue-950 rounded-xl shadow-2xl text-center w-full max-w-lg mx-auto border border-blue-500/30 overflow-hidden"
-                style={{ maxHeight: "90vh" }} // Limitar altura máxima
+                style={{ maxHeight: "90vh" }}
               >
                 <div className="bg-gradient-to-r from-blue-800 to-blue-700 py-3 px-4 sticky top-0 z-10">
                   <h3 className="text-xl font-bold">{t("shop.info")}</h3>
@@ -573,10 +602,8 @@ export default function Shop() {
                   style={{ maxHeight: "calc(90vh - 56px)" }}
                 >
                   {!showPurchaseAnimation ? (
-                    // Vista normal del modal de compra - ahora con scroll interno
                     <>
                       <div className="flex justify-center mb-6 transform transition-transform hover:scale-105 max-w-full">
-                        {/* Contenedor con tamaño máximo para la carta */}
                         <div className="max-w-xs w-full">
                           <Carta2 jugador={selectedCard} />
                         </div>
@@ -603,7 +630,7 @@ export default function Shop() {
                         <FaCoins className="text-yellow-400 text-xl" />
                       </div>
 
-                      <p className="text-lg mb-6">{t("shop.question")} </p>
+                      <p className="text-lg mb-6">{t("shop.question")}</p>
 
                       <div className="grid grid-cols-2 gap-4 px-4">
                         <button
@@ -621,7 +648,6 @@ export default function Shop() {
                       </div>
                     </>
                   ) : (
-                    // Vista de animación de compra
                     <div className="py-4 flex items-center justify-center min-h-64">
                       <PurchaseAnimationWithStatus />
                     </div>
@@ -659,7 +685,7 @@ export default function Shop() {
             <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
               <div className="bg-blue-900/80 p-6 rounded-xl shadow-lg text-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-white mx-auto mb-4"></div>
-                <p className="text-white text-lg"> {t("shop.loading")}</p>
+                <p className="text-white text-lg">{t("shop.loading")}</p>
               </div>
             </div>
           )}

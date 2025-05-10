@@ -160,17 +160,15 @@ export default function PlayButton({ className = "", iconClassName = "" }) {
           <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-transparent opacity-0 hover:opacity-100 transition"></div>
         </motion.button>
 
-        <button className="flex flex-col items-center justify-center px-4 py-2 hover:bg-purple-900/50 transition group">
-          <div className="relative">
-            <FaBolt
-              className={`text-xl text-yellow-400 group-hover:scale-110 transition ${iconClassName}`}
-            />
-            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-purple-500 rounded-full opacity-0 group-hover:opacity-100 transition"></div>
-          </div>
-          <span className="text-xs text-gray-300 group-hover:text-white mt-1">
+        {/* Cambiado de botón a div para mostrar solo texto */}
+        <div className="flex flex-col items-center justify-center px-4 py-2">
+          <FaBolt
+            className={`text-xl text-yellow-400 ${iconClassName}`}
+          />
+          <span className="text-xs text-gray-300 mt-1">
             1 vs 1
           </span>
-        </button>
+        </div>
       </motion.div>
     </>
   );

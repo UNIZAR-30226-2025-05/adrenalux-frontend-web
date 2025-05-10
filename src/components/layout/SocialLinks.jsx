@@ -1,4 +1,3 @@
-import React from "react";
 import { FaFacebook, FaYoutube, FaLinkedin, FaInstagram } from "react-icons/fa";
 
 export default function SocialLinks() {
