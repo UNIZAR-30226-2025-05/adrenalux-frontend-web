@@ -843,15 +843,17 @@ class SocketService {
   handleMatchFound(data) {
     console.log("Partida encontrada:", data);
 
-    // 1) First, let the component show the UI
     if (typeof this.onMatchFound === "function") {
       this.onMatchFound(data);
     }
 
-    // 2) Only after a delay do we actually navigate
     setTimeout(() => {
-      this.navigate(`/partida/${encodeURIComponent(data.matchId)}`);
-    }, 5000); // 3 seconds → adjust as you like
+      this.navigate(`/partida/${encodeURIComponent(data.matchId)}`, {
+        state: { 
+          tournamentMatch: data.tournamentMatch 
+        }
+      });
+    }, 5000);
   }
 
   async handleRoundStart(data) {

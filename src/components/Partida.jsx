@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unknown-property */
 /* eslint-disable no-case-declarations */
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation  } from "react-router-dom";
 import { socketService } from "../services/websocket/socketService";
 import background from "../assets/backgroundAlineacion.png";
 import { getProfile } from "../services/api/profileApi";
@@ -44,6 +44,9 @@ const Partida = () => {
   
   const selectedCardRef = useRef(null);
   const opponentCardsRef = useRef([]);
+
+  const location = useLocation();
+  const isTournamentMatch = location.state?.tournamentMatch || false;
 
   const [showPausedMenu, setShowPausedMenu] = useState(false);
   const [pausedMatches, setPausedMatches] = useState([]);
@@ -1555,25 +1558,27 @@ const Partida = () => {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 20 }}
         >
-          {gameState.phase === "paused" ? (
-            <button
-              onClick={handleResume}
-              style={menuItemStyle}
-              className="hover:bg-emerald-600/50"
-            >
-              <FaPlay /> Reanudar
-            </button>
-          ) : (
-            <button
-              onClick={handlePause}
-              style={menuItemStyle}
-              className="hover:bg-yellow-600/50"
-            >
-              <FaPause /> Pausar
-            </button>
+          {!isTournamentMatch && (
+            gameState.phase === "paused" ? (
+              <button 
+                onClick={handleResume} 
+                style={menuItemStyle}
+                className="hover:bg-emerald-600/50"
+              >
+                <FaPlay /> Reanudar
+              </button>
+            ) : (
+              <button 
+                onClick={handlePause} 
+                style={menuItemStyle}
+                className="hover:bg-yellow-600/50"
+              >
+                <FaPause /> Pausar
+              </button>
+            )
           )}
-          <button
-            onClick={handleSurrender}
+          <button 
+            onClick={handleSurrender} 
             style={menuItemStyle}
             className="hover:bg-red-600/50"
           >
