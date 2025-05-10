@@ -27,7 +27,7 @@ const Ajustes = () => {
 
   const [musicVolume, setMusicVolume] = useState(() => {
     const savedVolume = localStorage.getItem("musicVolume");
-    return savedVolume !== null ? (savedVolume * 100) : 50;
+    return savedVolume !== null ? (savedVolume * 100) : 20;
   });
 
   const [language, setLanguage] = useState(currentLanguage || "es");
