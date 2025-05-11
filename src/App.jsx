@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Register from "./components/Register";
 import Login from "./components/Login";
@@ -27,9 +27,10 @@ import PartidasPausadas from "./components/PartidasPausadas";
 import Info from "./components/InfoFirstUser";
 import Terminos from "./components/Terminos";
 import Soporte from "./components/Soporte";
+import Politica from "./components/Politica";
 
 function App() {
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
+  const [theme] = useState(localStorage.getItem("theme") || "dark");
 
   useEffect(() => {
     // Aplicar el tema a la raíz del documento HTML
@@ -80,6 +81,7 @@ function App() {
         <Route path="/info" element={<Info />} />
         <Route path="/terminos" element={<Terminos />} />
         <Route path="/soporte" element={<Soporte />} />
+        <Route path="/politica" element={<Politica />} />
       </Routes>
     </Router>
   );

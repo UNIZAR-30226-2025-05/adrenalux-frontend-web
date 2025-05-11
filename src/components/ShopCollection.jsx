@@ -4,6 +4,7 @@ import BackButton from "../components/layout/game/BackButton";
 import background from "../assets/background.png";
 import Card from "./layout/game/Card";
 import { getToken } from "../services/api/authApi";
+import PropTypes from "prop-types";
 // Simulación de datos obtenidos del backend.
 
 export default function ShopCollection({
@@ -149,3 +150,10 @@ export default function ShopCollection({
     </div>
   );
 }
+
+ShopCollection.propTypes = {
+  searchQuery: PropTypes.string,
+  selectedTeam: PropTypes.string,
+  selectedPosition: PropTypes.string,
+  onBack: PropTypes.func.isRequired, 
+};

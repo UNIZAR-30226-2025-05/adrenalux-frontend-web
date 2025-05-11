@@ -19,7 +19,7 @@ export default function CardsForSaleAlbum() {
   const [currentPage, setCurrentPage] = useState(1);
   const [showDialog, setShowDialog] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
-  const [infoUser, setInfoUser] = useState(null);
+  const [setInfoUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const token = getToken();
 

@@ -132,7 +132,7 @@ const Terminos = () => {
           <div className={sectionBoxStyle}>
             <h2 className="text-2xl font-semibold text-white mb-3">5. Limitación de Responsabilidad</h2>
             <p className="text-gray-300">
-              AdrenaLux se proporciona "tal cual", sin garantías explícitas o implícitas sobre su funcionamiento, disponibilidad o resultados esperados. No garantizamos que la plataforma esté libre de errores, interrupciones o pérdidas de datos.
+              AdrenaLux se proporciona &quot;tal cual&quot;, sin garantías explícitas o implícitas sobre su funcionamiento, disponibilidad o resultados esperados. No garantizamos que la plataforma esté libre de errores, interrupciones o pérdidas de datos.
             </p>
             <p className="text-gray-400 mt-2">
               En ningún caso seremos responsables por daños indirectos, incidentales o consecuentes derivados del uso o imposibilidad de uso del servicio.

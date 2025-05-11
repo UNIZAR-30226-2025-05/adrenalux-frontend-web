@@ -49,7 +49,7 @@ const Inicio = () => {
   };
 
   const sectionRef = useRef(null);
-  const [isSectionVisible, setIsSectionVisible] = useState(false);
+  const [setIsSectionVisible] = useState(false);
 
   // Función para hacer scroll a la sección
   const scrollToSection = () => {

@@ -81,7 +81,7 @@ const Register = () => {
     setIsSubmitting(true);
 
     try {
-      const { status, data } = await register(
+      const { status } = await register(
         formData.email,
         formData.username,
         formData.lastname,

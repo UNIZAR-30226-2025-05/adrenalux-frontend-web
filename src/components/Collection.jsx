@@ -831,7 +831,7 @@ export default function Collection({ onBack }) {
                 {t("collection.rarity")}
               </h4>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {Object.entries(rarities).map(([key, rarity]) => (
+                {Object.entries(rarities).map(([key]) => (
                   <button
                     key={key}
                     onClick={() => handleRarityClick(key)}
