@@ -23,7 +23,7 @@
       "close": "Close"
     }
   },
-  "common" : {
+  "common": {
     "actions": {
       "title": "Common actions"
     }
@@ -256,6 +256,53 @@
     "rewards": {
       "type": "+{{reward_type}}",
       "amount": "+{{reward_amount}} 🪙"
+    }
+  },
+  "info": {
+    "welcome": {
+      "title": "Welcome to Adrenalux",
+      "skip": "Skip",
+      "stepIndicator": "Step {{current}} of {{total}}",
+      "finalStepMessage": "Get ready for the kickoff!",
+      "market": "MARKET"
+    },
+    "features": {
+      "openCardPacks": {
+        "title": "Open Card Packs",
+        "description": "Discover legendary La Liga stars by opening exciting card packs. Collect rare and powerful cards from all Spanish clubs to build your ultimate collection.",
+        "iconLabel": "Card Pack"
+      },
+      "duelYourFriends": {
+        "title": "Duel Your Friends",
+        "description": "Challenge your friends in thrilling card duels. Select your best cards, choose their abilities strategically, and compete in head-to-head matches to prove who’s the best manager.",
+        "iconLabel": "Game Controller"
+      },
+      "tradeInTheMarketplace": {
+        "title": "Trade in the Marketplace",
+        "description": "Buy, sell, and trade cards with other players in the dynamic marketplace. Swap your duplicate players for the cards you need to complete your collection.",
+        "iconLabel": "Shopping Cart"
+      },
+      "buildYourDreamTeam": {
+        "title": "Build Your Dream Team",
+        "description": "Select your favorite players for your lineup. Choose formations and positions to create the perfect team strategy that suits your playstyle.",
+        "iconLabel": "Football Field"
+      },
+      "howToPlay": {
+        "title": "How to Play",
+        "description": "Add your lineup to favorites to create your team. In duels, select a card and a specific ability to compete. Players take turns choosing cards: on your turn, pick any player, but when responding, you must match the position of your opponent’s last choice. The duel continues until there’s a winner!",
+        "iconLabel": "Gamepad",
+        "pick": "PICK",
+        "play": "PLAY",
+        "info": "Choose the same position when responding."
+      }
+    },
+    "buttons": {
+      "next": "Next",
+      "hitThePitch": "Hit the Pitch"
+    },
+    "skills": {
+      "s1": "ATTACK",
+      "s2": "DEFENSE"
     }
   }
 }
