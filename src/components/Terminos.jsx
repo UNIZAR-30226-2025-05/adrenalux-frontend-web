@@ -7,12 +7,13 @@ import { getToken } from "../services/api/authApi";
 const Terminos = () => {
     const navigate = useNavigate();
     const token = getToken();
+
     useEffect(() => {
         document.documentElement.classList.add('bg-black');
         document.body.className = 'bg-gradient-to-b from-gray-900 to-black text-white';
         return () => {
-        document.documentElement.classList.remove('bg-black');
-        document.body.className = '';
+            document.documentElement.classList.remove('bg-black');
+            document.body.className = '';
         };
     }, []);
 
@@ -22,9 +23,9 @@ const Terminos = () => {
     const itemVariants = {
         hidden: { y: 20, opacity: 0 },
         visible: {
-        y: 0,
-        opacity: 1,
-        transition: { type: "spring", stiffness: 100 },
+            y: 0,
+            opacity: 1,
+            transition: { type: "spring", stiffness: 100 },
         },
     };
 
@@ -142,14 +143,14 @@ const Terminos = () => {
           <div className={sectionBoxStyle}>
             <h2 className="text-2xl font-semibold text-white mb-3">6. Contacto</h2>
             <p className="text-gray-300">
-              Si tienes dudas sobre estos términos, puedes contactarnos mediante el formulario de soporte disponible en el sitio web. Nos tomamos muy en serio las preocupaciones de la comunidad y agradecemos tu compromiso con un entorno justo y competitivo.
+              Si tienes dudas sobre estos términos, puedes contactarnos. Nos tomamos muy en serio las preocupaciones de la comunidad y agradecemos tu compromiso con un entorno justo y competitivo.
             </p>
           </div>
 
         </section>
 
         <p className="text-sm text-gray-500 text-center py-10">
-          © {new Date().getFullYear()} AdrenaLux. Todos los derechos reservados. — Última actualización: mayo de 2025
+          © {new Date().getFullYear()} AdrenaLux — Última actualización: mayo de 2025
         </p>
       </main>
     </div>
