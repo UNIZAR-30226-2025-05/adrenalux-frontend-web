@@ -1,4 +1,6 @@
 import { useEffect } from 'react';
+import { motion } from "framer-motion";
+import logo from "../assets/adrenalux_logo_white.png";
 
 const Terminos = () => {
   useEffect(() => {
@@ -10,11 +12,51 @@ const Terminos = () => {
     };
   }, []);
 
-  const sectionBoxStyle = "bg-gray-800/50 border border-gray-700 rounded-2xl p-6 shadow-lg backdrop-blur";
+    const handleLoginClick = () => navigate("/login");
+    const handleSignUpClick = () => navigate("/register");
+    
+    const itemVariants = {
+        hidden: { y: 20, opacity: 0 },
+        visible: {
+        y: 0,
+        opacity: 1,
+        transition: { type: "spring", stiffness: 100 },
+        },
+    };
+
+  const sectionBoxStyle = "bg-gray-800/20 border border-white/10 rounded-2xl p-6 shadow-lg backdrop-blur";
 
   return (
     <div className="w-full h-screen flex justify-center bg-gradient-to-b from-gray-900 to-black overflow-y-auto">
-      <main className="w-full lg:w-1/2 px-6 py-8 md:py-12 space-y-10">
+      <main className="w-full lg:w-1/2 px-6 pb-8 md:pb-12 space-y-10">
+          {/* Navbar */}
+        <header className="w-full px-4 py-4 md:px-8 md:py-6 flex justify-between items-center z-50 backdrop-blur-2xl border-b border-white/10">
+            <motion.img
+            src={logo}
+            alt="AdrenaLux Logo"
+            className="w-16 md:w-24 cursor-pointer transition-all duration-500 hover:scale-105"
+            onClick={() => navigate("/")}
+            whileHover={{ scale: 1.05 }}
+            variants={itemVariants}
+            />
+            <nav className="flex gap-2 md:gap-4">
+            <motion.button
+                onClick={handleLoginClick}
+                className="bg-white/5 hover:bg-white/10 px-4 py-2 rounded-xl transition-all duration-300 border border-white/10 backdrop-blur-lg text-sm md:text-base"
+                variants={itemVariants}
+            >
+                Iniciar sesión
+            </motion.button>
+            <motion.button
+                onClick={handleSignUpClick}
+                className="relative bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-400 hover:to-purple-500 px-6 py-2 rounded-xl transition-all duration-300 hover:shadow-[0_0_20px_-5px_rgba(99,102,241,0.5)]"
+                variants={itemVariants}
+            >
+                <span className="relative z-10">Registrarse</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/30 to-purple-600/30 rounded-xl opacity-0 hover:opacity-100 transition-opacity duration-300" />
+            </motion.button>
+            </nav>
+        </header>
         <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-300 bg-clip-text text-transparent text-center">
           Términos de Uso
         </h1>
