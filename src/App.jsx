@@ -26,6 +26,7 @@ import MusicManager from "./context/MusicManager";
 import PartidasPausadas from "./components/PartidasPausadas";
 import Info from "./components/InfoFirstUser";
 import Terminos from "./components/Terminos";
+import Soporte from "./components/Soporte";
 
 function App() {
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
@@ -78,6 +79,7 @@ function App() {
         <Route path="/partidasPausadas" element={<PartidasPausadas />} />
         <Route path="/info" element={<Info />} />
         <Route path="/terminos" element={<Terminos />} />
+        <Route path="/soporte" element={<Soporte />} />
       </Routes>
     </Router>
   );

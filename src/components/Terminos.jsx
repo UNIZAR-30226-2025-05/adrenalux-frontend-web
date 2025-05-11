@@ -1,16 +1,21 @@
 import { useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import logo from "../assets/adrenalux_logo_white.png";
+import { getToken } from "../services/api/authApi";
 
 const Terminos = () => {
-  useEffect(() => {
-    document.documentElement.classList.add('bg-black');
-    document.body.className = 'bg-gradient-to-b from-gray-900 to-black text-white';
-    return () => {
-      document.documentElement.classList.remove('bg-black');
-      document.body.className = '';
-    };
-  }, []);
+    const navigate = useNavigate();
+    const token = getToken();
+
+    useEffect(() => {
+        document.documentElement.classList.add('bg-black');
+        document.body.className = 'bg-gradient-to-b from-gray-900 to-black text-white';
+        return () => {
+            document.documentElement.classList.remove('bg-black');
+            document.body.className = '';
+        };
+    }, []);
 
     const handleLoginClick = () => navigate("/login");
     const handleSignUpClick = () => navigate("/register");
@@ -18,9 +23,9 @@ const Terminos = () => {
     const itemVariants = {
         hidden: { y: 20, opacity: 0 },
         visible: {
-        y: 0,
-        opacity: 1,
-        transition: { type: "spring", stiffness: 100 },
+            y: 0,
+            opacity: 1,
+            transition: { type: "spring", stiffness: 100 },
         },
     };
 
@@ -28,7 +33,7 @@ const Terminos = () => {
 
   return (
     <div className="w-full h-screen flex justify-center bg-gradient-to-b from-gray-900 to-black overflow-y-auto">
-      <main className="w-full lg:w-1/2 px-6 pb-8 md:pb-12 space-y-10">
+      <main className="w-full lg:w-2/3 px-6 pb-8 md:pb-12 space-y-10">
           {/* Navbar */}
         <header className="w-full px-4 py-4 md:px-8 md:py-6 flex justify-between items-center z-50 backdrop-blur-2xl border-b border-white/10">
             <motion.img
@@ -39,7 +44,17 @@ const Terminos = () => {
             whileHover={{ scale: 1.05 }}
             variants={itemVariants}
             />
-            <nav className="flex gap-2 md:gap-4">
+        <nav className="flex gap-2 md:gap-4">
+        {token ? (
+            <motion.button
+            onClick={() => navigate("/home")} // o a donde quieras
+            className="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl transition-all duration-300 border border-white/10 backdrop-blur-lg text-sm md:text-base"
+            variants={itemVariants}
+            >
+            Inicio
+            </motion.button>
+        ) : (
+            <>
             <motion.button
                 onClick={handleLoginClick}
                 className="bg-white/5 hover:bg-white/10 px-4 py-2 rounded-xl transition-all duration-300 border border-white/10 backdrop-blur-lg text-sm md:text-base"
@@ -55,7 +70,9 @@ const Terminos = () => {
                 <span className="relative z-10">Registrarse</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-500/30 to-purple-600/30 rounded-xl opacity-0 hover:opacity-100 transition-opacity duration-300" />
             </motion.button>
-            </nav>
+            </>
+        )}
+        </nav>
         </header>
         <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-300 bg-clip-text text-transparent text-center">
           Términos de Uso
@@ -126,14 +143,14 @@ const Terminos = () => {
           <div className={sectionBoxStyle}>
             <h2 className="text-2xl font-semibold text-white mb-3">6. Contacto</h2>
             <p className="text-gray-300">
-              Si tienes dudas sobre estos términos, puedes contactarnos mediante el formulario de soporte disponible en el sitio web. Nos tomamos muy en serio las preocupaciones de la comunidad y agradecemos tu compromiso con un entorno justo y competitivo.
+              Si tienes dudas sobre estos términos, puedes contactarnos. Nos tomamos muy en serio las preocupaciones de la comunidad y agradecemos tu compromiso con un entorno justo y competitivo.
             </p>
           </div>
 
         </section>
 
         <p className="text-sm text-gray-500 text-center py-10">
-          © {new Date().getFullYear()} AdrenaLux. Todos los derechos reservados. — Última actualización: mayo de 2025
+          © {new Date().getFullYear()} AdrenaLux — Última actualización: mayo de 2025
         </p>
       </main>
     </div>
