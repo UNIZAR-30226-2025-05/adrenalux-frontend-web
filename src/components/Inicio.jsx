@@ -1,14 +1,28 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaInstagram, FaLinkedin, FaYoutube, FaDiscord } from "react-icons/fa";
+import {
+  FaInstagram,
+  FaLinkedin,
+  FaYoutube,
+  FaDiscord,
+  FaAndroid,
+  FaDownload,
+} from "react-icons/fa";
 import { motion } from "framer-motion";
 import logo from "../assets/adrenalux_logo_white.png";
 import pantallaPrincipal from "../assets/Sobres.png";
 import { getToken } from "../services/api/authApi";
+import gameApk from "../assets/adrenalux-Android.apk";
 
 const Inicio = () => {
   const navigate = useNavigate();
   const token = getToken();
+
+  // Refs para las secciones a las que haremos scroll
+  const downloadSectionRef = useRef(null);
+  const mainSectionRef = useRef(null);
+
+  const [isSectionVisible, setIsSectionVisible] = useState(false);
 
   useEffect(() => {
     if (token) {
@@ -23,6 +37,36 @@ const Inicio = () => {
       document.body.className = "";
     };
   }, [token, navigate]);
+
+  // Función para hacer scroll suave a la sección de descarga
+  const scrollToDownloadSection = () => {
+    downloadSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  // Función para hacer scroll a la sección principal
+  const scrollToMainSection = () => {
+    mainSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  // Detectar cuando la sección es visible
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsSectionVisible(entry.isIntersecting);
+      },
+      { threshold: 0.5 }
+    );
+
+    if (mainSectionRef.current) {
+      observer.observe(mainSectionRef.current);
+    }
+
+    return () => {
+      if (mainSectionRef.current) {
+        observer.unobserve(mainSectionRef.current);
+      }
+    };
+  }, []);
 
   const handleLoginClick = () => navigate("/login");
   const handleSignUpClick = () => navigate("/register");
@@ -48,42 +92,12 @@ const Inicio = () => {
     },
   };
 
-  const sectionRef = useRef(null);
-  const [setIsSectionVisible] = useState(false);
-
-  // Función para hacer scroll a la sección
-  const scrollToSection = () => {
-    sectionRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  // Detectar cuando la sección es visible
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        // Si la sección es visible, ocultamos el botón
-        setIsSectionVisible(entry.isIntersecting);
-      },
-      { threshold: 0.5 } // La sección es visible cuando el 50% de ella está en la pantalla
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    // Limpiar el observador cuando el componente se desmonte
-    return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
-      }
-    };
-  }, []);
-
   return (
     <motion.div
       initial="hidden"
       animate="visible"
       variants={containerVariants}
-      className="flex flex-col text-white relative h-screen min-h-screen w-full max-w-full bg-black" // Añadir bg-black aquí
+      className="flex flex-col text-white relative h-screen min-h-screen w-full max-w-full bg-black"
     >
       {/* Navbar */}
       <header className="fixed top-0 left-0 w-full px-4 py-4 md:px-8 md:py-6 flex justify-between items-center z-50 backdrop-blur-2xl bg-black/30 border-b border-white/10">
@@ -182,6 +196,50 @@ const Inicio = () => {
                   </a>
                 </div>
               </motion.div>
+
+              <motion.div
+                variants={itemVariants}
+                onClick={scrollToDownloadSection}
+                className="relative overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 p-4 rounded-xl border border-indigo-500/30 shadow-lg hover:shadow-indigo-500/20 transition-all duration-300 group mt-6 max-w-[12rem] cursor-pointer transform hover:-translate-y-1"
+                whileHover={{
+                  scale: 1.02,
+                  transition: { duration: 0.2 },
+                }}
+              >
+                <div className="absolute -top-12 -right-12 w-32 h-32 bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/20 transition-all duration-500"></div>
+                <div className="absolute -bottom-8 -left-8 w-28 h-28 bg-indigo-500/10 rounded-full blur-xl group-hover:bg-indigo-500/20 transition-all duration-500"></div>
+
+                <div className="relative z-10">
+                  <div className="flex items-center mb-2">
+                    <div className="mr-2 p-1.5 bg-gradient-to-br from-emerald-500 to-indigo-600 rounded-lg shadow-sm">
+                      <FaAndroid className="text-lg text-white" />
+                    </div>
+                    <h3 className="text-lg font-bold text-white">
+                      App Android
+                    </h3>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="group/btn inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-emerald-500 to-indigo-600 hover:from-emerald-400 hover:to-indigo-500 px-3 py-2 rounded-lg transition-all duration-200 w-full text-sm shadow-sm hover:shadow-indigo-500/20">
+                      <FaAndroid className="text-base" />
+                      <span>Ver más</span>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 group-hover/btn:translate-y-0.5 transition-transform duration-200"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
             </motion.section>
 
             {/* Imagen */}
@@ -201,21 +259,43 @@ const Inicio = () => {
 
         {/* Botón de scroll hacia abajo */}
         <motion.button
-          ref={sectionRef}
-          onClick={scrollToSection}
+          ref={mainSectionRef}
+          onClick={scrollToMainSection}
           className="absolute bottom-10 left-1/2 transform -translate-x-1/2 py-3 px-4 rounded-full bg-white/5 text-white shadow-md hover:shadow-lg transition-all duration-300"
         >
           <span className="text-2xl">&#8595;</span> {/* Flecha hacia abajo */}
         </motion.button>
 
         {/* Sección de características */}
-        <section className="pb-12 px-6 md:px-16 lg:px-32 text-white relative z-10">
+        <section className="py-20 px-6 md:px-16 lg:px-32 text-white relative z-10">
+          <div className="text-center mb-12">
+            <motion.h2
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={itemVariants}
+              className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4"
+            >
+              Todo lo que ofrece AdrenaLux
+            </motion.h2>
+            <motion.p
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={itemVariants}
+              className="text-gray-300 max-w-2xl mx-auto"
+            >
+              Descubre todas las características que hacen de AdrenaLux el TCG
+              de fútbol definitivo
+            </motion.p>
+          </div>
+
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={containerVariants}
-            className="grid grid-cols-1 lg:grid-cols-3 gap-8 text-center"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-center"
           >
             <motion.div
               variants={itemVariants}
@@ -225,7 +305,9 @@ const Inicio = () => {
                 ¡Experiencia de Fútbol Digital!
               </h3>
               <p className="text-gray-300">
-                Únete a un mundo donde el fútbol cobra vida a través de cartas coleccionables. ¡Desafía a tus amigos, construye tu equipo y demuestra que eres el mejor!
+                Únete a un mundo donde el fútbol cobra vida a través de cartas
+                coleccionables. ¡Desafía a tus amigos, construye tu equipo y
+                demuestra que eres el mejor!
               </p>
               <div className="text-4xl mt-4 text-center">
                 <span role="img" aria-label="Balón de fútbol">
@@ -242,7 +324,8 @@ const Inicio = () => {
                 Colecciona y Abre Sobres
               </h3>
               <p className="text-gray-300">
-                ¡Consigue sobres con cartas de futbolistas únicos! Cada carta tiene una valoración que aumenta su poder en el campo.
+                ¡Consigue sobres con cartas de futbolistas únicos! Cada carta
+                tiene una valoración que aumenta su poder en el campo.
               </p>
               <div className="text-4xl mt-4 text-center">
                 <span role="img" aria-label="Balón de fútbol">
@@ -259,7 +342,8 @@ const Inicio = () => {
                 Duela con Amigos
               </h3>
               <p className="text-gray-300">
-                Desafía a tus amigos o jugadores de todo el mundo en emocionantes duelos. ¡Solo los mejores equipos ganan!
+                Desafía a tus amigos o jugadores de todo el mundo en
+                emocionantes duelos. ¡Solo los mejores equipos ganan!
               </p>
               <div className="text-4xl mt-4 text-center">
                 <span role="img" aria-label="Balón de fútbol">
@@ -276,7 +360,8 @@ const Inicio = () => {
                 Mercado de Intercambios
               </h3>
               <p className="text-gray-300">
-                ¿Quieres mejorar tu equipo? Usa el mercado para intercambiar cartas con otros jugadores.
+                ¿Quieres mejorar tu equipo? Usa el mercado para intercambiar
+                cartas con otros jugadores.
               </p>
               <div className="text-4xl mt-4 text-center">
                 <span role="img" aria-label="Balón de fútbol">
@@ -293,7 +378,9 @@ const Inicio = () => {
                 Construye Tu Equipo de Ensueño
               </h3>
               <p className="text-gray-300">
-                Escoge tus jugadores favoritos y forma el equipo que siempre soñaste. Usa tu estrategia y habilidades para crear el mejor equipo posible para competir.
+                Escoge tus jugadores favoritos y forma el equipo que siempre
+                soñaste. Usa tu estrategia y habilidades para crear el mejor
+                equipo posible para competir.
               </p>
               <div className="text-4xl mt-4 text-center">
                 <span role="img" aria-label="Balón de fútbol">
@@ -301,7 +388,7 @@ const Inicio = () => {
                 </span>
               </div>
             </motion.div>
-            
+
             <motion.div
               variants={itemVariants}
               className="bg-white/5 p-6 rounded-2xl border border-white/10 shadow-md hover:shadow-blue-400/10 transition-all duration-300"
@@ -310,7 +397,9 @@ const Inicio = () => {
                 Participa en Torneos
               </h3>
               <p className="text-gray-300">
-                Compite en grandes eventos donde los mejores jugadores luchan por la gloria. Gana premios y cartas raras para mejorar tu colección.
+                Compite en grandes eventos donde los mejores jugadores luchan
+                por la gloria. Gana premios y cartas raras para mejorar tu
+                colección.
               </p>
               <div className="text-4xl mt-4 text-center">
                 <span role="img" aria-label="Balón de fútbol">
@@ -318,6 +407,124 @@ const Inicio = () => {
                 </span>
               </div>
             </motion.div>
+          </motion.div>
+
+          {/* Android Download CTA Section - Añadido ref para scroll */}
+          <motion.div
+            ref={downloadSectionRef}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={itemVariants}
+            className="mt-20 flex flex-col items-center"
+            id="android-download-section"
+          >
+            <div className="text-center mb-8">
+              <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-400 to-indigo-400 bg-clip-text text-transparent">
+                Lleva AdrenaLux contigo
+              </h2>
+              <p className="text-gray-300 mt-2">
+                Descarga nuestra aplicación Android y juega en cualquier momento
+                y lugar
+              </p>
+            </div>
+
+            <div className="flex flex-col md:flex-row items-center justify-center gap-8">
+              <motion.div
+                variants={itemVariants}
+                className="relative overflow-hidden bg-gradient-to-br from-gray-900 to-gray-800 p-6 rounded-xl border border-indigo-500/30 shadow-lg hover:shadow-indigo-500/20 transition-all duration-300 group max-w-xs"
+                whileHover={{
+                  scale: 1.02,
+                  transition: { duration: 0.2 },
+                }}
+              >
+                {/* Círculos de fondo decorativos */}
+                <div className="absolute -top-12 -right-12 w-32 h-32 bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/20 transition-all duration-500"></div>
+                <div className="absolute -bottom-8 -left-8 w-28 h-28 bg-indigo-500/10 rounded-full blur-xl group-hover:bg-indigo-500/20 transition-all duration-500"></div>
+
+                <div className="relative z-10">
+                  <div className="flex items-center mb-4">
+                    <div className="mr-3 p-2 bg-gradient-to-br from-emerald-500 to-indigo-600 rounded-lg shadow-sm">
+                      <FaAndroid className="text-2xl text-white" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white">
+                      App Android
+                    </h3>
+                  </div>
+                  <div className="space-y-3">
+                    <p className="text-gray-200 text-sm leading-relaxed">
+                      Juega AdrenaLux en tu móvil. Descarga ahora la versión
+                      Android y disfruta de todas las características donde
+                      quieras.
+                    </p>
+
+                    <motion.a
+                      href={gameApk}
+                      download="AdrenaLux-Game.apk"
+                      className="group/btn inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-emerald-500 to-indigo-600 hover:from-emerald-400 hover:to-indigo-500 px-4 py-3 rounded-lg transition-all duration-200 w-full text-sm shadow-sm hover:shadow-indigo-500/20"
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <FaAndroid className="text-base" />
+                      <span>Descargar Ahora</span>
+                      <FaDownload className="text-xs group-hover/btn:translate-y-0.5 transition-transform duration-200" />
+                    </motion.a>
+
+                    <div className="flex justify-between items-center text-xs text-gray-300">
+                      <span>v1.0.0</span>
+                      <div className="flex items-center">
+                        <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 mr-1"></span>
+                        <span>80.4MB</span>
+                      </div>
+                      <span>Android 7+</span>
+                    </div>
+                  </div>
+
+                  {/* Badges de confianza */}
+                  <div className="mt-3 pt-2 border-t border-indigo-500/20 flex justify-center gap-4 text-xs text-gray-300">
+                    <div className="flex items-center">
+                      <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500/30 mr-1"></span>
+                      <span>100% Seguro</span>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="inline-block h-1.5 w-1.5 rounded-full bg-indigo-500/30 mr-1"></span>
+                      <span>Sin publicidad</span>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+
+              <div className="hidden md:block">
+                <div className="flex flex-col gap-4 text-center">
+                  <div className="text-4xl">📱</div>
+                  <div className="text-4xl">→</div>
+                  <div className="text-4xl">🎮</div>
+                </div>
+              </div>
+
+              <div className="max-w-sm">
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-2">
+                    <div className="text-emerald-400 text-xl">✓</div>
+                    <p className="text-gray-300 text-sm">
+                      Acceso completo a todas las funciones del juego
+                    </p>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="text-emerald-400 text-xl">✓</div>
+                    <p className="text-gray-300 text-sm">
+                      Interfaz optimizada para dispositivos móviles
+                    </p>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="text-emerald-400 text-xl">✓</div>
+                    <p className="text-gray-300 text-sm">
+                      Juega cuando y donde quieras sin limitaciones
+                    </p>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </motion.div>
         </section>
       </main>

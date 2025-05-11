@@ -330,5 +330,42 @@
       "s2": "DEFENSA"
     }
   },
-  "register": {}
+  "register": {
+    "title": "Registrarse",
+    "description": "Crea una nueva cuenta para empezar a jugar.",
+    "email": "Correo electrónico",
+    "name": "Nombre",
+    "lastname": "Apellido",
+    "username": "Nombre de usuario",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "registerButton": "Registrarse",
+    "alreadyHaveAccount": "¿Ya tienes cuenta? Inicia sesión",
+    "processing": "Procesando...",
+    "placeholders": {
+      "email": "Introduce tu correo electrónico",
+      "name": "Introduce tu nombre",
+      "lastname": "Introduce tu apellido",
+      "username": "Introduce un nombre de usuario",
+      "password": "Introduce tu contraseña",
+      "confirmPassword": "Confirma tu contraseña"
+    },
+    "errors": {
+      "emailRequired": "El correo es obligatorio.",
+      "emailInvalid": "El correo no es válido.",
+      "nameRequired": "El nombre es obligatorio.",
+      "lastnameRequired": "El apellido es obligatorio.",
+      "usernameRequired": "El nombre de usuario es obligatorio.",
+      "passwordRequired": "La contraseña es obligatoria.",
+      "passwordLength": "La contraseña debe tener al menos 6 caracteres.",
+      "passwordMismatch": "Las contraseñas no coinciden.",
+      "emailExists": "Este correo ya está en uso.",
+      "usernameExists": "Este nombre de usuario ya está en uso.",
+      "serverError": "Error en la conexión con el servidor. Inténtalo de nuevo."
+    },
+    "success": {
+      "title": "¡Registro Exitoso!",
+      "message": "Tu cuenta ha sido creada exitosamente. Inicia sesión para comenzar a jugar."
+    }
+  }
 }

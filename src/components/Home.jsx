@@ -1,4 +1,3 @@
-// Home.jsx - Updated with Info Button in bottom left corner
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
