@@ -54,15 +54,21 @@ const Login = () => {
   //Google sign in
   const handleGoogleSuccess = async (tokenId) => {
     const { status, data } = await googleSignIn(tokenId);
-    if (status === 200) {
-      // Verificar si es nuevo usuario (depende de tu API)
-      if (data.isNewUser) {
-        localStorage.removeItem("welcomeTutorialSeen");
-        localStorage.setItem("isNewUser", "true");
-        navigate("/info");
-      } else {
-        navigate("/home");
-      }
+    if (status !== 200) return; // manejar error
+
+    const googleId = data.user.id;
+    const seenMap = JSON.parse(localStorage.getItem("seenGoogleMap") || "{}");
+    const hasSeen = !!seenMap[googleId];
+
+    if (!hasSeen) {
+      seenMap[googleId] = true;
+      localStorage.setItem("seenGoogleMap", JSON.stringify(seenMap));
+      // Forzar tutorial para nuevos usuarios
+      localStorage.setItem("isNewUser", "true"); // 👈 Añadir esta línea
+      localStorage.removeItem("welcomeTutorialSeen");
+      navigate("/info");
+    } else {
+      navigate("/home");
     }
   };
 

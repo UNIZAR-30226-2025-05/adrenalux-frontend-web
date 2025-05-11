@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FaInstagram, FaLinkedin, FaYoutube, FaDiscord } from 'react-icons/fa';
-import { motion } from 'framer-motion';
-import logo from '../assets/adrenalux_logo_white.png';
-import pantallaPrincipal from '../assets/Sobres.png';
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { FaInstagram, FaLinkedin, FaYoutube, FaDiscord } from "react-icons/fa";
+import { motion } from "framer-motion";
+import logo from "../assets/adrenalux_logo_white.png";
+import pantallaPrincipal from "../assets/Sobres.png";
 import { getToken } from "../services/api/authApi";
 
 const Inicio = () => {
@@ -14,41 +14,42 @@ const Inicio = () => {
     if (token) {
       navigate("/home");
     }
-    document.documentElement.classList.add('bg-black');
-    document.body.className = 'bg-gradient-to-b from-gray-900 to-black overflow-x-hidden';
-    
+    document.documentElement.classList.add("bg-black");
+    document.body.className =
+      "bg-gradient-to-b from-gray-900 to-black overflow-x-hidden";
+
     return () => {
-      document.documentElement.classList.remove('bg-black');
-      document.body.className = '';
+      document.documentElement.classList.remove("bg-black");
+      document.body.className = "";
     };
   }, [token, navigate]);
 
-  const handleLoginClick = () => navigate('/login');
-  const handleSignUpClick = () => navigate('/register');
-  const handleDiscoverClick = () => navigate('/register');
+  const handleLoginClick = () => navigate("/login");
+  const handleSignUpClick = () => navigate("/register");
+  const handleDiscoverClick = () => navigate("/register");
 
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1, 
-      transition: { 
+    visible: {
+      opacity: 1,
+      transition: {
         duration: 1,
-        staggerChildren: 0.3
-      } 
+        staggerChildren: 0.3,
+      },
     },
   };
 
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
-    visible: { 
-      y: 0, 
+    visible: {
+      y: 0,
       opacity: 1,
-      transition: { type: 'spring', stiffness: 100 }
+      transition: { type: "spring", stiffness: 100 },
     },
   };
 
   return (
-    <motion.div 
+    <motion.div
       initial="hidden"
       animate="visible"
       variants={containerVariants}
@@ -56,25 +57,25 @@ const Inicio = () => {
     >
       {/* Navbar */}
       <header className="fixed top-0 left-0 w-full px-4 py-4 md:px-8 md:py-6 flex justify-between items-center z-50 backdrop-blur-2xl bg-black/30 border-b border-white/10">
-        <motion.img 
-          src={logo} 
-          alt="AdrenaLux Logo" 
+        <motion.img
+          src={logo}
+          alt="AdrenaLux Logo"
           className="w-16 md:w-24 cursor-pointer transition-all duration-500 hover:scale-105"
-          onClick={() => navigate('/')}
+          onClick={() => navigate("/")}
           whileHover={{ scale: 1.05 }}
           variants={itemVariants}
         />
-        
+
         <nav className="flex gap-2 md:gap-4">
-          <motion.button 
-            onClick={handleLoginClick} 
+          <motion.button
+            onClick={handleLoginClick}
             className="bg-white/5 hover:bg-white/10 px-4 py-2 rounded-xl transition-all duration-300 border border-white/10 backdrop-blur-lg text-sm md:text-base"
             variants={itemVariants}
           >
             Iniciar sesión
           </motion.button>
-          
-          <motion.button 
+
+          <motion.button
             onClick={handleSignUpClick}
             className="relative bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-400 hover:to-purple-500 px-6 py-2 rounded-xl transition-all duration-300 hover:shadow-[0_0_20px_-5px_rgba(99,102,241,0.5)]"
             variants={itemVariants}
@@ -84,12 +85,11 @@ const Inicio = () => {
           </motion.button>
         </nav>
       </header>
-      
+
       <main className="flex-1 bg-gradient-to-b from-gray-900 to-black w-full max-w-full">
         <div className="relative px-4 md:px-8 lg:px-16 w-full max-w-full">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-16">
-
-            <motion.section 
+            <motion.section
               className="flex-1 space-y-8 z-10 max-w-2xl"
               variants={containerVariants}
             >
@@ -102,33 +102,52 @@ const Inicio = () => {
                 </h1>
               </motion.div>
 
-              <motion.p 
-                variants={itemVariants} 
+              <motion.p
+                variants={itemVariants}
                 className="text-lg md:text-xl text-gray-300/90 leading-relaxed"
               >
-                AdrenaLux reinventa el TCG tradicional con tecnología en tiempo real. Colecciona cartas dinámicas que evolucionan con el rendimiento de los jugadores en La Liga.
+                AdrenaLux reinventa el TCG tradicional con tecnología en tiempo
+                real. Colecciona cartas dinámicas que evolucionan con el
+                rendimiento de los jugadores en La Liga.
               </motion.p>
 
-              <motion.div 
-                variants={itemVariants} 
+              <motion.div
+                variants={itemVariants}
                 className="flex gap-4 flex-wrap items-center"
               >
-                <button 
+                <button
                   onClick={handleDiscoverClick}
                   className="group relative bg-gradient-to-r from-blue-600 to-purple-700 px-6 py-3 rounded-xl transition-all duration-300 hover:scale-[1.02] flex items-center gap-2"
                 >
                   <span className="text-lg">Empezar ahora</span>
-                  <span className="group-hover:translate-x-1.5 transition-transform">&rarr;</span>
+                  <span className="group-hover:translate-x-1.5 transition-transform">
+                    &rarr;
+                  </span>
                 </button>
-                
+
                 <div className="flex items-center gap-4">
-                  <a href="https://discord.gg" target="_blank" rel="noopener noreferrer" aria-label="Discord">
+                  <a
+                    href="https://discord.gg"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Discord"
+                  >
                     <FaDiscord className="text-2xl text-indigo-400 hover:text-indigo-300 transition-colors" />
                   </a>
-                  <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+                  <a
+                    href="https://youtube.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="YouTube"
+                  >
                     <FaYoutube className="text-2xl text-red-500 hover:text-red-400 transition-colors" />
                   </a>
-                  <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                  <a
+                    href="https://instagram.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Instagram"
+                  >
                     <FaInstagram className="text-2xl text-pink-500 hover:text-pink-400 transition-colors" />
                   </a>
                 </div>
@@ -136,7 +155,7 @@ const Inicio = () => {
             </motion.section>
 
             {/* Imagen */}
-            <motion.div 
+            <motion.div
               className="relative flex-1 max-w-3xl"
               variants={itemVariants}
             >
@@ -155,19 +174,44 @@ const Inicio = () => {
       <footer className="w-full border-t border-white/10 bg-black/90 backdrop-blur-lg mt-auto">
         <div className="max-w-screen-xl mx-auto px-4 md:px-8 py-8 flex flex-col md:flex-row justify-between items-center gap-6 text-sm">
           <div className="flex gap-4">
-            <a href="/politica" className="hover:text-blue-400 transition-colors">Política</a>
-            <a href="/terminos" className="hover:text-purple-400 transition-colors">Términos</a>
-            <a href="/soporte" className="hover:text-blue-400 transition-colors">Soporte</a>
+            <a
+              href="/politica"
+              className="hover:text-blue-400 transition-colors"
+            >
+              Política
+            </a>
+            <a
+              href="/terminos"
+              className="hover:text-purple-400 transition-colors"
+            >
+              Términos
+            </a>
+            <a
+              href="/soporte"
+              className="hover:text-blue-400 transition-colors"
+            >
+              Soporte
+            </a>
           </div>
-          
+
           <div className="flex items-center gap-4 text-gray-400">
             <span>© 2024 AdrenaLux</span>
             <div className="h-4 w-px bg-white/20" />
             <div className="flex gap-3">
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+              <a
+                href="https://linkedin.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn"
+              >
                 <FaLinkedin className="hover:text-blue-400 transition-colors" />
               </a>
-              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+              <a
+                href="https://youtube.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="YouTube"
+              >
                 <FaYoutube className="hover:text-red-500 transition-colors" />
               </a>
             </div>

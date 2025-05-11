@@ -21,15 +21,20 @@ const Register = () => {
 
   const handleGoogleSuccess = async (tokenId) => {
     const { status, data } = await googleSignIn(tokenId);
-    if (status === 200) {
-      // Verificar si es nuevo usuario (depende de tu API)
-      if (data.isNewUser) {
-        localStorage.removeItem("welcomeTutorialSeen");
-        localStorage.setItem("isNewUser", "true");
-        navigate("/info");
-      } else {
-        navigate("/home");
-      }
+    if (status !== 200) return; // Manejar error
+
+    const userId = data.user?.id || tokenId;
+    const seenMap = JSON.parse(localStorage.getItem("seenGoogleMap") || "{}");
+    const hasSeen = !!seenMap[userId];
+
+    if (!hasSeen) {
+      seenMap[userId] = true;
+      localStorage.setItem("seenGoogleMap", JSON.stringify(seenMap));
+      localStorage.setItem("isNewUser", "true"); // 👈 Marcar como nuevo usuario
+      localStorage.removeItem("welcomeTutorialSeen"); // Forzar el tutorial
+      navigate("/info");
+    } else {
+      navigate("/home");
     }
   };
 
