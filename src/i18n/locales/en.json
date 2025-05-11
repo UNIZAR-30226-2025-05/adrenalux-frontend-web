@@ -46,7 +46,7 @@
     "loading": "Loading...",
     "open": "Open"
   },
-  "squad": {
+  "squad":{
     "title": "My Lineups",
     "loading": "Loading lineups...",
     "add": "Add New Lineup",
@@ -60,7 +60,24 @@
     "creating": "Creating...",
     "created": "Create Lineup",
     "condition": "The name must have at least 4 characters and be unique",
-    "new": "New Lineup"
+    "new": "New Lineup",
+    "confirmActivation": "Confirm Activation",
+    "activating": "Activating...",
+    "confirm": "Confirm",
+    "question": "Are you sure you want to activate the lineup",
+    "activated": "Lineup \"{{name}}\" activated successfully",
+    "tip": "Tip",
+    "tipText": "Place your best cards in the lineup",
+    "warning3": "This will be your main lineup for future matches",
+    "need11Cards": "The lineup must have at least 11 cards to be activated",
+    "incompleteTemplate": "You cannot activate an incomplete lineup",
+    "errorActivatingTemplate": "There was an error activating the lineup",
+    "success": "Successfully activated!",
+    "nowActive": "The lineup",
+    "isActive": "is now active",
+    "deleteSuccess": "Lineup \"{{name}}\" deleted successfully",
+    "inputPlaceholder": "Lineup name",
+    "createSuccess": "Lineup \"{{name}}\" created successfully"
   },
   "standing": {
     "loading": "Loading ranking...",

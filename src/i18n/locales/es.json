@@ -46,8 +46,8 @@
     "loading": "Cargando...",
     "open": "abrir"
   },
-  "squad": {
-    "title": "Mis aliniaciones",
+  "squad":{
+    "title": "Mis alineaciones",
     "loading": "Cargando alineaciones...",
     "add": "Añadir nueva alineación",
     "create": "Crea una nueva alineación personalizada",
@@ -60,7 +60,24 @@
     "creating": "Creando...",
     "created": "Crear alineación",
     "condition": "El nombre debe tener al menos 4 caracteres y ser único",
-    "new": "Nueva alineación"
+    "new": "Nueva alineación",
+    "confirmActivation": "Confirmar activación",
+    "activating": "Activando...",
+    "confirm": "Confirmar",
+    "question": "¿Estás seguro de que quieres activar la alineación",
+    "activated": "Alineación \"{{name}}\" activada correctamente",
+    "tip": "Consejo",
+    "tipText": "Pon tus mejores cartas en la alineación ",
+    "warning3": "Esta será tu alineación principal para futuras partidas",
+    "need11Cards": "La plantilla debe tener al menos 11 cartas para activarla",
+    "incompleteTemplate": "No se puede activar una plantilla no completa",
+    "errorActivatingTemplate": "Hubo un error al activar la plantilla",
+    "success": "¡Activada con éxito!",
+    "nowActive": "La alineación",
+    "isActive": "está ahora activa",
+    "deleteSuccess": "Alineación \"{{name}}\" eliminada correctamente",
+    "inputPlaceholder": "Nombre de la alineación",
+    "createSuccess": "Alineación \"{{name}}\" creada correctamente"
   },
   "standing": {
     "loading": "Cargando clasificacion...",
@@ -90,7 +107,6 @@
     "loading2": "Cargar más cartas",
     "view": "Ver todas las cartas en venta",
     "info": "Detalles de la Carta",
-
     "price": "Precio",
     "question": "¿Deseas comprar esta carta?",
     "buy": "Comprar",
