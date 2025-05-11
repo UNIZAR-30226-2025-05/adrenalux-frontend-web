@@ -24,6 +24,7 @@ const Register = () => {
     if (status === 200) {
       // Verificar si es nuevo usuario (depende de tu API)
       if (data.isNewUser) {
+        localStorage.removeItem("welcomeTutorialSeen");
         localStorage.setItem("isNewUser", "true");
         navigate("/info");
       } else {
@@ -83,6 +84,7 @@ const Register = () => {
         const { status } = await login(formData.email, formData.password);
         if (status === 200) {
           // Marcar como nuevo usuario antes de redirigir
+          localStorage.removeItem("welcomeTutorialSeen");
           localStorage.setItem("isNewUser", "true");
           navigate("/info"); // Redirigir al tutorial de bienvenida
         }

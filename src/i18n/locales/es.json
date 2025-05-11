@@ -312,5 +312,6 @@
       "s1": "ATAQUE",
       "s2": "DEFENSA"
     }
-  }
+  },
+  "register": {}
 }

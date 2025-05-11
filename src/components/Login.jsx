@@ -57,6 +57,7 @@ const Login = () => {
     if (status === 200) {
       // Verificar si es nuevo usuario (depende de tu API)
       if (data.isNewUser) {
+        localStorage.removeItem("welcomeTutorialSeen");
         localStorage.setItem("isNewUser", "true");
         navigate("/info");
       } else {
