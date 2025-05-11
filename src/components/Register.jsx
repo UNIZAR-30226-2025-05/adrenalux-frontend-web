@@ -21,17 +21,21 @@ const Register = () => {
 
   const handleGoogleSuccess = async (tokenId) => {
     const { status, data } = await googleSignIn(tokenId);
-    if (status !== 200) return; // Manejar error
+    console.log("Google response:", { status, data }); // Debug
 
-    const userId = data.user?.id || tokenId;
+    if (status !== 200) return;
+
+    // Usa el email como ID único (mejor que tokenId)
+    const userId = data.user?.email || tokenId;
     const seenMap = JSON.parse(localStorage.getItem("seenGoogleMap") || "{}");
-    const hasSeen = !!seenMap[userId];
 
-    if (!hasSeen) {
-      seenMap[userId] = true;
-      localStorage.setItem("seenGoogleMap", JSON.stringify(seenMap));
-      localStorage.setItem("isNewUser", "true"); // 👈 Marcar como nuevo usuario
-      localStorage.removeItem("welcomeTutorialSeen"); // Forzar el tutorial
+    if (!seenMap[userId]) {
+      localStorage.setItem(
+        "seenGoogleMap",
+        JSON.stringify({ ...seenMap, [userId]: true })
+      );
+      localStorage.setItem("isNewUser", "true"); // 👈 ¡Clave!
+      localStorage.removeItem("welcomeTutorialSeen");
       navigate("/info");
     } else {
       navigate("/home");
