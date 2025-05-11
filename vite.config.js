@@ -1,19 +1,20 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   server: {
-    cors: true, 
+    cors: true,
   },
-  base: '/',
+  assetsInclude: ["**/*.apk"],
+  base: "/",
   build: {
-    assetsDir: 'assets',
+    assetsDir: "assets",
     rollupOptions: {
       output: {
-        assetFileNames: 'src/assets/[name][extname]'
-      }
-    }
-  }
-})
+        assetFileNames: "src/assets/[name][extname]",
+      },
+    },
+  },
+});
