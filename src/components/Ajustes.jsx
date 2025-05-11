@@ -27,7 +27,7 @@ const Ajustes = () => {
 
   const [musicVolume, setMusicVolume] = useState(() => {
     const savedVolume = localStorage.getItem("musicVolume");
-    return savedVolume !== null ? (savedVolume * 100) : 20;
+    return savedVolume !== null ? savedVolume * 100 : 20;
   });
 
   const [language, setLanguage] = useState(currentLanguage || "es");
@@ -87,6 +87,9 @@ const Ajustes = () => {
     try {
       const success = await logout();
       if (success) {
+        // 👉 Limpiar flags del tutorial
+        localStorage.removeItem("isNewUser");
+        localStorage.removeItem("welcomeTutorialSeen");
         navigate("/login");
       } else {
         throw new Error("Error al cerrar sesión en el servidor");
@@ -254,7 +257,9 @@ const Ajustes = () => {
                           min="0"
                           max="100"
                           value={musicVolume}
-                          onChange={(e) => setMusicVolume(Number(e.target.value))} 
+                          onChange={(e) =>
+                            setMusicVolume(Number(e.target.value))
+                          }
                           className="w-full h-3 bg-gray-700 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-gradient-to-b [&::-webkit-slider-thumb]:from-purple-400 [&::-webkit-slider-thumb]:to-purple-600"
                         />
                         <span className="text-2xl text-gray-300">🔊</span>
@@ -363,70 +368,69 @@ const Ajustes = () => {
 
       {/* About Us Modal */}
       <AnimatePresence>
-      {showAboutUs && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-        >
+        {showAboutUs && (
           <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.8, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            className="bg-gray-900 border-2 border-purple-500 p-8 rounded-xl w-full max-w-lg shadow-2xl relative mx-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           >
-          {/* Decorative elements */}
-          <div className="absolute -top-3 -left-3 w-6 h-6 bg-purple-500 rounded-full"></div>
-          <div className="absolute -bottom-3 -right-3 w-6 h-6 bg-purple-500 rounded-full"></div>
-
-          {/* Close Button */}
-          <motion.button
-            className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors duration-200"
-            onClick={() => setShowAboutUs(false)}
-            whileHover={{ rotate: 90, scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            <FaTimes className="text-3xl" />
-          </motion.button>
-
-          <div className="text-center mb-6">
-            <motion.h2
-              className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 text-3xl font-bold mb-2"
-              animate={{
-                textShadow: "0 0 8px rgba(216, 180, 254, 0.6)",
-              }}
-              transition={{
-                repeat: Infinity,
-                repeatType: "reverse",
-                duration: 1.5,
-              }}
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              className="bg-gray-900 border-2 border-purple-500 p-8 rounded-xl w-full max-w-lg shadow-2xl relative mx-4"
             >
-              {t("aboutUs.title")}
-            </motion.h2>
-            <div className="w-1/3 h-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mx-auto mb-4"></div>
-          </div>
+              {/* Decorative elements */}
+              <div className="absolute -top-3 -left-3 w-6 h-6 bg-purple-500 rounded-full"></div>
+              <div className="absolute -bottom-3 -right-3 w-6 h-6 bg-purple-500 rounded-full"></div>
 
-          <p className="text-gray-300 text-lg mb-8 leading-relaxed">
-            {t("aboutUs.content")}
-          </p>
+              {/* Close Button */}
+              <motion.button
+                className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors duration-200"
+                onClick={() => setShowAboutUs(false)}
+                whileHover={{ rotate: 90, scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <FaTimes className="text-3xl" />
+              </motion.button>
 
-          <div className="flex justify-center">
-            <motion.button
-              className="bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 text-white py-3 px-8 rounded-xl font-bold shadow-lg"
-              onClick={() => setShowAboutUs(false)}
-              whileHover={{ y: -3 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              {t("settings.buttons.close")}
-            </motion.button>
-          </div>
-        </motion.div>
-      </motion.div>
-    )}
-  </AnimatePresence>
+              <div className="text-center mb-6">
+                <motion.h2
+                  className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 text-3xl font-bold mb-2"
+                  animate={{
+                    textShadow: "0 0 8px rgba(216, 180, 254, 0.6)",
+                  }}
+                  transition={{
+                    repeat: Infinity,
+                    repeatType: "reverse",
+                    duration: 1.5,
+                  }}
+                >
+                  {t("aboutUs.title")}
+                </motion.h2>
+                <div className="w-1/3 h-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mx-auto mb-4"></div>
+              </div>
 
+              <p className="text-gray-300 text-lg mb-8 leading-relaxed">
+                {t("aboutUs.content")}
+              </p>
+
+              <div className="flex justify-center">
+                <motion.button
+                  className="bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 text-white py-3 px-8 rounded-xl font-bold shadow-lg"
+                  onClick={() => setShowAboutUs(false)}
+                  whileHover={{ y: -3 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {t("settings.buttons.close")}
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

@@ -20,11 +20,15 @@ const Register = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleGoogleSuccess = async (tokenId) => {
-    const { status } = await googleSignIn(tokenId);
+    const { status, data } = await googleSignIn(tokenId);
     if (status === 200) {
-      navigate("/Home");
-    } else {
-      alert("Error al iniciar sesión con Google");
+      // Verificar si es nuevo usuario (depende de tu API)
+      if (data.isNewUser) {
+        localStorage.setItem("isNewUser", "true");
+        navigate("/info");
+      } else {
+        navigate("/home");
+      }
     }
   };
 
@@ -62,7 +66,7 @@ const Register = () => {
 
   const handleSignUpClick = async (e) => {
     e.preventDefault();
-    if (!validateForm()) return; // Detener si hay errores
+    if (!validateForm()) return;
 
     setIsSubmitting(true);
 
@@ -78,10 +82,9 @@ const Register = () => {
       if (status.error_message === "") {
         const { status } = await login(formData.email, formData.password);
         if (status === 200) {
-          console.log("Inicio de sesión exitoso");
-          navigate("/Home");
-        } else {
-          console.error("Error al iniciar sesión:", data);
+          // Marcar como nuevo usuario antes de redirigir
+          localStorage.setItem("isNewUser", "true");
+          navigate("/info"); // Redirigir al tutorial de bienvenida
         }
       } else {
         // Manejo de errores específicos
@@ -108,29 +111,29 @@ const Register = () => {
   // Variantes para animaciones
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { 
+    visible: {
       opacity: 1,
-      transition: { 
+      transition: {
         duration: 0.5,
         when: "beforeChildren",
-        staggerChildren: 0.1
-      }
-    }
+        staggerChildren: 0.1,
+      },
+    },
   };
 
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
-    visible: { 
-      y: 0, 
+    visible: {
+      y: 0,
       opacity: 1,
-      transition: { duration: 0.3 }
-    }
+      transition: { duration: 0.3 },
+    },
   };
 
   const buttonVariants = {
     idle: { scale: 1 },
     hover: { scale: 1.05, transition: { duration: 0.2 } },
-    tap: { scale: 0.95 }
+    tap: { scale: 0.95 },
   };
 
   return (
@@ -138,13 +141,13 @@ const Register = () => {
       className="fixed inset-0 flex justify-center items-center bg-cover bg-center p-4 sm:p-0"
       style={{ backgroundImage: `url(${background})` }}
     >
-      <motion.div 
+      <motion.div
         className="bg-gray-300 dark:bg-gray-900 p-4 sm:p-8 w-full max-w-md rounded-lg shadow-2xl backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90"
         initial="hidden"
         animate="visible"
         variants={containerVariants}
       >
-        <motion.div 
+        <motion.div
           className="flex flex-col sm:flex-row justify-between items-center mb-6"
           variants={itemVariants}
         >
@@ -153,8 +156,8 @@ const Register = () => {
           </h2>
           <GoogleSignInButton onSuccess={handleGoogleSuccess} />
         </motion.div>
-        
-        <motion.p 
+
+        <motion.p
           className="text-black dark:text-white text-sm mb-6"
           variants={itemVariants}
         >
@@ -191,7 +194,9 @@ const Register = () => {
               value={formData.name}
               onChange={handleChange}
             />
-            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+            {errors.name && (
+              <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+            )}
           </motion.div>
 
           {/** Apellido */}
@@ -247,7 +252,7 @@ const Register = () => {
 
           {/** Botón de registro */}
           <motion.div variants={itemVariants}>
-            <motion.button 
+            <motion.button
               className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-500 hover:to-indigo-600 text-white rounded-lg py-3 font-medium shadow-lg transition duration-300"
               type="submit"
               disabled={isSubmitting}
@@ -268,7 +273,7 @@ const Register = () => {
           </motion.div>
 
           {/* Botón "Ya tengo cuenta" */}
-          <motion.div 
+          <motion.div
             className="flex justify-center mt-6"
             variants={itemVariants}
           >

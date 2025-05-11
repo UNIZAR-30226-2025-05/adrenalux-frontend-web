@@ -265,5 +265,52 @@
       "type": "+{{reward_type}}",
       "amount": "+{{reward_amount}} 🪙"
     }
+  },
+  "info": {
+    "welcome": {
+      "title": "Bienvenido a Adrenalux",
+      "skip": "Omitir",
+      "stepIndicator": "Paso {{current}} de {{total}}",
+      "finalStepMessage": "¡Prepárate para el saque inicial!",
+      "market": "TIENDA"
+    },
+    "features": {
+      "openCardPacks": {
+        "title": "Abrir Paquetes de Cartas",
+        "description": "Descubre estrellas legendarias de La Liga abriendo emocionantes paquetes de cartas. Colecciona cartas raras y poderosas de todos los clubes españoles para construir tu colección definitiva.",
+        "iconLabel": "Paquete de Cartas"
+      },
+      "duelYourFriends": {
+        "title": "Duelo con Amigos",
+        "description": "Desafía a tus amigos en emocionantes duelos de cartas. Selecciona tus mejores cartas, elige sus habilidades estratégicamente y compite en partidos cara a cara para demostrar quién es el mejor mánager.",
+        "iconLabel": "Controlador de Juego"
+      },
+      "tradeInTheMarketplace": {
+        "title": "Comerciar en el Mercado",
+        "description": "Compra, vende e intercambia cartas con otros jugadores en el dinámico mercado. Cambia tus jugadores duplicados por las cartas que necesitas para completar tu colección.",
+        "iconLabel": "Carrito de Compras"
+      },
+      "buildYourDreamTeam": {
+        "title": "Construye tu Equipo Soñado",
+        "description": "Selecciona tus jugadores favoritos para tu alineación. Elige formaciones y posiciones para crear la estrategia de equipo perfecta que se adapte a tu estilo de juego.",
+        "iconLabel": "Campo de Fútbol"
+      },
+      "howToPlay": {
+        "title": "Cómo Jugar",
+        "description": "Añade tu aliniación a favoritos para crear tu alineación. En los duelos, selecciona una carta y una habilidad específica para competir. Los jugadores se turnan para elegir cartas: cuando es tu turno, elige cualquier jugador, pero cuando respondes, debes coincidir con la posición de la última elección de tu oponente. ¡El duelo continúa hasta que haya un ganador!",
+        "iconLabel": "Mando de Juego",
+        "pick": "ELIGE",
+        "play": "JUEGA",
+        "info": "Excoge la misma posición cuando respondes."
+      }
+    },
+    "buttons": {
+      "next": "Siguiente",
+      "hitThePitch": "Salta al Campo"
+    },
+    "skills": {
+      "s1": "ATAQUE",
+      "s2": "DEFENSA"
+    }
   }
 }

@@ -9,7 +9,9 @@ const MusicManager = () => {
   const location = useLocation();
 
   useEffect(() => {
-    const isSilentRoute = ["/", "/login", "/register"].includes(location.pathname);
+    const isSilentRoute = ["/", "/login", "/register"].includes(
+      location.pathname
+    );
 
     if (isSilentRoute) {
       stopMusic();
@@ -26,4 +28,3 @@ const MusicManager = () => {
 };
 
 export default MusicManager;
-

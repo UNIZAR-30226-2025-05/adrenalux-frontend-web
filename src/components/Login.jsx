@@ -53,11 +53,15 @@ const Login = () => {
 
   //Google sign in
   const handleGoogleSuccess = async (tokenId) => {
-    const { status } = await googleSignIn(tokenId);
+    const { status, data } = await googleSignIn(tokenId);
     if (status === 200) {
-      navigate("/Home");
-    } else {
-      alert("Error al iniciar sesión con Google");
+      // Verificar si es nuevo usuario (depende de tu API)
+      if (data.isNewUser) {
+        localStorage.setItem("isNewUser", "true");
+        navigate("/info");
+      } else {
+        navigate("/home");
+      }
     }
   };
 
@@ -73,7 +77,7 @@ const Login = () => {
 
       if (status === 200) {
         console.log("Inicio de sesión exitoso");
-        navigate("/Home");
+        navigate("/home");
       } else {
         setErrors({
           ...errors,

@@ -24,6 +24,7 @@ import Partida from "./components/Partida";
 import Torneo from "./components/Torneo";
 import MusicManager from "./context/MusicManager";
 import PartidasPausadas from "./components/PartidasPausadas";
+import Info from "./components/InfoFirstUser";
 
 function App() {
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
@@ -74,6 +75,7 @@ function App() {
         <Route path="/partida/:matchId" element={<Partida />} />
         <Route path="/torneo" element={<Torneo />} />
         <Route path="/partidasPausadas" element={<PartidasPausadas />} />
+        <Route path="/info" element={<Info />} />
       </Routes>
     </Router>
   );
