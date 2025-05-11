@@ -8,6 +8,7 @@ import {
   FaExchangeAlt,
   FaTrophy,
   FaGamepad,
+  FaGlobe,
 } from "react-icons/fa";
 import {
   GiSoccerBall,
@@ -22,8 +23,9 @@ import { IoGameController } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import background from "../assets/background.png";
 import { useTranslation } from "react-i18next";
-
-// Sample football cards for illustration (you would replace these with your actual card assets)
+import { useLanguage } from "../context/LanguageProvider";
+import { useLocation } from "react-router-dom";
+// Sample football cards for illustration
 const cardImages = [
   "src/assets/card_luxury.png",
   "/assets/card_sample_2.png",
@@ -32,33 +34,44 @@ const cardImages = [
 
 export default function WelcomeLanding() {
   const { t } = useTranslation();
-
+  const { currentLanguage, changeLanguage } = useLanguage();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [showLanding, setShowLanding] = useState(false);
   const [hasSkipped, setHasSkipped] = useState(false);
-
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const [isHovered, setIsHovered] = useState(null);
+  const location = useLocation();
   // Simulate staggered entrance
   useEffect(() => {
     const checkUserStatus = () => {
-      const isNewUser = localStorage.getItem("isNewUser") === "true";
-      const hasSeenTutorial =
-        localStorage.getItem("welcomeTutorialSeen") === "true";
+      // Verifica si viene de /home a través del estado de navegación
+      const comesFromHome =
+        location.state?.fromHome ||
+        new URLSearchParams(location.search).get("fromHome") === "true";
 
-      if (!isNewUser || hasSeenTutorial) {
-        navigate("/home");
-      } else {
-        // Si es nuevo y no ha visto el tutorial, mostramos la pantalla
+      if (comesFromHome) {
+        // Si viene de /home, muestra el tutorial sin importar si ya lo ha visto
         setShowLanding(true);
+      } else {
+        // Lógica original para nuevos usuarios
+        const isNewUser = localStorage.getItem("isNewUser") === "true";
+        const hasSeenTutorial =
+          localStorage.getItem("welcomeTutorialSeen") === "true";
+
+        if (!isNewUser || hasSeenTutorial) {
+          navigate("/home");
+        } else {
+          setShowLanding(true);
+        }
       }
     };
 
     const timer = setTimeout(checkUserStatus, 100);
-
     return () => clearTimeout(timer);
-  }, [navigate]);
+  }, [navigate, location]);
 
-  // Football game features data for steps - reordered as requested
+  // Football game features data
   const gameFeatures = [
     {
       title: t("info.features.openCardPacks.title"),
@@ -106,25 +119,60 @@ export default function WelcomeLanding() {
     if (currentStep < gameFeatures.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Marcar como visto y redirigir
       localStorage.setItem("welcomeTutorialSeen", "true");
-      localStorage.removeItem("isNewUser"); // Ya no es nuevo usuario
+      localStorage.removeItem("isNewUser");
       navigate("/home");
     }
   };
 
   const handleSkip = () => {
     localStorage.setItem("welcomeTutorialSeen", "true");
-    localStorage.removeItem("isNewUser"); // Ya no es nuevo usuario
+    localStorage.removeItem("isNewUser");
     navigate("/home");
   };
 
-  // Controls what text to show on the button
+  const handleLanguageChange = (newLang) => {
+    changeLanguage(newLang);
+    setShowLanguageModal(false);
+  };
+
   const getButtonText = () => {
     if (currentStep === gameFeatures.length - 1) {
       return t("info.buttons.hitThePitch");
     }
     return t("info.buttons.next");
+  };
+
+  const renderLanguageButton = (lang, label, flag) => {
+    const isActive = currentLanguage === lang;
+    return (
+      <motion.button
+        onClick={() => handleLanguageChange(lang)}
+        onHoverStart={() => setIsHovered(lang)}
+        onHoverEnd={() => setIsHovered(null)}
+        className={`relative w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 ${
+          isActive
+            ? "bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-lg"
+            : "bg-gray-700 hover:bg-gray-600 text-gray-200 shadow-md"
+        }`}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        {isActive && (
+          <motion.div
+            className="absolute inset-0 bg-white opacity-10 rounded-full"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.1 }}
+            transition={{
+              repeat: Infinity,
+              repeatType: "reverse",
+              duration: 1.5,
+            }}
+          />
+        )}
+        <span className="text-3xl">{flag}</span>
+      </motion.button>
+    );
   };
 
   return (
@@ -192,7 +240,7 @@ export default function WelcomeLanding() {
               <div className="absolute bottom-0 left-0 w-10 h-10 border-b-2 border-l-2 border-yellow-400 rounded-bl-lg" />
               <div className="absolute bottom-0 right-0 w-10 h-10 border-b-2 border-r-2 border-yellow-400 rounded-br-lg" />
 
-              {/* Header with title and skip button */}
+              {/* Header with title, skip button, and language button */}
               <div className="bg-gradient-to-r from-green-900 to-blue-900 p-4 md:p-6 flex justify-between items-center">
                 <motion.h1
                   className="text-2xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-blue-200"
@@ -205,14 +253,24 @@ export default function WelcomeLanding() {
                   }}
                   transition={{ repeat: Infinity, duration: 3 }}
                 >
-                  {t("info.welcome.title")}{" "}
+                  {t("info.welcome.title")}
                 </motion.h1>
-                <button
-                  onClick={handleSkip}
-                  className="text-gray-300 hover:text-white text-sm md:text-base flex items-center"
-                >
-                  {t("info.welcome.skip")} <FaTimes className="ml-1" />
-                </button>
+                <div className="flex items-center space-x-4">
+                  <motion.button
+                    onClick={() => setShowLanguageModal(true)}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="text-gray-300 hover:text-white"
+                  >
+                    <FaGlobe className="text-2xl" />
+                  </motion.button>
+                  <button
+                    onClick={handleSkip}
+                    className="text-gray-300 hover:text-white text-sm md:text-base flex items-center"
+                  >
+                    {t("info.welcome.skip")} <FaTimes className="ml-1" />
+                  </button>
+                </div>
               </div>
 
               {/* Steps indicator */}
@@ -294,7 +352,6 @@ export default function WelcomeLanding() {
                             >
                               <GiCardRandom className="text-2xl text-white" />
                             </motion.div>
-
                             <motion.div
                               animate={{
                                 opacity: [0, 1, 1, 0],
@@ -309,7 +366,6 @@ export default function WelcomeLanding() {
                             >
                               <GiSoccerBall className="text-2xl text-white" />
                             </motion.div>
-
                             <div className="flex space-x-2">
                               {[0, 1, 2].map((i) => (
                                 <motion.div
@@ -343,7 +399,6 @@ export default function WelcomeLanding() {
                             </div>
                           </div>
                         )}
-
                         {/* Duel Animation */}
                         {currentStep === 1 && (
                           <div className="flex items-center space-x-6">
@@ -362,7 +417,6 @@ export default function WelcomeLanding() {
                                 {t("info.skills.s1")}
                               </span>
                             </motion.div>
-
                             <motion.div
                               animate={{
                                 scale: [1, 1.5, 1],
@@ -375,7 +429,6 @@ export default function WelcomeLanding() {
                             >
                               <FaExchangeAlt className="text-2xl text-red-500" />
                             </motion.div>
-
                             <motion.div
                               className="w-16 h-24 md:w-20 md:h-28 rounded-lg bg-gradient-to-b from-red-600 to-red-900 border border-red-400 flex items-center justify-center shadow-lg"
                               animate={{
@@ -393,7 +446,6 @@ export default function WelcomeLanding() {
                             </motion.div>
                           </div>
                         )}
-
                         {/* Marketplace Animation */}
                         {currentStep === 2 && (
                           <div className="flex items-center space-x-8">
@@ -406,7 +458,6 @@ export default function WelcomeLanding() {
                             >
                               <GiCardPlay className="text-2xl text-green-300" />
                             </motion.div>
-
                             <motion.div
                               className="flex flex-col items-center"
                               animate={{
@@ -419,7 +470,6 @@ export default function WelcomeLanding() {
                                 {t("info.welcome.market")}
                               </div>
                             </motion.div>
-
                             <motion.div
                               className="w-12 h-16 md:w-16 md:h-20 rounded-lg bg-green-800/50 border border-green-500 flex items-center justify-center"
                               animate={{
@@ -431,7 +481,6 @@ export default function WelcomeLanding() {
                             </motion.div>
                           </div>
                         )}
-
                         {/* Dream Team Animation */}
                         {currentStep === 3 && (
                           <div className="flex items-center space-x-4">
@@ -450,13 +499,10 @@ export default function WelcomeLanding() {
                               }}
                             >
                               <div className="grid grid-cols-4 gap-1 w-full h-full p-2">
-                                {/* Goalkeeper - Position 1 */}
                                 <motion.div className="col-span-4 flex justify-center">
                                   <motion.div
                                     className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-white flex items-center justify-center"
-                                    animate={{
-                                      y: [0, -3, 0],
-                                    }}
+                                    animate={{ y: [0, -3, 0] }}
                                     transition={{
                                       duration: 1.5,
                                       delay: 0,
@@ -468,16 +514,12 @@ export default function WelcomeLanding() {
                                     </span>
                                   </motion.div>
                                 </motion.div>
-
-                                {/* Defenders - Positions 2-5 */}
                                 <div className="col-span-4 flex justify-around">
                                   {[2, 3, 4, 5].map((pos) => (
                                     <motion.div
                                       key={`defender-${pos}`}
                                       className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-white flex items-center justify-center"
-                                      animate={{
-                                        y: [0, 3, 0],
-                                      }}
+                                      animate={{ y: [0, 3, 0] }}
                                       transition={{
                                         duration: 1.5,
                                         delay: pos * 0.1,
@@ -490,16 +532,12 @@ export default function WelcomeLanding() {
                                     </motion.div>
                                   ))}
                                 </div>
-
-                                {/* Midfielders - Positions 6-9 */}
                                 <div className="col-span-4 flex justify-around">
                                   {[6, 7, 8, 9].map((pos) => (
                                     <motion.div
                                       key={`midfielder-${pos}`}
                                       className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-white flex items-center justify-center"
-                                      animate={{
-                                        y: [0, -3, 0],
-                                      }}
+                                      animate={{ y: [0, -3, 0] }}
                                       transition={{
                                         duration: 1.5,
                                         delay: pos * 0.1,
@@ -512,16 +550,12 @@ export default function WelcomeLanding() {
                                     </motion.div>
                                   ))}
                                 </div>
-
-                                {/* Attackers - Positions 10-12 */}
                                 <div className="col-span-4 flex justify-around">
                                   {[10, 11, 12].map((pos) => (
                                     <motion.div
                                       key={`attacker-${pos}`}
                                       className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-white flex items-center justify-center"
-                                      animate={{
-                                        y: [0, 3, 0],
-                                      }}
+                                      animate={{ y: [0, 3, 0] }}
                                       transition={{
                                         duration: 1.5,
                                         delay: pos * 0.1,
@@ -538,16 +572,13 @@ export default function WelcomeLanding() {
                             </motion.div>
                           </div>
                         )}
-
                         {/* How To Play Animation */}
                         {currentStep === 4 && (
                           <div className="flex flex-col items-center space-y-4">
                             <div className="flex items-center space-x-8 mb-4">
                               <motion.div
                                 className="w-12 h-16 md:w-16 md:h-20 rounded-lg bg-yellow-800/50 border border-yellow-500 flex flex-col items-center justify-center p-1"
-                                animate={{
-                                  y: [0, -5, 0],
-                                }}
+                                animate={{ y: [0, -5, 0] }}
                                 transition={{ duration: 2, repeat: Infinity }}
                               >
                                 <GiCardPickup className="text-xl text-yellow-300 mb-1" />
@@ -555,7 +586,6 @@ export default function WelcomeLanding() {
                                   {t("info.features.howToPlay.pick")}
                                 </span>
                               </motion.div>
-
                               <motion.div
                                 animate={{
                                   rotate: [0, 0, 360],
@@ -565,12 +595,9 @@ export default function WelcomeLanding() {
                               >
                                 <FaGamepad className="text-2xl text-blue-400" />
                               </motion.div>
-
                               <motion.div
                                 className="w-12 h-16 md:w-16 md:h-20 rounded-lg bg-yellow-800/50 border border-yellow-500 flex flex-col items-center justify-center p-1"
-                                animate={{
-                                  y: [0, 5, 0],
-                                }}
+                                animate={{ y: [0, 5, 0] }}
                                 transition={{
                                   duration: 2,
                                   repeat: Infinity,
@@ -633,6 +660,61 @@ export default function WelcomeLanding() {
                 </motion.button>
               </div>
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Language Selection Modal */}
+      <AnimatePresence>
+        {showLanguageModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              className="bg-gray-900 border-2 border-purple-500 p-8 rounded-xl w-full max-w-sm shadow-2xl relative"
+            >
+              {/* Decorative elements */}
+              <div className="absolute -top-3 -left-3 w-6 h-6 bg-purple-500 rounded-full" />
+              <div className="absolute -bottom-3 -right-3 w-6 h-6 bg-purple-500 rounded-full" />
+
+              {/* Close Button */}
+              <motion.button
+                className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors duration-200"
+                onClick={() => setShowLanguageModal(false)}
+                whileHover={{ rotate: 90, scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <FaTimes className="text-2xl" />
+              </motion.button>
+
+              <div className="text-center mb-6">
+                <motion.h2
+                  className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 text-2xl font-bold"
+                  animate={{
+                    textShadow: "0 0 8px rgba(216, 180, 254, 0.6)",
+                  }}
+                  transition={{
+                    repeat: Infinity,
+                    repeatType: "reverse",
+                    duration: 1.5,
+                  }}
+                >
+                  {t("settings.language.title")}
+                </motion.h2>
+              </div>
+
+              <div className="flex justify-center space-x-6">
+                {renderLanguageButton("es", t("settings.language.es"), "🇪🇸")}
+                {renderLanguageButton("en", t("settings.language.en"), "🇬🇧")}
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
