@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaTimes, FaTrophy, FaMedal, FaUserAlt } from "react-icons/fa";
+import { FaTrophy, FaMedal, FaUserAlt } from "react-icons/fa";
 import { GiRank3, GiPodium } from "react-icons/gi";
 import BackButton from "./layout/game/BackButton";
 import {

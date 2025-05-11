@@ -12,7 +12,6 @@ import StoreButton from "./layout/game/StoreButton";
 import CollectionButton from "./layout/game/CollectionButton";
 import PlayButton from "./layout/game/PlayButton";
 import CardsMenu from "./layout/game/CardsMenu";
-import { InfoIcon } from "lucide-react";
 
 const Home = () => {
   const navigate = useNavigate();

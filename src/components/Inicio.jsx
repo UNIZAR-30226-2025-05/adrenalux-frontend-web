@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaInstagram, FaLinkedin, FaYoutube, FaDiscord } from "react-icons/fa";
 import { motion } from "framer-motion";
@@ -48,12 +48,42 @@ const Inicio = () => {
     },
   };
 
+  const sectionRef = useRef(null);
+  const [setIsSectionVisible] = useState(false);
+
+  // Función para hacer scroll a la sección
+  const scrollToSection = () => {
+    sectionRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  // Detectar cuando la sección es visible
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // Si la sección es visible, ocultamos el botón
+        setIsSectionVisible(entry.isIntersecting);
+      },
+      { threshold: 0.5 } // La sección es visible cuando el 50% de ella está en la pantalla
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    // Limpiar el observador cuando el componente se desmonte
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
+    };
+  }, []);
+
   return (
     <motion.div
       initial="hidden"
       animate="visible"
       variants={containerVariants}
-      className="flex flex-col text-white relative min-h-screen w-full max-w-full bg-black" // Añadir bg-black aquí
+      className="flex flex-col text-white relative h-screen min-h-screen w-full max-w-full bg-black" // Añadir bg-black aquí
     >
       {/* Navbar */}
       <header className="fixed top-0 left-0 w-full px-4 py-4 md:px-8 md:py-6 flex justify-between items-center z-50 backdrop-blur-2xl bg-black/30 border-b border-white/10">
@@ -168,6 +198,128 @@ const Inicio = () => {
             </motion.div>
           </div>
         </div>
+
+        {/* Botón de scroll hacia abajo */}
+        <motion.button
+          ref={sectionRef}
+          onClick={scrollToSection}
+          className="absolute bottom-10 left-1/2 transform -translate-x-1/2 py-3 px-4 rounded-full bg-white/5 text-white shadow-md hover:shadow-lg transition-all duration-300"
+        >
+          <span className="text-2xl">&#8595;</span> {/* Flecha hacia abajo */}
+        </motion.button>
+
+        {/* Sección de características */}
+        <section className="pb-12 px-6 md:px-16 lg:px-32 text-white relative z-10">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={containerVariants}
+            className="grid grid-cols-1 lg:grid-cols-3 gap-8 text-center"
+          >
+            <motion.div
+              variants={itemVariants}
+              className="bg-white/5 p-6 rounded-2xl border border-white/10 shadow-md hover:shadow-blue-400/10 transition-all duration-300"
+            >
+              <h3 className="text-xl font-semibold mb-2 text-gradient bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                ¡Experiencia de Fútbol Digital!
+              </h3>
+              <p className="text-gray-300">
+                Únete a un mundo donde el fútbol cobra vida a través de cartas coleccionables. ¡Desafía a tus amigos, construye tu equipo y demuestra que eres el mejor!
+              </p>
+              <div className="text-4xl mt-4 text-center">
+                <span role="img" aria-label="Balón de fútbol">
+                  ⚽
+                </span>
+              </div>
+            </motion.div>
+
+            <motion.div
+              variants={itemVariants}
+              className="bg-white/5 p-6 rounded-2xl border border-white/10 shadow-md hover:shadow-blue-400/10 transition-all duration-300"
+            >
+              <h3 className="text-xl font-semibold mb-2 text-gradient bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">
+                Colecciona y Abre Sobres
+              </h3>
+              <p className="text-gray-300">
+                ¡Consigue sobres con cartas de futbolistas únicos! Cada carta tiene una valoración que aumenta su poder en el campo.
+              </p>
+              <div className="text-4xl mt-4 text-center">
+                <span role="img" aria-label="Balón de fútbol">
+                  💌
+                </span>
+              </div>
+            </motion.div>
+
+            <motion.div
+              variants={itemVariants}
+              className="bg-white/5 p-6 rounded-2xl border border-white/10 shadow-md hover:shadow-blue-400/10 transition-all duration-300"
+            >
+              <h3 className="text-xl font-semibold mb-2 text-gradient bg-gradient-to-r from-blue-400 to-red-400 bg-clip-text text-transparent">
+                Duela con Amigos
+              </h3>
+              <p className="text-gray-300">
+                Desafía a tus amigos o jugadores de todo el mundo en emocionantes duelos. ¡Solo los mejores equipos ganan!
+              </p>
+              <div className="text-4xl mt-4 text-center">
+                <span role="img" aria-label="Balón de fútbol">
+                  🎮
+                </span>
+              </div>
+            </motion.div>
+
+            <motion.div
+              variants={itemVariants}
+              className="bg-white/5 p-6 rounded-2xl border border-white/10 shadow-md hover:shadow-blue-400/10 transition-all duration-300"
+            >
+              <h3 className="text-xl font-semibold mb-2 text-gradient bg-gradient-to-r from-pink-400 to-orange-400 bg-clip-text text-transparent">
+                Mercado de Intercambios
+              </h3>
+              <p className="text-gray-300">
+                ¿Quieres mejorar tu equipo? Usa el mercado para intercambiar cartas con otros jugadores.
+              </p>
+              <div className="text-4xl mt-4 text-center">
+                <span role="img" aria-label="Balón de fútbol">
+                  🛒
+                </span>
+              </div>
+            </motion.div>
+
+            <motion.div
+              variants={itemVariants}
+              className="bg-white/5 p-6 rounded-2xl border border-white/10 shadow-md hover:shadow-blue-400/10 transition-all duration-300"
+            >
+              <h3 className="text-xl font-semibold mb-2 text-gradient bg-gradient-to-r from-yellow-400 to-purple-400 bg-clip-text text-transparent">
+                Construye Tu Equipo de Ensueño
+              </h3>
+              <p className="text-gray-300">
+                Escoge tus jugadores favoritos y forma el equipo que siempre soñaste. Usa tu estrategia y habilidades para crear el mejor equipo posible para competir.
+              </p>
+              <div className="text-4xl mt-4 text-center">
+                <span role="img" aria-label="Balón de fútbol">
+                  🏆
+                </span>
+              </div>
+            </motion.div>
+            
+            <motion.div
+              variants={itemVariants}
+              className="bg-white/5 p-6 rounded-2xl border border-white/10 shadow-md hover:shadow-blue-400/10 transition-all duration-300"
+            >
+              <h3 className="text-xl font-semibold mb-2 text-gradient bg-gradient-to-r from-orange-400 to-green-400 bg-clip-text text-transparent">
+                Participa en Torneos
+              </h3>
+              <p className="text-gray-300">
+                Compite en grandes eventos donde los mejores jugadores luchan por la gloria. Gana premios y cartas raras para mejorar tu colección.
+              </p>
+              <div className="text-4xl mt-4 text-center">
+                <span role="img" aria-label="Balón de fútbol">
+                  ⭐
+                </span>
+              </div>
+            </motion.div>
+          </motion.div>
+        </section>
       </main>
 
       {/* Footer */}
@@ -195,7 +347,7 @@ const Inicio = () => {
           </div>
 
           <div className="flex items-center gap-4 text-gray-400">
-            <span>© 2024 AdrenaLux</span>
+            <span>© {new Date().getFullYear()} AdrenaLux</span>
             <div className="h-4 w-px bg-white/20" />
             <div className="flex gap-3">
               <a

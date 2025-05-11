@@ -1400,7 +1400,7 @@ const Partida = () => {
               {gameState.scores[jugadorId.toString()]} -{" "}
               {Object.entries(gameState.scores)
                 .filter(([key]) => key !== jugadorId.toString())
-                .map(([_, value]) => value)}
+                .map(([value]) => value)}
               </motion.div>
 
               {/* Cambio de puntos */}

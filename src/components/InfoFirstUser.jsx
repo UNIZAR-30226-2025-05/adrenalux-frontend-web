@@ -4,9 +4,7 @@ import {
   FaArrowRight,
   FaTimes,
   FaCheck,
-  FaUsers,
   FaExchangeAlt,
-  FaTrophy,
   FaGamepad,
   FaGlobe,
 } from "react-icons/fa";
@@ -14,7 +12,6 @@ import {
   GiSoccerBall,
   GiSoccerField,
   GiCardPlay,
-  GiTrophy,
   GiCardRandom,
   GiCardPickup,
 } from "react-icons/gi";
@@ -38,9 +35,9 @@ export default function WelcomeLanding() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [showLanding, setShowLanding] = useState(false);
-  const [hasSkipped, setHasSkipped] = useState(false);
+  const [hasSkipped] = useState(false);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
-  const [isHovered, setIsHovered] = useState(null);
+  const [setIsHovered] = useState(null);
   const location = useLocation();
   // Simulate staggered entrance
   useEffect(() => {
