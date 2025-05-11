@@ -1,10 +1,9 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import PropTypes from "prop-types";
 import { 
-  FaSearch, FaPlus, FaTrophy, 
-  FaUsers, FaCalendarAlt, FaCoins, 
-  FaSignOutAlt, FaLock, FaSpinner, FaTimes, 
+  FaSearch, FaPlus, FaUserFriends, FaTrophy, 
+  FaUsers, FaCalendarAlt, FaCoins, FaSignOutAlt, 
+  FaLock, FaSpinner, FaTimes, FaArrowLeft,
   FaPlay, FaExclamationTriangle
 } from "react-icons/fa";
 import { tournamentApi } from "../services/api/tournamentApi";
@@ -461,24 +460,6 @@ const Torneo = () => {
     );
   };
 
-  MatchesSection.propTypes = {
-  partidas: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-      // Agrega aquí las propiedades que tenga cada partida
-    })
-  ).isRequired,
-  participantCount: PropTypes.number.isRequired,
-  participants: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-      nombre: PropTypes.string,
-      // Agrega más campos si los necesitas
-    })
-  ).isRequired,
-};
-
-
   const MatchCard = ({ match, participants }) => {
     const findParticipant = (id) => 
       participants?.find(p => p.id === id || p.user_id === id);
@@ -523,23 +504,6 @@ const Torneo = () => {
       </div>
     );
   };
-
-  MatchCard.propTypes = {
-  match: PropTypes.shape({
-    user1_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    user2_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    ganador_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    fecha: PropTypes.string, // o Date si lo pasas como objeto
-  }).isRequired,
-  participants: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-      user_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-      nombre: PropTypes.string,
-      // Agrega más campos si existen
-    })
-  ).isRequired,
-};
 
   const CardTorneo = ({ torneo }) => {
     const esParticipante = isUserInTournament(torneo);
@@ -595,20 +559,6 @@ const Torneo = () => {
       </div>
     );
   };
-
-  CardTorneo.propTypes = {
-  torneo: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-    nombre: PropTypes.string.isRequired,
-    descripcion: PropTypes.string,
-    participantes: PropTypes.number.isRequired,
-    maxParticipantes: PropTypes.number.isRequired,
-    premio: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    requiereContraseña: PropTypes.bool,
-    estado: PropTypes.string.isRequired,
-  }).isRequired,
-};
-
 
   if (state.loading.global) {
     return (

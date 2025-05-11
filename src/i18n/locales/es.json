@@ -256,6 +256,7 @@
     "sentRequests": "Solicitudes enviadas",
     "exchange2": "te ha invitado a un intercambio",
     "friendsCount": "{{current}}/{{max}} amigos",
+    "searchFriend": "Nombre del amigo",
     "addFriendModal": {
       "title": "Ingresa el código de amigo",
       "placeholder": "Código de amigo"

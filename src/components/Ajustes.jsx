@@ -303,11 +303,6 @@ const Ajustes = () => {
                       t("settings.language.en"),
                       "🇬🇧"
                     )}
-                    {renderLanguageButton(
-                      "fr",
-                      t("settings.language.fr"),
-                      "🇫🇷"
-                    )}
                   </div>
                 </div>
 

@@ -249,6 +249,7 @@
     "exchange2": "has invited you to an exchange",
     "sentRequests": "Sent Requests",
     "friendsCount": "{{current}}/{{max}} friends",
+    "searchFriend": "Friend's name",
     "addFriendModal": {
       "title": "Enter Friend Code",
       "placeholder": "Friend Code"
