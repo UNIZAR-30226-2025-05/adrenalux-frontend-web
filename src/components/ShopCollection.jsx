@@ -1,11 +1,11 @@
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import BackButton from "../components/layout/game/BackButton";
 import background from "../assets/background.png";
 import Card from "./layout/game/Card";
 import { getToken } from "../services/api/authApi";
 import PropTypes from "prop-types";
-// Simulación de datos obtenidos del backend.
 
 export default function ShopCollection({
   searchQuery = "",
@@ -13,6 +13,7 @@ export default function ShopCollection({
   selectedPosition = "",
   onBack,
 }) {
+  const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
   const [showDialog, setShowDialog] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
@@ -26,7 +27,6 @@ export default function ShopCollection({
       navigate("/");
     }
   }, [token, navigate]);
-  
 
   const filteredCards = useMemo(() => {
     return cardData.filter((card) => {
@@ -95,7 +95,7 @@ export default function ShopCollection({
           ))
         ) : (
           <p className="text-xl font-semibold col-span-4">
-            No se encontraron resultados
+            {t("shop.noResults")}
           </p>
         )}
       </div>
@@ -111,7 +111,7 @@ export default function ShopCollection({
             &lt;
           </button>
           <span className="text-lg">
-            Página {currentPage} de {totalPages}
+            {t("shop.page")} {currentPage} {t("shop.of")} {totalPages}
           </span>
           <button
             onClick={handleNextPage}
@@ -123,25 +123,25 @@ export default function ShopCollection({
         </div>
       )}
 
-      {/* Diálogo  */}
+      {/* Diálogo */}
       {showDialog && selectedCard && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-black p-6 rounded-lg shadow-lg text-center max-w-sm mx-auto">
             <p className="text-lg mb-6">
-              ¿Quieres comprar la carta de <b>{selectedCard.name}</b>?
+              {t("shop.confirmQuestion", { name: selectedCard.name })}
             </p>
             <div className="flex justify-center space-x-6">
               <button
                 onClick={handleConfirm}
                 className="bg-green-600 px-4 py-2 rounded hover:bg-green-500 transition"
               >
-                Sí
+                {t("shop.yes")}
               </button>
               <button
                 onClick={handleCancel}
                 className="bg-red-600 px-4 py-2 rounded hover:bg-red-500 transition"
               >
-                No
+                {t("shop.no")}
               </button>
             </div>
           </div>
@@ -155,5 +155,5 @@ ShopCollection.propTypes = {
   searchQuery: PropTypes.string,
   selectedTeam: PropTypes.string,
   selectedPosition: PropTypes.string,
-  onBack: PropTypes.func.isRequired, 
+  onBack: PropTypes.func.isRequired,
 };

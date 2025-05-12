@@ -67,7 +67,7 @@ const SearchTab = () => {
           <div className="relative flex-grow w-full lg:w-auto">
             <input
               type="text"
-              placeholder="Buscar cartas..."
+              placeholder={t('shop.searchPlaceholder')}
               className="w-full pl-10 pr-4 py-3 bg-white/20 backdrop-blur-md text-white placeholder-white/70 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -99,7 +99,7 @@ const SearchTab = () => {
               aria-label="Clear filters"
             >
               <FaTimes size={18} />
-              <span>Limpiar</span>
+              <span>{t('shop.clear')}</span>
             </button>
           </div>
         </div>

@@ -46,6 +46,24 @@
     "loading": "Cargando...",
     "open": "abrir"
   },
+  "lineup": {
+    "title": "Editar Alineación",
+    "loading": "Cargando alineación",
+    "preparingPlayers": "Preparando jugadores",
+    "error": "Error",
+    "backToLineups": "Volver a alineaciones",
+    "saveName": "Guardar",
+    "cancelNameEdit": "Cancelar",
+    "save": "Guardar",
+    "selectPlayerFor": "Selecciona un jugador para",
+    "noAvailableCards": "No tienes cartas disponibles para esta posición",
+    "cancel": "Cancelar",
+    "saveChangesPrompt": "¿Quieres guardar los cambios antes de salir?",
+    "yesSave": "Sí, guardar",
+    "noDiscard": "No, descartar",
+    "newName": "Nuevo nombre",
+    "editName": "Editar nombre"
+  },
   "squad": {
     "title": "Mis alineaciones",
     "loading": "Cargando alineaciones...",
@@ -92,10 +110,11 @@
     "suggestion": "Consejo: Haz click en un jugador para ver sus estadísticas detalladas",
     "me": "TÚ",
     "close": "CERRAR"
+    
   },
   "shop": {
     "filter": "Filtros",
-    "position": "Posicion",
+    "position": "Posición",
     "reastPos": "Todas las posiciones",
     "team": "Equipo",
     "reastTeam": "Todos los equipos",
@@ -112,7 +131,20 @@
     "question": "¿Deseas comprar esta carta?",
     "buy": "Comprar",
     "cancel": "Cancelar",
-    "loading": "Cargando tienda..."
+    "loading": "Cargando tienda...",
+    "clear": "Limpiar",
+    "searchPlaceholder": "Buscar cartas...",
+    "noResults": "No se encontraron resultados",
+    "page": "Página",
+    "of": "de",
+    "confirmQuestion": "¿Deseas comprar la carta de {{name}}?",
+    "yes": "Sí",
+    "no": "No",
+    "back": "Volver",
+    "dailyLabel": " (Diaria)",
+    "loadingAllCards": "Cargando todas las cartas...",
+    "insufficient_coins": "¡No tienes suficientes AdrenaCoins para comprar esta carta!"
+
   },
   "auth": {
     "title": "Inicio de sesión",

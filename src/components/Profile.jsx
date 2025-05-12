@@ -8,6 +8,7 @@ import { getProfile, updateProfile } from "../services/api/profileApi";
 import { getToken } from "../services/api/authApi";
 import background from "../assets/background.png";
 import PropTypes from "prop-types";
+import BackButton from "./layout/game/BackButton";
 
 // Componente para efectos de partículas
 const ParticleBackground = () => {
@@ -82,7 +83,7 @@ const ParticleBackground = () => {
 };
 
 // Componente para el botón de retroceso
-const BackButton = ({ onClick }) => (
+const BackButtom = ({ onClick }) => (
   <motion.button
     whileHover={{ scale: 1.1 }}
     whileTap={{ scale: 0.9 }}
