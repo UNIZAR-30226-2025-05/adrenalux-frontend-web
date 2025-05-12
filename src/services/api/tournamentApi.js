@@ -175,6 +175,7 @@ export const tournamentApi = {
       });
 
       const data = response.data.data || response.data;
+      console.log(data);
       return data.map(item => ({
         id: item.infoTorneo.torneo_id,
         nombre: item.infoTorneo.torneo.nombre,

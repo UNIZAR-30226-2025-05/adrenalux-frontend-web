@@ -663,9 +663,6 @@ const Torneo = () => {
                     <p><span className="font-medium">Estado:</span> {state.torneoSeleccionado.estado === "en_curso" ? "En curso" : "Pendiente"}</p>
                     <p><span className="font-medium">Premio:</span> {state.torneoSeleccionado.premio}</p>
                     <p><span className="font-medium">Participantes:</span> {state.torneoSeleccionado.participantes?.length || 0}/{state.torneoSeleccionado.maxParticipantes}</p>
-                    {state.torneoSeleccionado.estado == 'en_curso' && (
-                      <p><span className="font-medium">Inicio:</span> {new Date(state.torneoSeleccionado.fechaInicio).toLocaleString()}</p>
-                    )}
                   </div>
                 </div>
                 
