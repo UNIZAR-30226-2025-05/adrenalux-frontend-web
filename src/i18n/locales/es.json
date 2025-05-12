@@ -46,7 +46,7 @@
     "loading": "Cargando...",
     "open": "abrir"
   },
-  "squad":{
+  "squad": {
     "title": "Mis alineaciones",
     "loading": "Cargando alineaciones...",
     "add": "Añadir nueva alineación",
@@ -90,7 +90,8 @@
     "standing": "Posicion",
     "name": "Nombre",
     "suggestion": "Consejo: Haz click en un jugador para ver sus estadísticas detalladas",
-    "me": "TÚ"
+    "me": "TÚ",
+    "close": "CERRAR"
   },
   "shop": {
     "filter": "Filtros",

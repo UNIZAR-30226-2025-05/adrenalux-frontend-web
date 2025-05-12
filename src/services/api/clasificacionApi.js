@@ -28,6 +28,7 @@ export const obtenerClasificacionTotal = async () => {
             userid: user.userid || user.id,
             puntos: user.clasificacion || 0,
             avatar: user.avatar ?? null,
+            friend_code: user.friend_code || null,
           }))
       : [];
 
@@ -85,5 +86,30 @@ export const obtenerClasificacionUsuario = async () => {
       url: error.config?.url,
     });
     return null;
+  }
+};
+export const obtenerAmigos = async () => {
+  console.log("[API] Iniciando obtención de amigos");
+  try {
+    const token = getToken();
+    if (!token) {
+      console.warn("[API] No se encontró token");
+      return [];
+    }
+
+    const response = await axios.get(`${API_URL}/amigos`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    console.log("[API] Respuesta de /amigos:", response.data);
+
+    return Array.isArray(response.data?.data) ? response.data.data : [];
+  } catch (error) {
+    console.error("[API] Error en obtenerAmigos:", {
+      status: error.response?.status,
+      message: error.message,
+      url: error.config?.url,
+    });
+    return [];
   }
 };

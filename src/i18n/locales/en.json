@@ -46,7 +46,7 @@
     "loading": "Loading...",
     "open": "Open"
   },
-  "squad":{
+  "squad": {
     "title": "My Lineups",
     "loading": "Loading lineups...",
     "add": "Add New Lineup",
@@ -90,7 +90,8 @@
     "standing": "Position",
     "name": "Name",
     "suggestion": "Tip: Click on a player to see their detailed stats",
-    "me": "YOU"
+    "me": "YOU",
+    "close": "CLOSE"
   },
   "shop": {
     "filter": "Filters",
