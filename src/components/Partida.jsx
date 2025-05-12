@@ -483,31 +483,6 @@ const Partida = () => {
     setGameState((prev) => {
       const roundsLeft = TOTAL_ROUNDS - prev.roundNumber;
 
-      // Clinch del jugador
-      /*if (playerScore > opponentScore + roundsLeft) {
-        return {
-          ...prev,
-          phase: "ended",
-          scores,
-          winner: jugadorId.toString(),
-          isDraw: false,
-        };
-      }
-      // Clinch del rival
-      if (opponentScore > playerScore + roundsLeft) {
-        const rivalId = Object.keys(scores).find(
-          (id) => id !== jugadorId.toString()
-        );
-        return {
-          ...prev,
-          phase: "ended",
-          scores,
-          winner: rivalId,
-          isDraw: false,
-        };
-      }*/
-
-      // No hay clinch: mostramos el resultado de la ronda
       return {
         ...prev,
         phase: "result",
@@ -575,38 +550,44 @@ const Partida = () => {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: "0.5rem 1rem",
-    background: "rgba(15, 23, 42, 0.8)",
-    borderRadius: "12px",
-    marginBottom: "1rem",
-    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+    padding: "1rem 1.5rem",
+    background: "rgba(15, 23, 42, 0.9)",
+    borderRadius: "16px",
+    marginBottom: "1.5rem",
+    boxShadow: "0 8px 16px rgba(0, 0, 0, 0.3)",
+    border: "1px solid rgba(124, 58, 237, 0.3)",
+    backdropFilter: "blur(8px)",
   };
 
   const scoreStyle = {
-    fontSize: "1.2rem",
+    fontSize: "1.4rem",
     fontWeight: "bold",
-    padding: "0.5rem 1rem",
-    borderRadius: "8px",
-    minWidth: "100px",
+    padding: "0.75rem 1.5rem",
+    borderRadius: "12px",
+    minWidth: "120px",
     textAlign: "center",
-    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+    border: "2px solid rgba(255, 255, 255, 0.1)",
+    backdropFilter: "blur(4px)",
   };
 
   const roundStyle = {
-    fontSize: "1.2rem",
+    fontSize: "1.4rem",
     fontWeight: "bold",
-    padding: "0.5rem 1rem",
-    borderRadius: "8px",
-    background: "rgba(30, 41, 59, 0.8)",
+    padding: "0.75rem 1.5rem",
+    borderRadius: "12px",
+    background: "rgba(30, 41, 59, 0.9)",
     color: "white",
-    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+    border: "2px solid rgba(124, 58, 237, 0.3)",
+    backdropFilter: "blur(4px)",
   };
 
   const contentContainerStyle = {
     flexGrow: 1,
     display: "flex",
     width: "100%",
-    minHeight: "calc(100vh - 100px)",
+    minHeight: "calc(100vh - 120px)",
     maxWidth: isDesktop ? "1400px" : "100%",
     margin: "0 auto",
     position: "relative",
@@ -627,19 +608,26 @@ const Partida = () => {
     flexDirection: "column",
     alignItems: "center",
     marginBottom: windowWidth < 768 ? "1rem" : "0",
-    background: "rgba(15, 23, 42, 0.7)",
-    borderRadius: "12px",
-    padding: "1rem",
-    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+    background: "rgba(15, 23, 42, 0.8)",
+    borderRadius: "16px",
+    padding: "1.5rem",
+    boxShadow: "0 8px 16px rgba(0, 0, 0, 0.3)",
+    border: "1px solid rgba(124, 58, 237, 0.2)",
+    backdropFilter: "blur(4px)",
   };
 
   const playerNameStyle = {
     color: "white",
-    fontSize: "1.5rem",
-    marginBottom: "1rem",
+    fontSize: "1.8rem",
+    marginBottom: "1.5rem",
     textAlign: "center",
     fontWeight: "bold",
-    textShadow: "0 2px 4px rgba(0, 0, 0, 0.5)",
+    textShadow: "0 2px 8px rgba(0, 0, 0, 0.7)",
+    background: "linear-gradient(90deg, #3b82f6, #8b5cf6)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+    padding: "0.5rem 1rem",
+    borderRadius: "8px",
   };
 
   const selectedCardContainerStyle = {
@@ -647,10 +635,10 @@ const Partida = () => {
     flexDirection: "column",
     alignItems: "center",
     background:
-      "linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95))",
-    padding: "1.5rem",
-    borderRadius: "16px",
-    boxShadow: "0 8px 16px rgba(0, 0, 0, 0.4)",
+      "linear-gradient(135deg, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 0.98))",
+    padding: "2rem",
+    borderRadius: "20px",
+    boxShadow: "0 12px 24px rgba(0, 0, 0, 0.5)",
     position: "fixed",
     top: "50%",
     left: "50%",
@@ -660,11 +648,12 @@ const Partida = () => {
     maxHeight: "90vh",
     overflowY: "auto",
     border: "2px solid rgba(124, 58, 237, 0.5)",
+    backdropFilter: "blur(12px)",
   };
 
   const skillButtonStyle = {
     padding: "0.75rem 1.5rem",
-    borderRadius: "8px",
+    borderRadius: "12px",
     border: "none",
     cursor: "pointer",
     background: "linear-gradient(135deg, #3b82f6, #6366f1)",
@@ -673,7 +662,8 @@ const Partida = () => {
     fontSize: "1rem",
     width: windowWidth < 500 ? "100%" : "auto",
     transition: "all 0.2s ease",
-    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
+    minWidth: "120px",
   };
 
   const confirmButtonStyle = {
@@ -686,7 +676,7 @@ const Partida = () => {
     fontWeight: "bold",
     fontSize: "1.1rem",
     marginTop: "1.5rem",
-    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.3)",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.4)",
     transition: "all 0.2s ease",
     width: "100%",
   };
@@ -695,8 +685,8 @@ const Partida = () => {
     position: "fixed",
     bottom: "2vh",
     left: "2vw",
-    width: "56px",
-    height: "56px",
+    width: "60px",
+    height: "60px",
     fontSize: "24px",
     background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
     color: "white",
@@ -707,22 +697,23 @@ const Partida = () => {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    boxShadow: "0 8px 16px rgba(0, 0, 0, 0.3)",
+    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)",
     transition: "all 0.25s ease",
+    border: "2px solid rgba(255, 255, 255, 0.1)",
   };
 
   const menuStyle = {
     position: "fixed",
-    bottom: "calc(2vh + 72px)",
+    bottom: "calc(2vh + 80px)",
     left: "2vw",
-    background: "rgba(15, 23, 42, 0.95)",
+    background: "rgba(15, 23, 42, 0.98)",
     border: "1px solid rgba(124, 58, 237, 0.5)",
     borderRadius: "16px",
-    minWidth: "200px",
+    minWidth: "220px",
     zIndex: 120,
-    boxShadow: "0 12px 24px rgba(0, 0, 0, 0.4)",
+    boxShadow: "0 16px 32px rgba(0, 0, 0, 0.5)",
     overflow: "hidden",
-    backdropFilter: "blur(8px)",
+    backdropFilter: "blur(12px)",
   };
 
   const menuItemStyle = {
@@ -730,11 +721,11 @@ const Partida = () => {
     color: "white",
     textAlign: "left",
     width: "100%",
-    borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+    borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
     display: "flex",
     alignItems: "center",
     gap: "1rem",
-    fontSize: "1rem",
+    fontSize: "1.1rem",
     transition: "all 0.2s ease",
   };
 
@@ -746,14 +737,16 @@ const Partida = () => {
     background: "linear-gradient(135deg, #f59e0b, #f97316)",
     color: "white",
     padding: "1rem 2rem",
-    borderRadius: "8px",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+    borderRadius: "12px",
+    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)",
     zIndex: 1000,
-    fontSize: "1rem",
+    fontSize: "1.1rem",
     fontWeight: "bold",
     textAlign: "center",
     maxWidth: "90%",
     animation: "fadeInOut 4s ease-in-out",
+    border: "1px solid rgba(255, 255, 255, 0.2)",
+    backdropFilter: "blur(4px)",
   };
 
   const renderPhase = () => {
@@ -771,11 +764,12 @@ const Partida = () => {
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
+                  className="relative z-10"
                 >
-                  <IoMdFootball className="text-6xl text-yellow-400 mx-auto" />
+                  <IoMdFootball className="text-7xl text-yellow-400 mx-auto" />
                 </motion.div>
                 <motion.div
-                  className="absolute inset-0 rounded-full bg-yellow-500 opacity-20"
+                  className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-500 to-amber-500 opacity-20 blur-md"
                   animate={{ scale: [1, 1.5, 1] }}
                   transition={{
                     repeat: Infinity,
@@ -785,7 +779,7 @@ const Partida = () => {
                 />
               </div>
 
-              <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400 mb-4">
+              <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400 mb-6">
                 Esperando al oponente...
               </h2>
               <p className="text-2xl text-gray-300 mb-8">
@@ -794,7 +788,7 @@ const Partida = () => {
 
               <div className="flex justify-center">
                 <motion.div
-                  className="h-3 bg-gray-700 rounded-full overflow-hidden w-3/4"
+                  className="h-4 bg-gray-800 rounded-full overflow-hidden w-3/4"
                   initial={{ width: "0%" }}
                   animate={{ width: "75%" }}
                   transition={{
@@ -828,8 +822,9 @@ const Partida = () => {
                 animate={{ opacity: 1 }}
                 className="text-center p-8"
               >
-                <div className="mb-6">
-                  <GiSwordman className="text-6xl text-red-500 mx-auto animate-pulse" />
+                <div className="mb-6 relative">
+                  <GiSwordman className="text-7xl text-red-500 mx-auto animate-pulse" />
+                  <div className="absolute inset-0 rounded-full bg-red-500 opacity-20 blur-md" />
                 </div>
                 <h2 className="text-3xl font-bold text-white mb-4">
                   Turno del rival
@@ -858,12 +853,14 @@ const Partida = () => {
                     background: "linear-gradient(90deg, #06d6a0, #3b82f6)",
                     color: "white",
                     padding: "1.5rem 3rem",
-                    borderRadius: "12px",
+                    borderRadius: "16px",
                     fontSize: "2rem",
                     fontWeight: "bold",
                     textShadow: "0 2px 8px rgba(0,0,0,0.5)",
                     zIndex: 9999,
-                    boxShadow: "0 8px 16px rgba(0,0,0,0.3)",
+                    boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
+                    border: "2px solid rgba(255, 255, 255, 0.2)",
+                    backdropFilter: "blur(4px)",
                   }}
                 >
                   ¡TU TURNO!
@@ -959,21 +956,22 @@ const Partida = () => {
               transition={{ duration: 0.3 }}
               className="text-center p-8"
             >
-              <div className="mb-8">
+              <div className="mb-8 relative">
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
                   style={{
-                    width: "80px",
-                    height: "80px",
+                    width: "100px",
+                    height: "100px",
                     margin: "0 auto",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                   }}
                 >
-                  <GiSoccerBall className="text-5xl text-blue-400" />
+                  <GiSoccerBall className="text-6xl text-blue-400" />
                 </motion.div>
+                <div className="absolute inset-0 rounded-full bg-blue-500 opacity-10 blur-md" />
               </div>
               <h2 className="text-3xl font-bold text-blue-400 mb-4">
                 Esperando respuesta...
@@ -993,8 +991,9 @@ const Partida = () => {
               animate={{ opacity: 1 }}
               className="text-center p-8"
             >
-              <div className="mb-6">
-                <FaPause className="text-6xl text-yellow-500 mx-auto" />
+              <div className="mb-6 relative">
+                <FaPause className="text-7xl text-yellow-500 mx-auto" />
+                <div className="absolute inset-0 rounded-full bg-yellow-500 opacity-10 blur-md" />
               </div>
               <h2 className="text-3xl font-bold text-white mb-4">
                 Partida pausada
@@ -1004,7 +1003,7 @@ const Partida = () => {
               </p>
               <motion.button
                 onClick={handleResume}
-                className="bg-green-600 hover:bg-green-500 text-white font-bold py-3 px-6 rounded-lg text-lg"
+                className="bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-500 hover:to-emerald-400 text-white font-bold py-3 px-8 rounded-lg text-lg shadow-lg"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -1032,7 +1031,7 @@ const Partida = () => {
               <motion.h2
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className={`text-4xl font-bold mb-6 ${
+                className={`text-5xl font-bold mb-8 ${
                   tie
                     ? "text-yellow-400"
                     : playerWon
@@ -1047,27 +1046,43 @@ const Partida = () => {
                   : "RONDA PERDIDA"}
               </motion.h2>
 
-              <div className="flex justify-center items-center gap-8 mb-8">
+              <div className="flex flex-col md:flex-row justify-center items-center gap-8 mb-8">
                 <div className="text-center">
-                  <CartaMediana jugador={gameState.selectedCard} />
-                  <div className="mt-2 text-xl font-bold text-white">Tú</div>
-                  <div className="text-2xl font-bold mt-2">
+                  <div className="relative">
+                    <CartaMediana jugador={gameState.selectedCard} />
+                    {playerWon && (
+                      <div className="absolute -top-4 -right-4 bg-green-500 text-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg">
+                        ✓
+                      </div>
+                    )}
+                  </div>
+                  <div className="mt-3 text-xl font-bold text-white">Tú</div>
+                  <div className="text-2xl font-bold mt-2 bg-gradient-to-r from-blue-500 to-purple-500 text-transparent bg-clip-text">
                     {playerVal} {stat}
                   </div>
                 </div>
 
-                <div className="text-3xl font-bold text-white">VS</div>
+                <div className="text-4xl font-bold text-white my-4 md:my-0">
+                  VS
+                </div>
 
                 <div className="text-center">
-                  <CartaMediana jugador={gameState.opponentSelectedCard} />
-                  <div className="mt-2 text-xl font-bold text-white">Rival</div>
-                  <div className="text-2xl font-bold mt-2">
+                  <div className="relative">
+                    <CartaMediana jugador={gameState.opponentSelectedCard} />
+                    {!playerWon && !tie && (
+                      <div className="absolute -top-4 -right-4 bg-red-500 text-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg">
+                        ✗
+                      </div>
+                    )}
+                  </div>
+                  <div className="mt-3 text-xl font-bold text-white">Rival</div>
+                  <div className="text-2xl font-bold mt-2 bg-gradient-to-r from-blue-500 to-purple-500 text-transparent bg-clip-text">
                     {rivalVal} {stat}
                   </div>
                 </div>
               </div>
 
-              <div className="text-2xl font-bold text-white mb-8">
+              <div className="text-3xl font-bold text-white mb-8 bg-gradient-to-r from-blue-500 to-purple-500 px-6 py-3 rounded-lg shadow-lg">
                 Marcador: {gameState.scores.player} -{" "}
                 {Object.values(gameState.scores).find(
                   (score) => score !== gameState.scores.player
@@ -1095,7 +1110,7 @@ const Partida = () => {
                     nextRoundStartRef.current = null;
                   }
                 }}
-                className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-lg text-lg"
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3 px-8 rounded-lg text-lg shadow-lg"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -1124,7 +1139,7 @@ const Partida = () => {
               className="text-center p-8"
             >
               <motion.h1
-                className={`text-5xl font-bold mb-6 ${
+                className={`text-6xl font-bold mb-8 ${
                   isDraw
                     ? "text-yellow-400"
                     : isWinner
@@ -1139,7 +1154,7 @@ const Partida = () => {
               </motion.h1>
 
               <motion.div
-                className="text-4xl font-bold text-white mb-8"
+                className="text-5xl font-bold text-white mb-8 bg-gradient-to-r from-blue-500 to-purple-500 px-8 py-4 rounded-xl shadow-xl"
                 initial={{ scale: 0.8 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.4, duration: 0.5 }}
@@ -1149,7 +1164,7 @@ const Partida = () => {
 
               {gameState.puntosChange && (
                 <motion.div
-                  className={`text-2xl font-bold mb-8 ${
+                  className={`text-3xl font-bold mb-8 ${
                     gameState.puntosChange[currentPlayerId] >= 0
                       ? "text-green-400"
                       : "text-red-400"
@@ -1167,11 +1182,11 @@ const Partida = () => {
                 onClick={() => navigate("/home")}
                 className={`${
                   isDraw
-                    ? "bg-yellow-500 hover:bg-yellow-400"
+                    ? "bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400"
                     : isWinner
-                    ? "bg-green-500 hover:bg-green-400"
-                    : "bg-red-500 hover:bg-red-400"
-                } text-white font-bold py-3 px-8 rounded-lg text-lg`}
+                    ? "bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400"
+                    : "bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-400 hover:to-rose-400"
+                } text-white font-bold py-4 px-10 rounded-lg text-xl shadow-xl`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -1185,8 +1200,9 @@ const Partida = () => {
         return (
           <ModalWrapper>
             <div className="text-center p-8">
-              <div className="mb-6">
-                <GiSoccerBall className="text-6xl text-blue-400 mx-auto animate-spin" />
+              <div className="mb-6 relative">
+                <GiSoccerBall className="text-7xl text-blue-400 mx-auto animate-spin" />
+                <div className="absolute inset-0 rounded-full bg-blue-500 opacity-10 blur-md" />
               </div>
               <h2 className="text-3xl font-bold text-white mb-4">
                 Cargando partida...
@@ -1206,8 +1222,8 @@ const Partida = () => {
             ...scoreStyle,
             background:
               gameState.scores.player > gameState.scores.opponent
-                ? "linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(6, 214, 160, 0.8))"
-                : "linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.8))",
+                ? "linear-gradient(135deg, rgba(16, 185, 129, 0.9), rgba(6, 214, 160, 0.9))"
+                : "linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9))",
             color: "white",
           }}
           transition={{ duration: 0.3 }}
@@ -1222,8 +1238,8 @@ const Partida = () => {
             ...scoreStyle,
             background:
               gameState.scores.opponent > gameState.scores.player
-                ? "linear-gradient(135deg, rgba(239, 68, 68, 0.8), rgba(220, 38, 38, 0.8))"
-                : "linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.8))",
+                ? "linear-gradient(135deg, rgba(239, 68, 68, 0.9), rgba(220, 38, 38, 0.9))"
+                : "linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9))",
             color: "white",
           }}
           transition={{ duration: 0.3 }}
@@ -1265,7 +1281,7 @@ const Partida = () => {
                   style={menuItemStyle}
                   className="hover:bg-emerald-600/50"
                 >
-                  <FaPlay /> Reanudar
+                  <FaPlay className="text-emerald-400" /> Reanudar
                 </button>
               ) : (
                 <button
@@ -1273,7 +1289,7 @@ const Partida = () => {
                   style={menuItemStyle}
                   className="hover:bg-yellow-600/50"
                 >
-                  <FaPause /> Pausar
+                  <FaPause className="text-yellow-400" /> Pausar
                 </button>
               ))}
             <button
@@ -1281,7 +1297,7 @@ const Partida = () => {
               style={menuItemStyle}
               className="hover:bg-red-600/50"
             >
-              <FaFlag /> Rendirse
+              <FaFlag className="text-red-400" /> Rendirse
             </button>
           </motion.div>
         )}
