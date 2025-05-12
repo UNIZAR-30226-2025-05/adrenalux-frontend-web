@@ -139,7 +139,6 @@ class SocketService {
   // Resto de las funciones de SocketService...
   handleExchangeCompleted(data) {
     console.log(data);
-    this.navigate("/home");
   }
 
   handleExchangeCancelled(data) {
