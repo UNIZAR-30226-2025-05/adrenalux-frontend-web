@@ -12,10 +12,10 @@ import {
 import { getToken } from "../services/api/authApi";
 import { jwtDecode } from "jwt-decode";
 import Formacion433 from "../components/layout/game/Formacion_4_3_3";
-import CartaGrande from "../components/layout/game/CartaGrande";
+import CartaGrande from "../components/layout/game/CartaMediana";
 import CartaMediana from "../components/layout/game/CartaMediana";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import ModalWrapper from "../components/layout/game/ModalWrapper";
 
 import { FaPause, FaPlay, FaFlag, FaHome, FaCog } from "react-icons/fa";
@@ -25,12 +25,13 @@ import {
   GiSwordWound,
   GiSwordwoman,
 } from "react-icons/gi";
+import { GiSoccerBall } from "react-icons/gi";
+import { IoMdFootball } from "react-icons/io";
 
 document.body.style.overflow = "auto";
 
 const Partida = () => {
   const nextRoundStartRef = useRef(null);
-
   const waitingNextRoundRef = useRef(false);
   const { matchId } = useParams();
   const navigate = useNavigate();
@@ -51,33 +52,35 @@ const Partida = () => {
   const [showPausedMenu, setShowPausedMenu] = useState(false);
   const [pausedMatches, setPausedMatches] = useState([]);
   const [loadingPaused, setLoadingPaused] = useState(false);
-  const handleShowPausedMenu = async () => {
-    setLoadingPaused(true);
-    setShowPausedMenu(true);
-    try {
-      const matches = await getPartidasPausadas(token);
-      setPausedMatches(matches);
-    } catch (err) {
-      setAlertMessage("Error cargando partidas pausadas");
-      setShowAlert(true);
-    }
-    setLoadingPaused(false);
-  };
-
+  const [showTurnBanner, setShowTurnBanner] = useState(false);
   const [currentOpponentCard, setCurrentOpponentCard] = useState(null);
-  console.log(currentOpponentCard);
   const [highlightedPosition, setHighlightedPosition] = useState(null);
-  const handlePause = () => {
-    console.log("Pausa solicitada");
-    socketService.pause(matchId);
-    setShowMenu(false);
-  };
-  const handleResume = () => {
-    socketService.resumeMatch(matchId);
-    setShowMenu(false);
-  };
+  const TOTAL_ROUNDS = 11;
 
-  // 1) CALLBACKS DE PAUSA / REANUDAR
+  const [gameState, setGameState] = useState({
+    phase: "waiting",
+    roundNumber: 1,
+    isPlayerTurn: false,
+    scores: { player: 0, opponent: 0 },
+    playerCards: [],
+    availablePlayerCards: [],
+    opponentCards: [],
+    selectedCard: null,
+    selectedSkill: null,
+    opponentSelectedCard: null,
+    opponentSelectedSkill: null,
+    matchInfo: null,
+    winner: null,
+  });
+
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Socket event handlers
   useEffect(() => {
     socketService.setOnMatchPaused(() => {
       setGameState((prev) => ({ ...prev, phase: "paused" }));
@@ -96,66 +99,7 @@ const Partida = () => {
         puntosDelta: payload.puntosDelta,
       }));
     });
-  }, []);
 
-  const [gameState, setGameState] = useState({
-    phase: "waiting",
-    roundNumber: 1,
-    isPlayerTurn: false,
-    scores: { player: 0, opponent: 0 },
-    playerCards: [],
-    availablePlayerCards: [],
-    opponentCards: [],
-    selectedCard: null,
-    selectedSkill: null,
-    opponentSelectedCard: null,
-    opponentSelectedSkill: null,
-    matchInfo: null,
-    winner: null,
-  });
-  useEffect(() => setShowMenu(false), [gameState.phase]);
-  const phaseRef = useRef(gameState.phase);
-  useEffect(() => {
-    phaseRef.current = gameState.phase;
-  }, [gameState.phase]);
-
-  useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  // Detectar cambios en el tamaño de la ventana
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-  useEffect(() => {
-    socketService.setOnMatchEnd((payload) => {
-      setGameState((prev) => ({
-        ...prev,
-        phase: "ended",
-        scores: payload.scores,
-        winner: payload.winner,
-        puntosDelta: payload.puntosDelta,
-      }));
-    });
-  }, []);
-
-  // Añadir este useEffect para monitorear cambios en las cartas del oponente
-  useEffect(() => {
-    console.log("Cartas del oponente actualizadas:", gameState.opponentCards);
-    // Actualizar también el ref cuando cambia el estado
-    opponentCardsRef.current = gameState.opponentCards;
-  }, [gameState.opponentCards]);
-
-  useEffect(() => {
     socketService.setOnRoundStart(handleRoundStart);
     socketService.setOnOpponentSelection(handleOpponentSelection);
     socketService.setOnRoundResult(handleRoundResult);
@@ -175,7 +119,7 @@ const Partida = () => {
           token
         );
 
-        // Mapear las cartas al formato compatible
+        // Map cards to compatible format
         const playerCards = Array.isArray(jugadores_plantilla?.data)
           ? (() => {
               const counters = {
@@ -211,7 +155,6 @@ const Partida = () => {
                     posicionEspecifica = "goalkeeper1";
                     break;
                   default:
-                    // Por defecto considerar como defensa si no coincide
                     counters.defender++;
                     posicionEspecifica = `defender${counters.defender}`;
                 }
@@ -222,7 +165,7 @@ const Partida = () => {
                   alias: jugador.alias,
                   posicion: posicionEspecifica,
                   posicionType: posicionLower,
-                  photo: jugador.photo, // Usar photo si existe
+                  photo: jugador.photo,
                   ataque: jugador.ataque,
                   defensa: jugador.defensa,
                   control: jugador.control,
@@ -242,7 +185,7 @@ const Partida = () => {
           matchInfo: { perfil, plantillas },
         }));
       } catch (error) {
-        console.error("Error cargando perfil o plantillas:", error);
+        console.error("Error loading profile or templates:", error);
         setGameState((prev) => ({
           ...prev,
           playerCards: [],
@@ -266,16 +209,10 @@ const Partida = () => {
     if (!gameState.isPlayerTurn || gameState.phase !== "selection") {
       setAlertMessage("¡No es tu turno!");
       setShowAlert(true);
-
-      // Ocultar la alerta después de 3 segundos
-      setTimeout(() => {
-        setShowAlert(false);
-      }, 3000);
-
+      setTimeout(() => setShowAlert(false), 3000);
       return;
     }
 
-    // Verificar si necesitamos validar la posición
     if (
       highlightedPosition &&
       data.jugador.posicionType.toLowerCase() !==
@@ -285,45 +222,30 @@ const Partida = () => {
         `Debes seleccionar una carta de posición: ${highlightedPosition}`
       );
       setShowAlert(true);
-
-      // Ocultar la alerta después de 3 segundos
-      setTimeout(() => {
-        setShowAlert(false);
-      }, 3000);
-
+      setTimeout(() => setShowAlert(false), 3000);
       return;
     }
 
     setGameState((prev) => ({
       ...prev,
       selectedCard: data.jugador,
-      selectedSkill: null, // Resetear habilidad al seleccionar nueva carta
+      selectedSkill: null,
     }));
   };
 
   const handleSkillSelect = (skill) => {
     if (!gameState.selectedCard) return;
-
     setGameState((prev) => ({
       ...prev,
       selectedSkill: skill,
     }));
   };
 
-  const isSkillDisabled = () => {
-    return false;
-  };
-
-  // Modificada la función handleConfirmSelection para guardar la referencia
   const handleConfirmSelection = () => {
     if (!gameState.selectedCard || !gameState.selectedSkill) return;
 
-    console.log("Confirmando selección:", gameState.selectedCard);
-
-    // Guardar la referencia a la carta seleccionada - IMPORTANTE
     selectedCardRef.current = { ...gameState.selectedCard };
 
-    // Verificar que la posición coincida con la del oponente
     if (
       highlightedPosition &&
       gameState.selectedCard.posicionType.toLowerCase() !==
@@ -333,13 +255,8 @@ const Partida = () => {
         `Debes elegir una carta de posición ${highlightedPosition}`
       );
       setShowAlert(true);
-
-      // Ocultar la alerta después de 3 segundos
-      setTimeout(() => {
-        setShowAlert(false);
-      }, 3000);
-
-      return; // No continuar si la posición no coincide
+      setTimeout(() => setShowAlert(false), 3000);
+      return;
     }
 
     const updatedAvailableCards = gameState.availablePlayerCards.filter(
@@ -358,27 +275,22 @@ const Partida = () => {
       });
     }
 
-    // Guarda la selección actual en el estado y en el ref
     setGameState((prev) => ({
       ...prev,
       phase: "response",
       availablePlayerCards: updatedAvailableCards,
-      mySelection: { ...gameState.selectedCard }, //
+      mySelection: { ...gameState.selectedCard },
     }));
     selectedCardRef.current = { ...gameState.selectedCard };
-
-    // Limpiar la posición destacada después de enviar la selección
     setHighlightedPosition(null);
   };
 
-  // Función para asignar posiciones específicas a las cartas del oponente
   const getPositionForOpponentCard = (carta, existingCards) => {
     const posicionLower = carta.posicion.toLowerCase();
     const existingPositions = existingCards
       ? existingCards.map((card) => card.posicion)
       : [];
 
-    // Contadores para cada tipo de posición
     const counters = {
       forward: 0,
       midfielder: 0,
@@ -386,7 +298,6 @@ const Partida = () => {
       goalkeeper: 0,
     };
 
-    // Contar las posiciones ya asignadas
     existingPositions.forEach((pos) => {
       if (pos.startsWith("forward")) counters.forward++;
       else if (pos.startsWith("midfielder")) counters.midfielder++;
@@ -394,7 +305,6 @@ const Partida = () => {
       else if (pos.startsWith("goalkeeper")) counters.goalkeeper++;
     });
 
-    // Asignar la posición específica
     let posicionEspecifica;
 
     switch (posicionLower) {
@@ -419,7 +329,6 @@ const Partida = () => {
         posicionEspecifica = "goalkeeper1";
         break;
       default:
-        // Por defecto considerar como defensa
         counters.defender++;
         posicionEspecifica = `defender${counters.defender}`;
     }
@@ -427,121 +336,15 @@ const Partida = () => {
     return posicionEspecifica;
   };
 
-  const [showTurnBanner, setShowTurnBanner] = useState(false);
-
-  /*const handleRoundStart = (data) => {
-    // Si seguimos en “result” bloqueamos este evento
-    if (waitingNextRoundRef.current) return;
-
-    // Limpiar cualquier carta u posición pendiente
-    setCurrentOpponentCard(null);
-    setHighlightedPosition(null);
-
-    // Pasar a selección y resetear mySelection
-    setGameState((prev) => ({
-      ...prev,
-      phase: dataConTurno.isPlayerTurn ? "selection" : "waiting",
-      roundNumber: data.dataConTurno.roundNumber,
-      isPlayerTurn: data.dataConTurno.isPlayerTurn,
-      timer: 30,
-      selectedSkill: null,
-      opponentSelection: null,
-      opponentCards:
-        prev.opponentCards.length > 0
-          ? prev.opponentCards
-          : opponentCardsRef.current,
-      mySelection: null, // ← borramos la selección anterior
-    }));
-
-    // Mostrar banner brevemente
-    setShowTurnBanner(true);
-    setTimeout(() => setShowTurnBanner(false), 1500);
-  };*/
-
-  /*const handleRoundStart = ({ dataConTurno } = {}) => {
-    // si no viene o seguimos en “result”, no hacemos nada
-    if (!dataConTurno || waitingNextRoundRef.current) return;
-
-    // limpiar cualquier carta u posición pendiente
-    setCurrentOpponentCard(null);
-    setHighlightedPosition(null);
-
-    // bloquear para que no procese un nuevo start hasta que hagas “Continuar”
-    waitingNextRoundRef.current = false;
-
-    // pasamos a selección solamente si es tu turno, si no, a waiting
-    setGameState((prev) => ({
-      ...prev,
-      phase: dataConTurno.isPlayerTurn ? "selection" : "waiting",
-      roundNumber: dataConTurno.roundNumber,
-      isPlayerTurn: dataConTurno.isPlayerTurn,
-      timer: 30,
-      selectedSkill: null,
-      opponentSelection: null,
-      // si nunca ha llegado carta de oponente, recupera del ref
-      opponentCards:
-        prev.opponentCards.length > 0
-          ? prev.opponentCards
-          : opponentCardsRef.current,
-      mySelection: null, // limpiamos selección anterior
-    }));
-
-    // banner de turno
-    setShowTurnBanner(true);
-    setTimeout(() => setShowTurnBanner(false), 1500);
-  };*/
-
-  /*const handleRoundStart = (payload) => {
-    const turno = payload.dataConTurno;
-    if (!turno) return;
-
-    // Si estoy mostrando el resultado, encolo y salgo
-    if (gameState.phase === "result") {
-      nextRoundStartRef.current = payload;
-      return;
-    }
-
-    // Si no, borro cualquier start pendiente y proceso normalmente
-    nextRoundStartRef.current = null;
-
-    setCurrentOpponentCard(null);
-    setHighlightedPosition(null);
-
-    setGameState((prev) => ({
-      ...prev,
-      phase: turno.isPlayerTurn ? "selection" : "waiting",
-      roundNumber: turno.roundNumber,
-      isPlayerTurn: turno.isPlayerTurn,
-      timer: 30,
-      selectedSkill: null,
-      opponentSelection: null,
-      mySelection: null,
-      opponentCards: prev.opponentCards.length
-        ? prev.opponentCards
-        : opponentCardsRef.current,
-    }));
-
-    setShowTurnBanner(true);
-    setTimeout(() => setShowTurnBanner(false), 1500);
-  };*/
-
   const handleRoundStart = useCallback((payload) => {
     const turno = payload?.dataConTurno;
     if (!turno) return;
 
-    // Si estamos mostrando el resultado, encolamos
-    if (phaseRef.current === "result") {
-      nextRoundStartRef.current = payload;
-      return;
-    }
-
-    // Si estamos bloqueados, también encolamos
     if (waitingNextRoundRef.current) {
       nextRoundStartRef.current = payload;
       return;
     }
 
-    // Procesamos
     waitingNextRoundRef.current = false;
     nextRoundStartRef.current = null;
 
@@ -565,19 +368,12 @@ const Partida = () => {
     setTimeout(() => setShowTurnBanner(false), 1500);
   }, []);
 
-  // Arreglo para handleOpponentSelection: Guardamos la información de la carta seleccionada
   const handleOpponentSelection = (data) => {
-    // Verificar el valor de la referencia
-    console.log("Carta seleccionada previa (ref):", selectedCardRef.current);
-    console.log("Carta seleccionada previa (estado):", gameState.mySelection);
-
-    // Obtener las cartas actuales del oponente desde el ref para mayor seguridad
     const currentOpponentCards =
       opponentCardsRef.current.length > 0
         ? [...opponentCardsRef.current]
         : [...gameState.opponentCards];
 
-    // Crear un nuevo objeto de carta correctamente formateado
     const opponentCard = {
       id: data.data.carta.id.toString(),
       nombre: data.data.carta.nombre,
@@ -597,34 +393,26 @@ const Partida = () => {
       tipo_carta: data.data.carta.tipo_carta,
     };
 
-    // Guardar la carta en la variable temporal
     setCurrentOpponentCard(opponentCard);
-
-    // Guardar la posición requerida para la respuesta
     setHighlightedPosition(data.data.carta.posicion);
 
-    // Verificar si esta carta ya existe en las cartas del oponente
     const opponentCardExists = currentOpponentCards.some(
       (card) => card.id === opponentCard.id
     );
 
     let updatedOpponentCards = currentOpponentCards;
 
-    // Solo añadimos la carta a la lista si no existe ya
     if (!opponentCardExists) {
       updatedOpponentCards = [...currentOpponentCards, opponentCard];
     }
 
-    // Actualizar también el ref de las cartas del oponente
     opponentCardsRef.current = updatedOpponentCards;
 
-    // Modificar el mensaje para indicar que debe elegir la misma posición
     setAlertMessage(
       `Oponente ha elegido: ${data.data.carta.posicion} - Debes elegir una carta de la misma posición`
     );
     setShowAlert(true);
 
-    // Ocultar la alerta después de 5 segundos
     setTimeout(() => {
       setShowAlert(false);
     }, 5000);
@@ -633,81 +421,112 @@ const Partida = () => {
       ...prev,
       isPlayerTurn: true,
       opponentSelection: data,
-      // Añadir esta carta del oponente al estado
       opponentSelectedCard: opponentCard,
       opponentSelectedSkill: data.data.skill,
       phase: "selection",
     }));
   };
-  const handleRoundResult = (data) => {
-    const { carta_j1, carta_j2, habilidad_j1, habilidad_j2 } =
-      data.data.detalles;
 
+  const handleRoundResult = (data) => {
+    const detalles = data.data.detalles;
+    const { ganador, scores } = data.data;
+
+    // 1) Identificar tu carta seleccionada
     const myCardRef = selectedCardRef.current;
     if (!myCardRef) {
-      console.error("ERROR: selectedCardRef es null en el resultado de ronda");
+      console.error("ERROR: selectedCardRef es null en handleRoundResult");
       return;
     }
-
     const myCardId = myCardRef.id.toString();
-    const isPlayerJ1 = carta_j1.id.toString() === myCardId;
+    const isPlayerJ1 = detalles.carta_j1.id.toString() === myCardId;
 
-    const myFinalCard = isPlayerJ1 ? carta_j1 : carta_j2;
-    const mySkill = isPlayerJ1 ? habilidad_j1 : habilidad_j2;
-    const opponentCard = isPlayerJ1 ? carta_j2 : carta_j1;
-    const opponentSkill = isPlayerJ1 ? habilidad_j2 : habilidad_j1;
+    // 2) Extraer habilidades y cartas
+    const mySkill = isPlayerJ1 ? detalles.habilidad_j1 : detalles.habilidad_j2;
+    const opponentRaw = isPlayerJ1 ? detalles.carta_j2 : detalles.carta_j1;
+    const opponentSkill = isPlayerJ1
+      ? detalles.habilidad_j2
+      : detalles.habilidad_j1;
 
+    // 3) Formatear objeto de carta del oponente
+    const formattedOpponentCard = {
+      id: opponentRaw.id.toString(),
+      nombre: opponentRaw.nombre,
+      alias: opponentRaw.alias,
+      photo: opponentRaw.photo,
+      ataque: opponentRaw.ataque,
+      defensa: opponentRaw.defensa,
+      control: opponentRaw.control,
+      equipo: opponentRaw.equipo,
+      escudo: opponentRaw.escudo,
+      pais: opponentRaw.pais,
+      tipo_carta: opponentRaw.tipo_carta,
+      posicion: opponentRaw.posicion,
+    };
+
+    // 4) Determinar resultado de la ronda
     let roundResult;
-
-    if (data.data.ganador === null) {
+    if (ganador === null) {
       roundResult = "empate";
     } else {
       roundResult =
-        data.data.ganador.toString() === jugadorId.toString()
-          ? "ganado"
-          : "perdido";
+        ganador.toString() === jugadorId.toString() ? "ganado" : "perdido";
     }
-    console.log(
-      "Ganador de la ronda:",
-      data.data.ganador.toString(),
-      "Token ID:",
-      jugadorId.toString(),
-      "Resultado:",
-      roundResult
-    );
 
-    setGameState((prev) => ({
-      ...prev,
-      phase: "result",
-      scores: data.data.scores,
-      roundResult: roundResult,
-      selectedSkill: mySkill,
-      selectedCard: { ...myCardRef },
-      opponentSelectedCard: {
-        id: opponentCard.id.toString(),
-        nombre: opponentCard.nombre,
-        alias: opponentCard.alias,
-        photo: opponentCard.photo,
-        ataque: opponentCard.ataque,
-        defensa: opponentCard.defensa,
-        control: opponentCard.control,
-        equipo: opponentCard.equipo,
-        escudo: opponentCard.escudo,
-        pais: opponentCard.pais,
-        tipo_carta: opponentCard.tipo_carta,
-        posicion: opponentCard.posicion,
-      },
-      opponentSelectedSkill: opponentSkill,
-    }));
+    // 5) Calcular puntuaciones y rounds restantes
+    const playerScore = scores[jugadorId.toString()] || 0;
+    const opponentScore =
+      Object.entries(scores).find(
+        ([key]) => key !== jugadorId.toString()
+      )?.[1] || 0;
 
+    // 6) Actualizar estado con posible clinch
+    setGameState((prev) => {
+      const roundsLeft = TOTAL_ROUNDS - prev.roundNumber;
+
+      // Clinch del jugador
+      /*if (playerScore > opponentScore + roundsLeft) {
+        return {
+          ...prev,
+          phase: "ended",
+          scores,
+          winner: jugadorId.toString(),
+          isDraw: false,
+        };
+      }
+      // Clinch del rival
+      if (opponentScore > playerScore + roundsLeft) {
+        const rivalId = Object.keys(scores).find(
+          (id) => id !== jugadorId.toString()
+        );
+        return {
+          ...prev,
+          phase: "ended",
+          scores,
+          winner: rivalId,
+          isDraw: false,
+        };
+      }*/
+
+      // No hay clinch: mostramos el resultado de la ronda
+      return {
+        ...prev,
+        phase: "result",
+        scores,
+        roundResult,
+        selectedSkill: mySkill,
+        selectedCard: { ...myCardRef },
+        opponentSelectedCard: formattedOpponentCard,
+        opponentSelectedSkill: opponentSkill,
+      };
+    });
+
+    // 7) Preparamos el próximo onRoundStart
     waitingNextRoundRef.current = true;
-    // ya listo para procesar el próximo onRoundStart
   };
 
   const handleMatchEnd = (data) => {
     setCurrentOpponentCard(null);
     setHighlightedPosition(null);
-    console.log("Partida terminada:", data);
     setGameState((prev) => ({
       ...prev,
       phase: "ended",
@@ -718,41 +537,30 @@ const Partida = () => {
     }));
   };
 
+  const handlePause = () => {
+    socketService.pause(matchId);
+    setShowMenu(false);
+  };
+
+  const handleResume = () => {
+    socketService.resumeMatch(matchId);
+    setShowMenu(false);
+  };
+
   const handleSurrender = () => {
     socketService.surrender(matchId);
-
     setGameState((prev) => ({
       ...prev,
       phase: "ended",
       winner: null,
       isDraw: false,
     }));
-
     setShowMenu(false);
   };
 
-  const optionsButtonStyle = {
-    position: "fixed",
-    bottom: "2vh",
-    left: "2vw",
-    width: "48px",
-    height: "48px",
-    fontSize: "24px",
-    backgroundColor: "#374151",
-    color: "white",
-    borderRadius: "50%",
-    border: "none",
-    cursor: "pointer",
-    zIndex: 110,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
-    transition: "all 0.25s ease",
-  };
-
+  // Styles
   const containerStyle = {
-    background: `url(${background}) fixed center/cover`,
+    background: `linear-gradient(rgba(0, 0, 0, 0.7), url(${background}) fixed center/cover`,
     minHeight: "100vh",
     width: "100vw",
     overflowY: "auto",
@@ -760,188 +568,38 @@ const Partida = () => {
     boxSizing: "border-box",
     display: "flex",
     flexDirection: "column",
+    position: "relative",
   };
 
   const headerStyle = {
     display: "flex",
     justifyContent: "space-between",
-    color: "white",
-  };
-  const contentStyle = {
-    flex: 1,
-    display: "grid",
-    gridTemplateColumns: isDesktop ? "1fr 1fr" : "1fr",
-    gap: "1rem",
-  };
-  const fixedCenter = {
-    position: "fixed",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%,-50%)",
-  };
-
-  const formationsContainerStyle = {
-    display: "grid",
-    gridTemplateColumns: isDesktop ? "1fr 1fr" : "1fr",
-    columnGap: "2rem",
-    alignItems: "start",
-    width: "100%",
-    flexGrow: 1,
-    padding: "1rem",
-  };
-
-  const formationStyle = {
-    flex: 1,
-    display: "flex",
-    flexDirection: "column",
     alignItems: "center",
-    marginBottom: windowWidth < 768 ? "1rem" : "0",
-  };
-
-  const playerNameStyle = {
-    color: "white",
-    fontSize: "clamp(1rem, 2vw, 1.5rem)",
-    marginBottom: "0.5rem",
-    textAlign: "center",
-    fontWeight: "bold",
-  };
-
-  const skillsContainerStyle = {
-    display: "flex",
-    flexDirection: windowWidth < 500 ? "column" : "row",
-    justifyContent: "center",
-    gap: "0.5rem",
-    width: "100%",
-    padding: "0.5rem",
-    flexWrap: "wrap",
-  };
-
-  const skillButtonStyle = {
-    padding: "0.75rem 1rem",
-    borderRadius: "8px",
-    border: "none",
-    cursor: "pointer",
-    backgroundColor: "#3b82f6",
-    color: "white",
-    fontWeight: "bold",
-    fontSize: "clamp(0.9rem, 1.5vw, 1.1rem)",
-    width: windowWidth < 500 ? "100%" : "auto",
-    transition: "all 0.2s ease",
-  };
-
-  const confirmButtonStyle = {
-    padding: "0.75rem 1rem",
-    borderRadius: "8px",
-    border: "none",
-    cursor: "pointer",
-    backgroundColor: "#10b981",
-    color: "white",
-    fontWeight: "bold",
-    fontSize: "clamp(0.9rem, 1.5vw, 1.1rem)",
-    marginTop: "1.5rem",
-    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.3)",
-    transition: "all 0.2s ease",
-    width: "100%",
-    margin: "1rem 0",
-  };
-
-  const selectedCardContainerStyle = {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    backgroundColor: "rgba(31, 41, 55, 0.95)",
-    padding: "1rem",
-    borderRadius: "10px",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
-    position: "fixed",
-    top: "20px",
-    bottom: "20px",
-    left: "50%",
-    transform: "translateX(-50%)",
-    zIndex: 50,
-    width: isDesktop ? "min(40vw, 500px)" : "90%",
-    maxHeight: "calc(100vh - 40px)",
-    overflowY: "auto",
-    boxSizing: "border-box",
-    minHeight: 0,
-  };
-
-  const modalStyle = {
-    position: "fixed",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    textAlign: "center",
-    width: windowWidth < 768 ? "90%" : "80%",
-    maxWidth: "800px",
-    backgroundColor: "rgba(0, 0, 0, 0.85)",
-    padding: "2rem",
-    borderRadius: "15px",
-    color: "white",
-    zIndex: 100,
-    boxShadow: "0 8px 16px rgba(0, 0, 0, 0.4)",
-  };
-
-  const surrenderButtonStyle = {
-    position: "fixed",
-    bottom: "2vh",
-    right: "2vw",
-    padding: "0.75rem 1.5rem",
-    fontSize: "clamp(0.75rem, 1.5vw, 1rem)",
-    backgroundColor: "#ef4444",
-    color: "white",
-    borderRadius: "8px",
-    border: "none",
-    cursor: "pointer",
-    zIndex: 100,
+    padding: "0.5rem 1rem",
+    background: "rgba(15, 23, 42, 0.8)",
+    borderRadius: "12px",
+    marginBottom: "1rem",
     boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
-    transition: "all 0.2s ease",
-  };
-  const centeredModalStyle = {
-    position: "fixed",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    zIndex: 1000,
-    maxWidth: "450px",
-    width: "90%",
-    backgroundColor: "rgba(0,0,0,0.85)",
-    padding: "2rem",
-    borderRadius: "15px",
-    color: "white",
-    textAlign: "center",
-    boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
-  };
-  const alertStyle = {
-    position: "fixed",
-    top: "20px",
-    left: "50%",
-    transform: "translateX(-50%)",
-    backgroundColor: "rgba(0, 0, 0, 0.85)",
-    color: "white",
-    padding: "15px 20px",
-    borderRadius: "5px",
-    boxShadow: "0 2px 10px rgba(0, 0, 0, 0.2)",
-    zIndex: 1000,
-    animation: "fadeInOut 4s ease-in-out",
-    fontSize: "clamp(0.75rem, 1.5vw, 1rem)",
-    maxWidth: "90%",
-    textAlign: "center",
   };
 
-  const backButtonStyle = {
-    padding: "0.75rem 1.5rem",
-    borderRadius: "8px",
-    border: "none",
-    cursor: "pointer",
-    backgroundColor: "#3b82f6",
-    color: "white",
+  const scoreStyle = {
+    fontSize: "1.2rem",
     fontWeight: "bold",
-    fontSize: "clamp(0.9rem, 1.5vw, 1.1rem)",
-    marginTop: "1.5rem",
-    width: windowWidth < 500 ? "100%" : "auto",
-    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.3)",
-    transition: "all 0.2s ease",
+    padding: "0.5rem 1rem",
+    borderRadius: "8px",
+    minWidth: "100px",
+    textAlign: "center",
+    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
+  };
+
+  const roundStyle = {
+    fontSize: "1.2rem",
+    fontWeight: "bold",
+    padding: "0.5rem 1rem",
+    borderRadius: "8px",
+    background: "rgba(30, 41, 59, 0.8)",
+    color: "white",
+    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
   };
 
   const contentContainerStyle = {
@@ -954,63 +612,170 @@ const Partida = () => {
     position: "relative",
   };
 
-  const waitingModalStyle = {
+  const formationsContainerStyle = {
+    display: "grid",
+    gridTemplateColumns: isDesktop ? "1fr 1fr" : "1fr",
+    gap: "2rem",
+    alignItems: "start",
+    width: "100%",
+    padding: "1rem",
+  };
+
+  const formationStyle = {
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    marginBottom: windowWidth < 768 ? "1rem" : "0",
+    background: "rgba(15, 23, 42, 0.7)",
+    borderRadius: "12px",
+    padding: "1rem",
+    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+  };
+
+  const playerNameStyle = {
+    color: "white",
+    fontSize: "1.5rem",
+    marginBottom: "1rem",
+    textAlign: "center",
+    fontWeight: "bold",
+    textShadow: "0 2px 4px rgba(0, 0, 0, 0.5)",
+  };
+
+  const selectedCardContainerStyle = {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    background:
+      "linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95))",
+    padding: "1.5rem",
+    borderRadius: "16px",
+    boxShadow: "0 8px 16px rgba(0, 0, 0, 0.4)",
     position: "fixed",
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    backgroundColor: "rgba(0, 0, 0, 0.85)",
-    padding: "2rem",
-    borderRadius: "15px",
-    textAlign: "center",
+    zIndex: 50,
+    width: isDesktop ? "min(40vw, 500px)" : "90%",
+    maxHeight: "90vh",
+    overflowY: "auto",
+    border: "2px solid rgba(124, 58, 237, 0.5)",
+  };
+
+  const skillButtonStyle = {
+    padding: "0.75rem 1.5rem",
+    borderRadius: "8px",
+    border: "none",
+    cursor: "pointer",
+    background: "linear-gradient(135deg, #3b82f6, #6366f1)",
     color: "white",
-    width: "90%",
-    maxWidth: "450px",
-    zIndex: 1000,
-    boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
+    fontWeight: "bold",
+    fontSize: "1rem",
+    width: windowWidth < 500 ? "100%" : "auto",
+    transition: "all 0.2s ease",
+    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+  };
+
+  const confirmButtonStyle = {
+    padding: "1rem 2rem",
+    borderRadius: "12px",
+    border: "none",
+    cursor: "pointer",
+    background: "linear-gradient(135deg, #10b981, #06d6a0)",
+    color: "white",
+    fontWeight: "bold",
+    fontSize: "1.1rem",
+    marginTop: "1.5rem",
+    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.3)",
+    transition: "all 0.2s ease",
+    width: "100%",
+  };
+
+  const optionsButtonStyle = {
+    position: "fixed",
+    bottom: "2vh",
+    left: "2vw",
+    width: "56px",
+    height: "56px",
+    fontSize: "24px",
+    background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+    color: "white",
+    borderRadius: "50%",
+    border: "none",
+    cursor: "pointer",
+    zIndex: 110,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    boxShadow: "0 8px 16px rgba(0, 0, 0, 0.3)",
+    transition: "all 0.25s ease",
   };
 
   const menuStyle = {
     position: "fixed",
-    bottom: "calc(2vh + 64px)",
+    bottom: "calc(2vh + 72px)",
     left: "2vw",
     background: "rgba(15, 23, 42, 0.95)",
     border: "1px solid rgba(124, 58, 237, 0.5)",
-    borderRadius: "12px",
-    minWidth: "180px",
+    borderRadius: "16px",
+    minWidth: "200px",
     zIndex: 120,
-    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)",
+    boxShadow: "0 12px 24px rgba(0, 0, 0, 0.4)",
     overflow: "hidden",
     backdropFilter: "blur(8px)",
   };
 
   const menuItemStyle = {
-    padding: "0.8rem 1.2rem",
+    padding: "1rem 1.5rem",
     color: "white",
     textAlign: "left",
     width: "100%",
     borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
     display: "flex",
     alignItems: "center",
-    gap: "0.8rem",
+    gap: "1rem",
+    fontSize: "1rem",
     transition: "all 0.2s ease",
+  };
+
+  const alertStyle = {
+    position: "fixed",
+    top: "20px",
+    left: "50%",
+    transform: "translateX(-50%)",
+    background: "linear-gradient(135deg, #f59e0b, #f97316)",
+    color: "white",
+    padding: "1rem 2rem",
+    borderRadius: "8px",
+    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+    zIndex: 1000,
+    fontSize: "1rem",
+    fontWeight: "bold",
+    textAlign: "center",
+    maxWidth: "90%",
+    animation: "fadeInOut 4s ease-in-out",
   };
 
   const renderPhase = () => {
     switch (gameState.phase) {
       case "waiting":
         return (
-          <ModalWrapper style={centeredModalStyle}>
+          <ModalWrapper>
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3 }}
-              className="text-center"
+              className="text-center p-8"
             >
-              <div className="relative mb-6">
-                <GiSwordman className="text-5xl text-purple-400 mx-auto" />
+              <div className="relative mb-8">
                 <motion.div
-                  className="absolute inset-0 rounded-full bg-purple-500 opacity-20"
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
+                >
+                  <IoMdFootball className="text-6xl text-yellow-400 mx-auto" />
+                </motion.div>
+                <motion.div
+                  className="absolute inset-0 rounded-full bg-yellow-500 opacity-20"
                   animate={{ scale: [1, 1.5, 1] }}
                   transition={{
                     repeat: Infinity,
@@ -1020,16 +785,16 @@ const Partida = () => {
                 />
               </div>
 
-              <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400 mb-2">
+              <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400 mb-4">
                 Esperando al oponente...
               </h2>
-              <p className="text-xl text-gray-300 mb-6">
+              <p className="text-2xl text-gray-300 mb-8">
                 Ronda {gameState.roundNumber}/11
               </p>
 
               <div className="flex justify-center">
                 <motion.div
-                  className="h-2 bg-purple-900 rounded-full overflow-hidden w-3/4"
+                  className="h-3 bg-gray-700 rounded-full overflow-hidden w-3/4"
                   initial={{ width: "0%" }}
                   animate={{ width: "75%" }}
                   transition={{
@@ -1039,7 +804,7 @@ const Partida = () => {
                   }}
                 >
                   <motion.div
-                    className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
+                    className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
                     initial={{ x: "-100%" }}
                     animate={{ x: "100%" }}
                     transition={{
@@ -1053,67 +818,60 @@ const Partida = () => {
             </motion.div>
           </ModalWrapper>
         );
-      //----------
+
       case "selection":
         if (!gameState.isPlayerTurn) {
           return (
-            <ModalWrapper style={centeredModalStyle}>
-              <h2>Turno del rival…</h2>
+            <ModalWrapper>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center p-8"
+              >
+                <div className="mb-6">
+                  <GiSwordman className="text-6xl text-red-500 mx-auto animate-pulse" />
+                </div>
+                <h2 className="text-3xl font-bold text-white mb-4">
+                  Turno del rival
+                </h2>
+                <p className="text-xl text-gray-300">
+                  Esperando a que elija su carta...
+                </p>
+              </motion.div>
             </ModalWrapper>
           );
         }
+
         return (
           <>
-            {showTurnBanner && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                style={{
-                  position: "fixed",
-                  top: "40%",
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  background: "linear-gradient(90deg, #06d6a0, #118ab2)",
-                  color: "white",
-                  padding: "1.2rem 2.5rem",
-                  borderRadius: "10px",
-                  fontSize: "clamp(1.8rem, 4vw, 2.5rem)",
-                  fontWeight: "bold",
-                  textShadow: "0px 2px 8px rgba(0,0,0,0.5)",
-                  zIndex: 9999,
-                }}
-              ></motion.div>
-            )}
+            <AnimatePresence>
+              {showTurnBanner && (
+                <motion.div
+                  initial={{ opacity: 0, y: -50, scale: 0.8 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -50 }}
+                  style={{
+                    position: "fixed",
+                    top: "20%",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    background: "linear-gradient(90deg, #06d6a0, #3b82f6)",
+                    color: "white",
+                    padding: "1.5rem 3rem",
+                    borderRadius: "12px",
+                    fontSize: "2rem",
+                    fontWeight: "bold",
+                    textShadow: "0 2px 8px rgba(0,0,0,0.5)",
+                    zIndex: 9999,
+                    boxShadow: "0 8px 16px rgba(0,0,0,0.3)",
+                  }}
+                >
+                  ¡TU TURNO!
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-            {/* ——— Indicador de turno ——— */}
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              style={{
-                position: "fixed",
-                top: "20%",
-                left: "50%",
-                transform: "translateX(-50%)",
-                padding: "1rem 2rem",
-                background: gameState.isPlayerTurn
-                  ? "linear-gradient(90deg,#06d6a0,#118ab2)"
-                  : "linear-gradient(90deg,#ef4444,#f97316)",
-                color: "#fff",
-                borderRadius: "8px",
-                zIndex: 999,
-                textAlign: "center",
-                fontWeight: "900",
-                fontSize: "clamp(1.5rem,4vw,2rem)",
-                textShadow: "0 2px 8px rgba(0,0,0,0.3)",
-              }}
-            ></motion.div>
-            {/* ——— Fin indicador ——— */}
-
-            {/* ——— Grid de selección ——— */}
             <div style={formationsContainerStyle}>
-              {/* Formación del jugador */}
               <div style={formationStyle}>
                 <h3 style={playerNameStyle}>Tu equipo</h3>
                 <Formacion433
@@ -1122,7 +880,6 @@ const Partida = () => {
                 />
               </div>
 
-              {/* Formación del oponente */}
               <div style={formationStyle}>
                 <h3 style={playerNameStyle}>Oponente</h3>
                 <Formacion433
@@ -1133,68 +890,59 @@ const Partida = () => {
               </div>
             </div>
 
-            {/* ——— Selección flotante ——— */}
             {gameState.selectedCard && (
               <motion.div
-                style={{
-                  ...selectedCardContainerStyle,
-                  boxShadow:
-                    "0 8px 36px rgba(6,214,160,0.2), 0 1px 20px rgba(14,165,233,0.2)",
-                  border: "2px solid #fff",
-                  background: "rgba(34,34,58,0.9)",
-                }}
+                style={selectedCardContainerStyle}
                 initial={{ opacity: 0, y: 30, scale: 0.98 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ duration: 0.4 }}
               >
                 <CartaGrande jugador={gameState.selectedCard} />
 
-                <div
-                  style={{
-                    ...skillsContainerStyle,
-                    marginTop: "1.2rem",
-                    flexShrink: 0,
-                  }}
-                >
-                  {["ataque", "control", "defensa"].map((skill) => (
-                    <motion.button
-                      key={skill}
-                      style={{
-                        ...skillButtonStyle,
-                        background:
-                          gameState.selectedSkill === skill
-                            ? "linear-gradient(90deg,#22d3ee,#a7f3d0)"
-                            : "#3b82f6",
-                        boxShadow:
-                          gameState.selectedSkill === skill
-                            ? "0 0 12px #06d6a0"
-                            : "none",
-                        fontSize: "1rem",
-                      }}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.97 }}
-                      onClick={() => handleSkillSelect(skill)}
-                    >
-                      {skill[0].toUpperCase() + skill.slice(1)}
-                    </motion.button>
-                  ))}
+                <div style={{ margin: "1.5rem 0", width: "100%" }}>
+                  <h3 className="text-xl font-bold text-white mb-4 text-center">
+                    Selecciona una habilidad:
+                  </h3>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "1rem",
+                      justifyContent: "center",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    {["ataque", "control", "defensa"].map((skill) => (
+                      <motion.button
+                        key={skill}
+                        style={{
+                          ...skillButtonStyle,
+                          background:
+                            gameState.selectedSkill === skill
+                              ? "linear-gradient(135deg, #22d3ee, #06d6a0)"
+                              : "linear-gradient(135deg, #3b82f6, #6366f1)",
+                          boxShadow:
+                            gameState.selectedSkill === skill
+                              ? "0 0 16px rgba(6, 214, 160, 0.7)"
+                              : "none",
+                        }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => handleSkillSelect(skill)}
+                      >
+                        {skill[0].toUpperCase() + skill.slice(1)}
+                      </motion.button>
+                    ))}
+                  </div>
                 </div>
 
                 {gameState.selectedSkill && (
                   <motion.button
-                    style={{
-                      ...confirmButtonStyle,
-                      flexShrink: 0,
-                      background: "linear-gradient(90deg,#06d6a0,#22d3ee)",
-                      color: "#1e293b",
-                      fontWeight: "900",
-                      marginTop: "1.5rem",
-                    }}
-                    whileHover={{ scale: 1.07 }}
+                    style={confirmButtonStyle}
+                    whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={handleConfirmSelection}
                   >
-                    Confirmar {gameState.selectedSkill}
+                    CONFIRMAR {gameState.selectedSkill.toUpperCase()}
                   </motion.button>
                 )}
               </motion.div>
@@ -1204,60 +952,65 @@ const Partida = () => {
 
       case "response":
         return (
-          <ModalWrapper style={centeredModalStyle}>
+          <ModalWrapper>
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3 }}
+              className="text-center p-8"
             >
-              <h2
-                style={{
-                  fontSize: "clamp(20px,5vw,28px)",
-                  color: "#38bdf8",
-                  marginBottom: "1rem",
-                }}
-              >
+              <div className="mb-8">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                  style={{
+                    width: "80px",
+                    height: "80px",
+                    margin: "0 auto",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <GiSoccerBall className="text-5xl text-blue-400" />
+                </motion.div>
+              </div>
+              <h2 className="text-3xl font-bold text-blue-400 mb-4">
                 Esperando respuesta...
               </h2>
-
-              <motion.div
-                style={{
-                  border: "5px solid rgba(255,255,255,0.2)",
-                  borderTop: "5px solid #38bdf8",
-                  borderRadius: "50%",
-                  width: "50px",
-                  height: "50px",
-                  margin: "20px auto",
-                  animation: "spin 1s linear infinite",
-                }}
-                initial={{ rotate: 0 }}
-                animate={{ rotate: 360 }}
-                transition={{ repeat: Infinity, ease: "linear", duration: 1 }}
-              ></motion.div>
-
-              <p
-                style={{
-                  marginTop: "1rem",
-                  fontSize: "clamp(16px,3vw,20px)",
-                  color: "rgba(255,255,255,0.7)",
-                }}
-              >
+              <p className="text-xl text-gray-300">
                 El rival está eligiendo su carta...
               </p>
             </motion.div>
           </ModalWrapper>
         );
-      //Paused
+
       case "paused":
         return (
-          <ModalWrapper style={centeredModalStyle}>
-            <h2 className="text-2xl mb-4">Partida pausada</h2>
-            <button
-              onClick={() => navigate("/home")}
-              className="bg-blue-600 px-4 py-2 rounded hover:bg-blue-500"
+          <ModalWrapper>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center p-8"
             >
-              Volver al inicio
-            </button>
+              <div className="mb-6">
+                <FaPause className="text-6xl text-yellow-500 mx-auto" />
+              </div>
+              <h2 className="text-3xl font-bold text-white mb-4">
+                Partida pausada
+              </h2>
+              <p className="text-xl text-gray-300 mb-8">
+                La partida está actualmente en pausa
+              </p>
+              <motion.button
+                onClick={handleResume}
+                className="bg-green-600 hover:bg-green-500 text-white font-bold py-3 px-6 rounded-lg text-lg"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Reanudar partida
+              </motion.button>
+            </motion.div>
           </ModalWrapper>
         );
 
@@ -1269,144 +1022,115 @@ const Partida = () => {
         const rivalVal = gameState.opponentSelectedCard[stat];
 
         return (
-          <ModalWrapper style={centeredModalStyle}>
-            {/* Título */}
-            <motion.h2
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              style={{
-                fontSize: "clamp(1.8rem,4vw,2.4rem)",
-                fontWeight: 900,
-                color: tie ? "#eab308" : playerWon ? "#06d6a0" : "#ef4444",
-                marginBottom: "1rem",
-                textShadow: "0 2px 8px rgba(0,0,0,0.3)",
-              }}
+          <ModalWrapper>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+              className="text-center p-8"
             >
-              {tie
-                ? "¡EMPATE!"
-                : playerWon
-                ? "¡GANASTE LA RONDA!"
-                : "PERDISTE LA RONDA"}
-            </motion.h2>
+              <motion.h2
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`text-4xl font-bold mb-6 ${
+                  tie
+                    ? "text-yellow-400"
+                    : playerWon
+                    ? "text-green-400"
+                    : "text-red-400"
+                }`}
+              >
+                {tie
+                  ? "¡EMPATE!"
+                  : playerWon
+                  ? "¡RONDA GANADA!"
+                  : "RONDA PERDIDA"}
+              </motion.h2>
 
-            {/* Cartas comparadas */}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: "2rem",
-                marginBottom: "1.5rem",
-              }}
-            >
-              <div style={{ textAlign: "center" }}>
-                <CartaMediana jugador={gameState.selectedCard} />
-                <div style={{ marginTop: 6, fontWeight: 700 }}>Tú</div>
+              <div className="flex justify-center items-center gap-8 mb-8">
+                <div className="text-center">
+                  <CartaMediana jugador={gameState.selectedCard} />
+                  <div className="mt-2 text-xl font-bold text-white">Tú</div>
+                  <div className="text-2xl font-bold mt-2">
+                    {playerVal} {stat}
+                  </div>
+                </div>
+
+                <div className="text-3xl font-bold text-white">VS</div>
+
+                <div className="text-center">
+                  <CartaMediana jugador={gameState.opponentSelectedCard} />
+                  <div className="mt-2 text-xl font-bold text-white">Rival</div>
+                  <div className="text-2xl font-bold mt-2">
+                    {rivalVal} {stat}
+                  </div>
+                </div>
               </div>
 
-              <div style={{ fontSize: "2rem", fontWeight: 700 }}>VS</div>
-
-              <div style={{ textAlign: "center" }}>
-                <CartaMediana jugador={gameState.opponentSelectedCard} />
-                <div style={{ marginTop: 6, fontWeight: 700 }}>Rival</div>
+              <div className="text-2xl font-bold text-white mb-8">
+                Marcador: {gameState.scores.player} -{" "}
+                {Object.values(gameState.scores).find(
+                  (score) => score !== gameState.scores.player
+                )}
               </div>
-            </div>
 
-            {/* Valores de la estadística */}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-around",
-                width: "100%",
-                marginBottom: "1.5rem",
-                fontSize: "1.1rem",
-              }}
-            >
-              <div>
-                <strong>{playerVal}</strong>
-                <div>{stat}</div>
-              </div>
-              <div>
-                <strong>{rivalVal}</strong>
-                <div>{stat}</div>
-              </div>
-            </div>
-
-            {/* Botón continuar */}
-            <motion.button
-              onClick={() => {
-                // 1) levantamos el bloqueo para que el próximo onRoundStart se procese
-                waitingNextRoundRef.current = false;
-
-                // 2) si ya hemos acabado la ronda 11, vamos a "ended"
-                if (gameState.roundNumber >= 11) {
+              <motion.button
+                onClick={() => {
+                  waitingNextRoundRef.current = false;
+                  if (gameState.roundNumber >= 11) {
+                    setGameState((prev) => ({
+                      ...prev,
+                      phase: "ended",
+                    }));
+                    return;
+                  }
                   setGameState((prev) => ({
                     ...prev,
-                    phase: "ended",
-                    // aquí puedes setear winner o scores finales si hiciera falta
+                    phase: prev.isPlayerTurn ? "selection" : "waiting",
+                    selectedCard: null,
+                    selectedSkill: null,
                   }));
-                  return;
-                }
-
-                // 3) pasamos a "waiting" a la espera del servidor
-                setGameState((prev) => ({
-                  ...prev,
-                  phase: "waiting",
-                  selectedCard: null,
-                  selectedSkill: null,
-                }));
-                if (nextRoundStartRef.current) {
-                  handleRoundStart(nextRoundStartRef.current);
-                  nextRoundStartRef.current = null;
-                }
-              }}
-            >
-              Continuar
-            </motion.button>
+                  if (nextRoundStartRef.current) {
+                    handleRoundStart(nextRoundStartRef.current);
+                    nextRoundStartRef.current = null;
+                  }
+                }}
+                className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-lg text-lg"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Continuar
+              </motion.button>
+            </motion.div>
           </ModalWrapper>
         );
       }
 
       case "ended":
         const currentPlayerId = jugadorId.toString();
-
         const isWinner = gameState.winner?.toString() === currentPlayerId;
         const isDraw = gameState.isDraw;
-        console.log(
-          "isWinner:",
-          gameState.winner?.toString(),
-          "isDraw:",
-          isDraw
-        );
-        console.log("gameState:", gameState);
+        const opponentScore =
+          Object.entries(gameState.scores).find(
+            ([key]) => key !== currentPlayerId
+          )?.[1] || 0;
+
         return (
-          <ModalWrapper
-            style={{
-              ...centeredModalStyle,
-              background: "linear-gradient(135deg, #0f172a, #1e293b)",
-              padding: "2.5rem",
-            }}
-          >
+          <ModalWrapper>
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
+              className="text-center p-8"
             >
-              {/* Título grande */}
               <motion.h1
-                style={{
-                  fontSize: "clamp(2.5rem, 6vw, 4rem)",
-                  marginBottom: "1rem",
-                  fontWeight: 900,
-                  background: isDraw
-                    ? "linear-gradient(90deg,#facc15,#eab308)"
+                className={`text-5xl font-bold mb-6 ${
+                  isDraw
+                    ? "text-yellow-400"
                     : isWinner
-                    ? "linear-gradient(90deg,#06d6a0,#3b82f6)"
-                    : "linear-gradient(90deg,#ef4444,#b91c1c)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  textShadow: "0 0 12px rgba(255,255,255,0.2)",
-                }}
+                    ? "text-green-400"
+                    : "text-red-400"
+                }`}
                 initial={{ y: -30 }}
                 animate={{ y: 0 }}
                 transition={{ delay: 0.2, type: "spring" }}
@@ -1414,61 +1138,42 @@ const Partida = () => {
                 {isDraw ? "¡EMPATE!" : isWinner ? "🏆 VICTORIA" : "😞 DERROTA"}
               </motion.h1>
 
-              {/* Puntuaciones */}
               <motion.div
-                style={{
-                  fontSize: "clamp(1.8rem,5vw,2.5rem)",
-                  fontWeight: "bold",
-                  marginBottom: "1.5rem",
-                  color: "white",
-                }}
+                className="text-4xl font-bold text-white mb-8"
                 initial={{ scale: 0.8 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.4, duration: 0.5 }}
               >
-                {gameState.scores[jugadorId.toString()]} -{" "}
-                {Object.entries(gameState.scores)
-                  .filter(([key]) => key !== jugadorId.toString())
-                  .map(([value]) => value)}
+                {gameState.scores[currentPlayerId]} - {opponentScore}
               </motion.div>
 
-              {/* Cambio de puntos */}
-              <motion.div
-                style={{
-                  fontSize: "1.5rem",
-                  fontWeight: "600",
-                  marginBottom: "2rem",
-                  color:
-                    gameState.puntosChange?.["2"] >= 0 ? "#4ade80" : "#f87171",
-                }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.6, duration: 0.5 }}
-              >
-                {gameState.puntosChange?.["2"] >= 0 ? "+" : ""}
-                {gameState.puntosChange?.["2"]} puntos
-              </motion.div>
+              {gameState.puntosChange && (
+                <motion.div
+                  className={`text-2xl font-bold mb-8 ${
+                    gameState.puntosChange[currentPlayerId] >= 0
+                      ? "text-green-400"
+                      : "text-red-400"
+                  }`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.6, duration: 0.5 }}
+                >
+                  {gameState.puntosChange[currentPlayerId] >= 0 ? "+" : ""}
+                  {gameState.puntosChange[currentPlayerId]} puntos
+                </motion.div>
+              )}
 
-              {/* Botón de volver */}
               <motion.button
                 onClick={() => navigate("/home")}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                style={{
-                  padding: "1rem 2.5rem",
-                  borderRadius: "12px",
-                  fontSize: "1.2rem",
-                  fontWeight: "bold",
-                  color: "#fff",
-                  background: isDraw
-                    ? "linear-gradient(90deg, #facc15, #fbbf24)"
+                className={`${
+                  isDraw
+                    ? "bg-yellow-500 hover:bg-yellow-400"
                     : isWinner
-                    ? "linear-gradient(90deg, #06d6a0, #22d3ee)"
-                    : "linear-gradient(90deg, #ef4444, #f87171)",
-                  border: "none",
-                  cursor: "pointer",
-                  boxShadow: "0 6px 12px rgba(0,0,0,0.3)",
-                }}
+                    ? "bg-green-500 hover:bg-green-400"
+                    : "bg-red-500 hover:bg-red-400"
+                } text-white font-bold py-3 px-8 rounded-lg text-lg`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
                 Volver al menú
               </motion.button>
@@ -1478,153 +1183,129 @@ const Partida = () => {
 
       default:
         return (
-          <div
-            style={{
-              color: "white",
-              textAlign: "center",
-              fontSize: "clamp(14px, 3vw, 18px)",
-              padding: "2rem",
-              position: "fixed",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-            }}
-          >
-            Cargando partida...
-          </div>
+          <ModalWrapper>
+            <div className="text-center p-8">
+              <div className="mb-6">
+                <GiSoccerBall className="text-6xl text-blue-400 mx-auto animate-spin" />
+              </div>
+              <h2 className="text-3xl font-bold text-white mb-4">
+                Cargando partida...
+              </h2>
+            </div>
+          </ModalWrapper>
         );
     }
   };
 
   return (
-    <>
-      {/* —— Fondo y contenido de partida —— */}
-      <div style={containerStyle}>
-        {/* Header y marcador */}
-        <div style={headerStyle}>
-          <div style={{ width: "30%", minWidth: "80px" }}>
-            <motion.h2
-              style={{
-                fontSize: "clamp(14px, 3vw, 20px)",
-                color: "white",
-                textAlign: "left",
-                margin: "0",
-                padding: "5px 10px",
-                backgroundColor: "rgba(0, 0, 0, 0.5)",
-                borderRadius: "5px",
-                display: "inline-block",
-              }}
-              animate={{
-                backgroundColor:
-                  gameState.scores.player > gameState.scores.opponent
-                    ? "rgba(16, 185, 129, 0.7)"
-                    : "rgba(0, 0, 0, 0.5)",
-              }}
-              transition={{ duration: 0.3 }}
-            >
-              Tú: {gameState.scores.player}
-            </motion.h2>
-          </div>
-          <div style={{ width: "40%", textAlign: "center" }}>
-            <motion.h1
-              style={{
-                fontSize: "clamp(16px, 3.5vw, 22px)",
-                color: "white",
-                fontWeight: "bold",
-                margin: "0",
-                padding: "5px 15px",
-                backgroundColor: "rgba(0, 0, 0, 0.5)",
-                borderRadius: "8px",
-                display: "inline-block",
-              }}
-            >
-              Ronda {gameState.roundNumber}/11
-            </motion.h1>
-          </div>
-          <div style={{ width: "30%", textAlign: "right", minWidth: "80px" }}>
-            <motion.h2
-              style={{
-                fontSize: "clamp(14px, 3vw, 20px)",
-                color: "white",
-                margin: "0",
-                padding: "5px 10px",
-                backgroundColor: "rgba(0, 0, 0, 0.5)",
-                borderRadius: "5px",
-                display: "inline-block",
-              }}
-              animate={{
-                backgroundColor:
-                  gameState.scores.opponent > gameState.scores.player
-                    ? "rgba(239, 68, 68, 0.7)"
-                    : "rgba(0, 0, 0, 0.5)",
-              }}
-              transition={{ duration: 0.3 }}
-            >
-              Rival: {gameState.scores.opponent}
-            </motion.h2>
-          </div>
-        </div>
-
-        <div style={contentContainerStyle}>
-          {gameState.phase === "selection" && renderPhase()}
-        </div>
-
-        {/* Botón opciones */}
-        <motion.button
-          onClick={() => setShowMenu((prev) => !prev)}
-          style={optionsButtonStyle}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          &#x22EE;
-        </motion.button>
-      </div>
-      {/* —— Overlays flotantes, fuera del fondo —— */}
-      {showMenu && (
+    <div style={containerStyle}>
+      {/* Header with scores */}
+      <div style={headerStyle}>
         <motion.div
-          style={menuStyle}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 20 }}
+          style={{
+            ...scoreStyle,
+            background:
+              gameState.scores.player > gameState.scores.opponent
+                ? "linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(6, 214, 160, 0.8))"
+                : "linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.8))",
+            color: "white",
+          }}
+          transition={{ duration: 0.3 }}
         >
-          {!isTournamentMatch &&
-            (gameState.phase === "paused" ? (
-              <button
-                onClick={handleResume}
-                style={menuItemStyle}
-                className="hover:bg-emerald-600/50"
-              >
-                <FaPlay /> Reanudar
-              </button>
-            ) : (
-              <button
-                onClick={handlePause}
-                style={menuItemStyle}
-                className="hover:bg-yellow-600/50"
-              >
-                <FaPause /> Pausar
-              </button>
-            ))}
-          <button
-            onClick={handleSurrender}
-            style={menuItemStyle}
-            className="hover:bg-red-600/50"
-          >
-            <FaFlag /> Rendirse
-          </button>
+          Tú: {gameState.scores.player}
         </motion.div>
-      )}
-      {/* —— MODALES flotantes, SIEMPRE FUERA del container —— */}
+
+        <div style={roundStyle}>Ronda {gameState.roundNumber}/11</div>
+
+        <motion.div
+          style={{
+            ...scoreStyle,
+            background:
+              gameState.scores.opponent > gameState.scores.player
+                ? "linear-gradient(135deg, rgba(239, 68, 68, 0.8), rgba(220, 38, 38, 0.8))"
+                : "linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.8))",
+            color: "white",
+          }}
+          transition={{ duration: 0.3 }}
+        >
+          Rival:{" "}
+          {Object.values(gameState.scores).find(
+            (score) => score !== gameState.scores.player
+          )}
+        </motion.div>
+      </div>
+
+      <div style={contentContainerStyle}>
+        {gameState.phase === "selection" && renderPhase()}
+      </div>
+
+      {/* Options button */}
+      <motion.button
+        onClick={() => setShowMenu((prev) => !prev)}
+        style={optionsButtonStyle}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        <FaCog />
+      </motion.button>
+
+      {/* Options menu */}
+      <AnimatePresence>
+        {showMenu && (
+          <motion.div
+            style={menuStyle}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+          >
+            {!isTournamentMatch &&
+              (gameState.phase === "paused" ? (
+                <button
+                  onClick={handleResume}
+                  style={menuItemStyle}
+                  className="hover:bg-emerald-600/50"
+                >
+                  <FaPlay /> Reanudar
+                </button>
+              ) : (
+                <button
+                  onClick={handlePause}
+                  style={menuItemStyle}
+                  className="hover:bg-yellow-600/50"
+                >
+                  <FaPause /> Pausar
+                </button>
+              ))}
+            <button
+              onClick={handleSurrender}
+              style={menuItemStyle}
+              className="hover:bg-red-600/50"
+            >
+              <FaFlag /> Rendirse
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Alert */}
+      <AnimatePresence>
+        {showAlert && (
+          <motion.div
+            style={alertStyle}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+          >
+            {alertMessage}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Render phase modals */}
       {["waiting", "paused", "response", "result", "ended"].includes(
         gameState.phase
       ) && renderPhase()}
-      {/* —— ALERTA flotante —— */}
-      {showAlert && (
-        <ModalWrapper style={{ top: "20px", transform: "translateX(-50%)" }}>
-          <div style={alertStyle}>{alertMessage}</div>
-        </ModalWrapper>
-      )}
-    </>
+    </div>
   );
 };
 
