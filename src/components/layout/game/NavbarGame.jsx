@@ -15,6 +15,8 @@ import { GiCrossedSwords } from "react-icons/gi";
 import SobreComun from "../../../assets/SobreComun.png";
 import { abrirSobreGratis } from "../../../services/api/cardApi";
 import { useTranslation } from "react-i18next";
+import CoinShop from "./CoinShop";
+import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 
 export default function NavbarGame() {
   const { t } = useTranslation();
@@ -29,6 +31,7 @@ export default function NavbarGame() {
     abrir: false,
   });
   const navigate = useNavigate();
+  const [showCoinShop, setShowCoinShop] = useState(false);
 
   useEffect(() => {
     const obtenerInfo = async () => {
@@ -230,6 +233,7 @@ export default function NavbarGame() {
               whileHover={{ scale: 1.2 }}
               whileTap={{ scale: 0.9 }}
               className="ml-2 bg-green-600 rounded-full p-1 cursor-pointer"
+              onClick={() => setShowCoinShop(true)}
             >
               <FaPlusCircle className="text-white text-lg" />
             </motion.div>
@@ -403,6 +407,12 @@ export default function NavbarGame() {
           </motion.div>
         )}
       </AnimatePresence>
+      {showCoinShop && (
+        <CoinShop
+          onClose={() => setShowCoinShop(false)}
+          adrenacoins={adrenacoins}
+        />
+      )}
     </motion.div>
   );
 }

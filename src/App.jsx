@@ -28,6 +28,7 @@ import Info from "./components/InfoFirstUser";
 import Terminos from "./components/Terminos";
 import Soporte from "./components/Soporte";
 import Politica from "./components/Politica";
+import CoinShop from "./components/layout/game/CoinShop";
 
 function App() {
   const [theme] = useState(localStorage.getItem("theme") || "dark");
@@ -82,6 +83,7 @@ function App() {
         <Route path="/terminos" element={<Terminos />} />
         <Route path="/soporte" element={<Soporte />} />
         <Route path="/politica" element={<Politica />} />
+        <Route path="/coinshop" element={<CoinShop />} />
       </Routes>
     </Router>
   );
