@@ -1,10 +1,20 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { 
-  FaSearch, FaPlus, FaUserFriends, FaTrophy, 
-  FaUsers, FaCalendarAlt, FaCoins, FaSignOutAlt, 
-  FaLock, FaSpinner, FaTimes, FaArrowLeft,
-  FaPlay, FaExclamationTriangle, FaMedal, FaFire
+import {
+  FaSearch,
+  FaPlus,
+  FaUserFriends,
+  FaTrophy,
+  FaUsers,
+  FaCalendarAlt,
+  FaCoins,
+  FaSignOutAlt,
+  FaLock,
+  FaSpinner,
+  FaTimes,
+  FaArrowLeft,
+  FaPlay,
+  FaExclamationTriangle,
 } from "react-icons/fa";
 import { tournamentApi } from "../services/api/tournamentApi";
 import { getToken } from "../services/api/authApi";
@@ -25,17 +35,17 @@ const initialState = {
     descripcion: "",
     premio: "",
     contrasena: "",
-    esPrivado: false
+    esPrivado: false,
   },
   formErrors: {
     nombre: "",
     descripcion: "",
     premio: "",
-    contrasena: ""
+    contrasena: "",
   },
   torneoParaUnirse: null,
   passwordInput: "",
-  initialCheckDone: false
+  initialCheckDone: false,
 };
 
 const Torneo = () => {
@@ -56,18 +66,22 @@ const Torneo = () => {
   useEffect(() => {
     const cargarTorneos = async () => {
       try {
-        setState(prev => ({ ...prev, loading: { ...prev.loading, global: true }, error: null }));
+        setState((prev) => ({
+          ...prev,
+          loading: { ...prev.loading, global: true },
+          error: null,
+        }));
         const data = await tournamentApi.obtenerTorneosActivos();
-        setState(prev => ({ 
-          ...prev, 
-          torneos: data, 
-          loading: { ...prev.loading, global: false } 
+        setState((prev) => ({
+          ...prev,
+          torneos: data,
+          loading: { ...prev.loading, global: false },
         }));
       } catch (err) {
-        setState(prev => ({ 
-          ...prev, 
-          error: err.message, 
-          loading: { ...prev.loading, global: false } 
+        setState((prev) => ({
+          ...prev,
+          error: err.message,
+          loading: { ...prev.loading, global: false },
         }));
       }
     };
@@ -80,7 +94,7 @@ const Torneo = () => {
         try {
           const jugados = await tournamentApi.obtenerTorneosJugador();
           if (Array.isArray(jugados) && jugados.length > 0) {
-          const pendiente = jugados.find(t => t.ganador_id == null);
+            const pendiente = jugados.find((t) => t.ganador_id == null);
             if (pendiente) {
               verDetalles(pendiente.id);
             }
@@ -88,7 +102,7 @@ const Torneo = () => {
         } catch (err) {
           console.error("Error al obtener torneos jugados:", err);
         } finally {
-          setState(prev => ({ ...prev, initialCheckDone: true }));
+          setState((prev) => ({ ...prev, initialCheckDone: true }));
         }
       }
     };
@@ -101,7 +115,7 @@ const Torneo = () => {
       nombre: "",
       descripcion: "",
       premio: "",
-      contrasena: ""
+      contrasena: "",
     };
 
     if (!state.form.nombre.trim()) {
@@ -130,9 +144,9 @@ const Torneo = () => {
       isValid = false;
     }
 
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
-      formErrors: errors
+      formErrors: errors,
     }));
 
     return isValid;
@@ -140,43 +154,52 @@ const Torneo = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       form: {
         ...prev.form,
-        [name]: type === 'checkbox' ? checked : value
+        [name]: type === "checkbox" ? checked : value,
       },
       formErrors: {
         ...prev.formErrors,
-        [name]: ""
-      }
+        [name]: "", // Limpiar el error cuando el usuario modifica el campo
+      },
     }));
   };
 
-  const torneosFiltrados = state.torneos.filter(torneo => {
-    const coincideBusqueda = torneo.nombre.toLowerCase().includes(state.filtros.busqueda.toLowerCase());
-    const estaDisponible = !state.filtros.soloDisponibles || 
-      (torneo.participantes < torneo.maxParticipantes && torneo.estado === "pendiente");
+  const torneosFiltrados = state.torneos.filter((torneo) => {
+    const coincideBusqueda = torneo.nombre
+      .toLowerCase()
+      .includes(state.filtros.busqueda.toLowerCase());
+    const estaDisponible =
+      !state.filtros.soloDisponibles ||
+      (torneo.participantes < torneo.maxParticipantes &&
+        torneo.estado === "pendiente");
     return coincideBusqueda && estaDisponible && torneo.ganador_id == null;
   });
 
-  const isUserInTournament = useCallback((torneo) => {
-    if (!user || !torneo.participantes) return false;
-    return torneo.participantes.some(p => p.id === user.id || p.user_id === user.id);
-  }, [user]);
+  const isUserInTournament = useCallback(
+    (torneo) => {
+      if (!user || !torneo.participantes) return false;
+      return torneo.participantes.some(
+        (p) => p.id === user.id || p.user_id === user.id
+      );
+    },
+    [user]
+  );
 
   const manejarUnion = async (torneo) => {
     if (!user) {
-      navigate('/login');
+      navigate("/login");
       return;
     }
 
     if (torneo.requiereContraseña) {
-      setState(prev => ({ 
-        ...prev, 
-        torneoParaUnirse: torneo, 
+      setState((prev) => ({
+        ...prev,
+        torneoParaUnirse: torneo,
         modal: { ...prev.modal, password: true },
-        passwordInput: ""
+        passwordInput: "",
       }));
       return;
     }
@@ -185,86 +208,87 @@ const Torneo = () => {
 
   const confirmarUnion = async (torneoId, contrasena) => {
     try {
-      setState(prev => ({ 
-        ...prev, 
-        loading: { ...prev.loading, action: true, torneoId } 
+      setState((prev) => ({
+        ...prev,
+        loading: { ...prev.loading, action: true, torneoId },
       }));
-      
+
       await tournamentApi.unirseATorneo(torneoId, contrasena);
-      
+
       const actualizados = await tournamentApi.obtenerTorneosActivos();
-      setState(prev => ({ 
-        ...prev, 
+      setState((prev) => ({
+        ...prev,
         torneos: actualizados,
         modal: { ...prev.modal, password: false },
         loading: { ...prev.loading, action: false, torneoId: null },
         passwordInput: "",
-        error: null
+        error: null,
       }));
       verDetalles(torneoId);
     } catch (error) {
-      setState(prev => ({ 
-        ...prev, 
+      setState((prev) => ({
+        ...prev,
         error: error.message,
-        loading: { ...prev.loading, action: false, torneoId: null }
+        loading: { ...prev.loading, action: false, torneoId: null },
       }));
     }
   };
+  const handleBackClick = () => navigate("/home");
 
   const manejarAbandono = async (torneoId) => {
     try {
-      setState(prev => ({ 
-        ...prev, 
-        loading: { ...prev.loading, action: true, torneoId } 
+      setState((prev) => ({
+        ...prev,
+        loading: { ...prev.loading, action: true, torneoId },
       }));
       await tournamentApi.abandonarTorneo(torneoId);
-      
+
       const actualizados = await tournamentApi.obtenerTorneosActivos();
-      setState(prev => ({ 
-        ...prev, 
+      setState((prev) => ({
+        ...prev,
         torneos: actualizados,
         torneoSeleccionado: null,
         loading: { ...prev.loading, action: false, torneoId: null },
-        error: null
+        error: null,
       }));
     } catch (error) {
-      setState(prev => ({ 
-        ...prev, 
+      setState((prev) => ({
+        ...prev,
         error: error.message,
-        loading: { ...prev.loading, action: false, torneoId: null }
+        loading: { ...prev.loading, action: false, torneoId: null },
       }));
     }
   };
 
   const manejarInicio = async () => {
     try {
-      setState(prev => ({ 
-        ...prev, 
-        loading: { ...prev.loading, action: true } 
+      setState((prev) => ({
+        ...prev,
+        loading: { ...prev.loading, action: true },
       }));
-      
+
       await tournamentApi.iniciarTorneo(state.torneoSeleccionado.id);
-      
+
       const [detalles, partidas] = await Promise.all([
         tournamentApi.obtenerDetallesTorneo(state.torneoSeleccionado.id),
-        tournamentApi.obtenerPartidasTorneo(state.torneoSeleccionado.id)
+        tournamentApi.obtenerPartidasTorneo(state.torneoSeleccionado.id),
       ]);
 
-      setState(prev => ({ 
-        ...prev, 
+      setState((prev) => ({
+        ...prev,
         torneoSeleccionado: {
           ...detalles,
           partidas: partidas,
-          participanteActual: isUserInTournament(detalles)
+          participanteActual: isUserInTournament(detalles),
         },
         loading: { ...prev.loading, action: false },
-        error: null
+        error: null,
       }));
     } catch (error) {
-      setState(prev => ({ 
-        ...prev, 
+      setState((prev) => ({
+        ...prev,
         error: error.message,
-        loading: { ...prev.loading, action: false }
+        loading: { ...prev.loading, action: false },
       }));
     }
   };
@@ -275,20 +299,20 @@ const Torneo = () => {
     }
 
     try {
-      setState(prev => ({ 
-        ...prev, 
-        loading: { ...prev.loading, action: true }, 
-        error: null 
+      setState((prev) => ({
+        ...prev,
+        loading: { ...prev.loading, action: true },
+        error: null,
       }));
-      
+
       const nuevoTorneo = await tournamentApi.crearTorneo({
         nombre: state.form.nombre,
         descripcion: state.form.descripcion,
         premio: state.form.premio,
-        contrasena: state.form.esPrivado ? state.form.contrasena : undefined
+        contrasena: state.form.esPrivado ? state.form.contrasena : undefined,
       });
 
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         torneos: [nuevoTorneo, ...prev.torneos],
         modal: { ...prev.modal, crear: false },
@@ -297,88 +321,88 @@ const Torneo = () => {
           descripcion: "",
           premio: "",
           contrasena: "",
-          esPrivado: false
+          esPrivado: false,
         },
         formErrors: {
           nombre: "",
           descripcion: "",
           premio: "",
-          contrasena: ""
+          contrasena: "",
         },
-        loading: { ...prev.loading, action: false }
+        loading: { ...prev.loading, action: false },
       }));
 
       verDetalles(nuevoTorneo.id);
-      
     } catch (error) {
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         error: error.message,
-        loading: { ...prev.loading, action: false }
+        loading: { ...prev.loading, action: false },
       }));
     }
   };
 
   const verDetalles = async (torneoId) => {
     try {
-      setState(prev => ({ 
-        ...prev, 
-        loading: { ...prev.loading, action: true, torneoId } 
+      setState((prev) => ({
+        ...prev,
+        loading: { ...prev.loading, action: true, torneoId },
       }));
       const [detalles, partidas] = await Promise.all([
         tournamentApi.obtenerDetallesTorneo(torneoId),
-        tournamentApi.obtenerPartidasTorneo(torneoId)
+        tournamentApi.obtenerPartidasTorneo(torneoId),
       ]);
 
       if (detalles.ganador_id) {
-        setState(prev => ({
+        setState((prev) => ({
           ...prev,
           torneoSeleccionado: null,
-          loading: { ...prev.loading, action: false, torneoId: null }
+          loading: { ...prev.loading, action: false, torneoId: null },
         }));
         return;
       }
-      
-      setState(prev => ({ 
-        ...prev, 
+
+      setState((prev) => ({
+        ...prev,
         torneoSeleccionado: {
           ...detalles,
           partidas: partidas,
-          participanteActual: isUserInTournament(detalles)
+          participanteActual: isUserInTournament(detalles),
         },
-        error: null
+        error: null,
       }));
     } catch (error) {
-      setState(prev => ({ 
-        ...prev, 
-        error: error.message
+      setState((prev) => ({
+        ...prev,
+        error: error.message,
       }));
     } finally {
-      setState(prev => ({ 
-        ...prev, 
-        loading: { ...prev.loading, action: false, torneoId: null } 
+      setState((prev) => ({
+        ...prev,
+        loading: { ...prev.loading, action: false, torneoId: null },
       }));
     }
   };
 
   const organizeMatchesIntoRounds = (partidas, participantCount) => {
-    const sortedMatches = [...(partidas || [])].sort((a, b) => 
-      new Date(a.fecha) - new Date(b.fecha));
-    
+    const sortedMatches = [...(partidas || [])].sort(
+      (a, b) => new Date(a.fecha) - new Date(b.fecha)
+    );
+
     const rounds = { quarters: [], semis: [], final: [] };
     let remainingMatches = [...sortedMatches];
-  
+
     if (participantCount >= 8) {
       rounds.quarters = remainingMatches.splice(0, 4);
     }
-  
+
     if (participantCount >= 4) {
       const semiCount = participantCount >= 8 ? 2 : 2;
       rounds.semis = remainingMatches.splice(0, semiCount);
     }
-  
+
     rounds.final = remainingMatches;
-  
+
     return rounds;
   };
 
@@ -406,45 +430,45 @@ const Torneo = () => {
               <FaTrophy className="text-yellow-300 mr-2" /> Cuartos de Final
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {rounds.quarters.map(match => (
-                <MatchCard 
-                  key={match.id} 
-                  match={match} 
-                  participants={participants} 
+              {rounds.quarters.map((match) => (
+                <MatchCard
+                  key={match.id}
+                  match={match}
+                  participants={participants}
                 />
               ))}
             </div>
           </div>
         )}
-        
+
         {rounds.semis.length > 0 && (
           <div className="mb-6">
             <h4 className="text-md font-bold text-yellow-300 mb-2 bg-indigo-900 p-2 rounded-t-lg flex items-center">
               <FaMedal className="text-yellow-300 mr-2" /> Semifinales
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {rounds.semis.map(match => (
-                <MatchCard 
-                  key={match.id} 
-                  match={match} 
-                  participants={participants} 
+              {rounds.semis.map((match) => (
+                <MatchCard
+                  key={match.id}
+                  match={match}
+                  participants={participants}
                 />
               ))}
             </div>
           </div>
         )}
-        
+
         {rounds.final.length > 0 && (
           <div className="mb-6">
             <h4 className="text-md font-bold text-yellow-300 mb-2 bg-indigo-900 p-2 rounded-t-lg flex items-center">
               <FaFire className="text-yellow-300 mr-2" /> Final
             </h4>
             <div className="grid grid-cols-1 gap-4">
-              {rounds.final.map(match => (
-                <MatchCard 
-                  key={match.id} 
-                  match={match} 
-                  participants={participants} 
+              {rounds.final.map((match) => (
+                <MatchCard
+                  key={match.id}
+                  match={match}
+                  participants={participants}
                 />
               ))}
             </div>
@@ -455,29 +479,31 @@ const Torneo = () => {
   };
 
   const MatchCard = ({ match, participants }) => {
-    const findParticipant = (id) => 
-      participants?.find(p => p.id === id || p.user_id === id);
-    
+    const findParticipant = (id) =>
+      participants?.find((p) => p.id === id || p.user_id === id);
+
     const player1 = findParticipant(match.user1_id);
     const player2 = findParticipant(match.user2_id);
     const winner = findParticipant(match.ganador_id);
-  
+
     const formatFecha = (fecha) => {
-      if (!fecha) return 'Fecha no definida';
+      if (!fecha) return "Fecha no definida";
       const date = new Date(fecha);
-      return date.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+      return date.toLocaleDateString("es-ES", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
       });
     };
-  
+
     return (
       <div className="bg-indigo-800 rounded-lg p-4 border-2 border-indigo-600 hover:border-yellow-400 transition-colors">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm text-indigo-300">{formatFecha(match.fecha)}</span>
+          <span className="text-sm text-gray-300">
+            {formatFecha(match.fecha)}
+          </span>
           {winner && (
             <span className="text-xs bg-green-800 text-green-200 px-2 py-1 rounded-full">
               Finalizada
@@ -485,14 +511,34 @@ const Torneo = () => {
           )}
         </div>
         <div className="flex items-center justify-around">
-          <div className={`text-center p-2 rounded-lg ${winner?.id === player1?.id ? 'bg-indigo-900 text-yellow-300' : 'text-white'}`}>
-            <p className="font-bold">{player1?.nombre || 'Por definir'}</p>
-            {player1 && <span className="text-xs bg-indigo-700 px-2 py-1 rounded-full">Lv. {player1.nivel}</span>}
+          <div
+            className={`text-center p-2 rounded-lg ${
+              winner?.id === player1?.id
+                ? "bg-indigo-900 text-yellow-300"
+                : "text-white"
+            }`}
+          >
+            <p className="font-bold">{player1?.nombre || "Por definir"}</p>
+            {player1 && (
+              <span className="text-xs bg-indigo-700 px-2 py-1 rounded-full">
+                Lv. {player1.nivel}
+              </span>
+            )}
           </div>
           <span className="mx-2 text-yellow-300 font-bold text-xl">VS</span>
-          <div className={`text-center p-2 rounded-lg ${winner?.id === player2?.id ? 'bg-indigo-900 text-yellow-300' : 'text-white'}`}>
-            <p className="font-bold">{player2?.nombre || 'Por definir'}</p>
-            {player2 && <span className="text-xs bg-indigo-700 px-2 py-1 rounded-full">Lv. {player2.nivel}</span>}
+          <div
+            className={`text-center p-2 rounded-lg ${
+              winner?.id === player2?.id
+                ? "bg-indigo-900 text-yellow-300"
+                : "text-white"
+            }`}
+          >
+            <p className="font-bold">{player2?.nombre || "Por definir"}</p>
+            {player2 && (
+              <span className="text-xs bg-indigo-700 px-2 py-1 rounded-full">
+                Lv. {player2.nivel}
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -503,16 +549,19 @@ const Torneo = () => {
     const esParticipante = isUserInTournament(torneo);
     const estaLleno = torneo.participantes >= torneo.maxParticipantes;
     const enCurso = torneo.estado === "en_curso";
-    const isLoading = state.loading.action && state.loading.torneoId === torneo.id;
-    
+    const isLoading =
+      state.loading.action && state.loading.torneoId === torneo.id;
+
     return (
       <div className="bg-indigo-800 rounded-lg p-4 border-2 border-indigo-600 hover:border-yellow-300 transition-colors shadow-lg">
         <div className="flex justify-between items-start mb-2">
           <h3 className="text-lg font-bold text-yellow-300">{torneo.nombre}</h3>
           {torneo.requiereContraseña && <FaLock className="text-red-400" />}
         </div>
-        <p className="text-indigo-200 text-sm mb-3 line-clamp-2">{torneo.descripcion}</p>
-        
+        <p className="text-indigo-200 text-sm mb-3 line-clamp-2">
+          {torneo.descripcion}
+        </p>
+
         <div className="flex justify-between text-sm mb-3">
           <span className="text-yellow-300 bg-indigo-900 px-2 py-1 rounded-full flex items-center">
             <FaUsers className="mr-1" />
@@ -522,19 +571,27 @@ const Torneo = () => {
             <FaCoins className="mr-1" />
             {torneo.premio}
           </span>
-          <span className={`px-2 py-1 rounded-full flex items-center ${enCurso ? "bg-red-900 text-red-300" : "bg-green-900 text-green-300"}`}>
+          <span
+            className={`px-2 py-1 rounded-full flex items-center ${
+              enCurso
+                ? "bg-red-900 text-red-300"
+                : "bg-green-900 text-green-300"
+            }`}
+          >
             {enCurso ? "En curso" : "Pendiente"}
           </span>
         </div>
-        
+
         <button
-          onClick={() => esParticipante ? verDetalles(torneo.id) : manejarUnion(torneo)}
+          onClick={() =>
+            esParticipante ? verDetalles(torneo.id) : manejarUnion(torneo)
+          }
           className={`w-full py-2 rounded-full text-sm font-bold ${
-            esParticipante 
-              ? "bg-blue-600 hover:bg-blue-700" 
+            esParticipante
+              ? "bg-blue-600 hover:bg-blue-700"
               : estaLleno || enCurso
-                ? "bg-gray-600 cursor-not-allowed"
-                : "bg-green-600 hover:bg-green-700"
+              ? "bg-gray-600 cursor-not-allowed"
+              : "bg-green-600 hover:bg-green-700"
           } text-white`}
           disabled={isLoading || estaLleno || enCurso}
         >
@@ -556,7 +613,10 @@ const Torneo = () => {
 
   if (state.loading.global) {
     return (
-      <div className="fixed inset-0 flex justify-center items-center bg-cover bg-center" style={{backgroundImage: `url(${background})`}}>
+      <div
+        className="fixed inset-0 flex justify-center items-center bg-cover bg-center"
+        style={{ backgroundImage: `url(${background})` }}
+      >
         <FaSpinner className="animate-spin text-4xl text-yellow-300" />
       </div>
     );
@@ -564,18 +624,21 @@ const Torneo = () => {
 
   if (state.error) {
     return (
-      <div className="fixed inset-0 flex justify-center items-center bg-cover bg-center" style={{backgroundImage: `url(${background})`}}>
+      <div
+        className="fixed inset-0 flex justify-center items-center bg-cover bg-center"
+        style={{ backgroundImage: `url(${background})` }}
+      >
         <div className="text-center bg-indigo-900 bg-opacity-90 p-6 rounded-lg border-2 border-red-500">
           <h3 className="text-xl text-red-400 mb-4">Error</h3>
           <p className="text-indigo-200 mb-6">{state.error}</p>
           <div className="flex gap-4 justify-center">
-            <button 
+            <button
               onClick={() => navigate("/home")}
               className="px-4 py-2 bg-indigo-700 hover:bg-indigo-600 rounded-full"
             >
               Volver
             </button>
-            <button 
+            <button
               onClick={() => window.location.reload()}
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-full"
             >
@@ -588,22 +651,25 @@ const Torneo = () => {
   }
 
   return (
-    <div className="fixed inset-0 bg-cover bg-center overflow-auto" style={{backgroundImage: `url(${background})`}}>
-      <NavBarGame />
-      
+    <div
+      className="fixed inset-0 bg-cover bg-center overflow-auto"
+      style={{ backgroundImage: `url(${background})` }}
+    >
       <div className="container mx-auto px-4 py-20 max-w-6xl">
-        <BackButton 
+        <BackButton
           onClick={() => navigate("/home")}
           className="absolute left-4 top-20"
         />
-        
+
         <div className="bg-indigo-900 bg-opacity-90 rounded-xl p-6 border-2 border-indigo-700 shadow-lg">
           <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
             <h1 className="text-2xl font-bold text-yellow-300 flex items-center">
-              <FaTrophy className="text-yellow-300 mr-2" /> 
-              {state.torneoSeleccionado ? state.torneoSeleccionado.nombre : "🏆 TOURNAMENTS RANKING 🏆"}
+              <FaTrophy className="text-yellow-300 mr-2" />
+              {state.torneoSeleccionado
+                ? state.torneoSeleccionado.nombre
+                : "🏆 TOURNAMENTS RANKING 🏆"}
             </h1>
-            
+
             {!state.torneoSeleccionado && (
               <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                 <div className="relative flex-grow">
@@ -613,16 +679,45 @@ const Torneo = () => {
                     placeholder="Buscar torneos..."
                     className="w-full pl-10 pr-4 py-2 bg-indigo-800 text-white rounded-full border-2 border-indigo-600 focus:ring-2 focus:ring-yellow-300 focus:border-yellow-300"
                     value={state.filtros.busqueda}
-                    onChange={(e) => setState(prev => ({ 
-                      ...prev, 
-                      filtros: { ...prev.filtros, busqueda: e.target.value } 
-                    }))}
+                    onChange={(e) =>
+                      setState((prev) => ({
+                        ...prev,
+                        filtros: { ...prev.filtros, busqueda: e.target.value },
+                      }))
+                    }
                   />
                 </div>
-                
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="soloDisponibles"
+                    checked={state.filtros.soloDisponibles}
+                    onChange={() =>
+                      setState((prev) => ({
+                        ...prev,
+                        filtros: {
+                          ...prev.filtros,
+                          soloDisponibles: !prev.filtros.soloDisponibles,
+                        },
+                      }))
+                    }
+                    className="h-4 w-4 text-yellow-400 focus:ring-yellow-400 rounded"
+                  />
+                  <label
+                    htmlFor="soloDisponibles"
+                    className="text-gray-300 text-sm"
+                  >
+                    Sólo disponibles
+                  </label>
+                </div>
                 {user && (
-                  <button 
-                    onClick={() => setState(prev => ({ ...prev, modal: { ...prev.modal, crear: true } }))}
+                  <button
+                    onClick={() =>
+                      setState((prev) => ({
+                        ...prev,
+                        modal: { ...prev.modal, crear: true },
+                      }))
+                    }
                     className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-full text-white font-bold shadow-lg"
                     disabled={state.loading.action}
                   >
@@ -638,13 +733,13 @@ const Torneo = () => {
               </div>
             )}
           </div>
-          
+
           {state.error && (
             <div className="mb-4 p-3 bg-red-600 bg-opacity-20 border-2 border-red-500 text-red-200 rounded-lg">
               {state.error}
             </div>
           )}
-          
+
           {state.torneoSeleccionado && !state.torneoSeleccionado.ganador_id ? (
             <div className="bg-indigo-800 rounded-lg p-6 border-2 border-indigo-600 shadow-xl">
               <div className="grid md:grid-cols-2 gap-6 mb-6">
@@ -653,71 +748,122 @@ const Torneo = () => {
                     <FaCalendarAlt className="mr-2" /> Detalles del Torneo
                   </h3>
                   <div className="text-indigo-100 space-y-2">
-                    <p><span className="font-bold text-yellow-200">Descripción:</span> {state.torneoSeleccionado.descripcion}</p>
-                    <p><span className="font-bold text-yellow-200">Estado:</span> 
-                      <span className={`ml-2 px-2 py-1 rounded-full text-sm ${state.torneoSeleccionado.estado === "en_curso" ? "bg-red-900 text-red-300" : "bg-green-900 text-green-300"}`}>
-                        {state.torneoSeleccionado.estado === "en_curso" ? "En curso" : "Pendiente"}
+                    <p>
+                      <span className="font-bold text-yellow-200">
+                        Descripción:
+                      </span>{" "}
+                      {state.torneoSeleccionado.descripcion}
+                    </p>
+                    <p>
+                      <span className="font-bold text-yellow-200">Estado:</span>
+                      <span
+                        className={`ml-2 px-2 py-1 rounded-full text-sm ${
+                          state.torneoSeleccionado.estado === "en_curso"
+                            ? "bg-red-900 text-red-300"
+                            : "bg-green-900 text-green-300"
+                        }`}
+                      >
+                        {state.torneoSeleccionado.estado === "en_curso"
+                          ? "En curso"
+                          : "Pendiente"}
                       </span>
                     </p>
-                    <p><span className="font-bold text-yellow-200">Premio:</span> 
-                      <span className="ml-2 bg-yellow-900 text-yellow-300 px-2 py-1 rounded-full text-sm">{state.torneoSeleccionado.premio}</span>
+                    <p>
+                      <span className="font-bold text-yellow-200">Premio:</span>
+                      <span className="ml-2 bg-yellow-900 text-yellow-300 px-2 py-1 rounded-full text-sm">
+                        {state.torneoSeleccionado.premio}
+                      </span>
                     </p>
-                    <p><span className="font-bold text-yellow-200">Participantes:</span> 
+                    <p>
+                      <span className="font-bold text-yellow-200">
+                        Participantes:
+                      </span>
                       <span className="ml-2 bg-indigo-900 text-indigo-300 px-2 py-1 rounded-full text-sm">
-                        {state.torneoSeleccionado.participantes?.length || 0}/{state.torneoSeleccionado.maxParticipantes}
+                        {state.torneoSeleccionado.participantes?.length || 0}/
+                        {state.torneoSeleccionado.maxParticipantes}
                       </span>
                     </p>
-                    {state.torneoSeleccionado.estado === 'en_curso' && (
-                      <p><span className="font-bold text-yellow-200">Inicio:</span> {new Date(state.torneoSeleccionado.fechaInicio).toLocaleString()}</p>
+                    {state.torneoSeleccionado.estado === "en_curso" && (
+                      <p>
+                        <span className="font-bold text-yellow-200">
+                          Inicio:
+                        </span>{" "}
+                        {new Date(
+                          state.torneoSeleccionado.fechaInicio
+                        ).toLocaleString()}
+                      </p>
                     )}
                   </div>
                 </div>
-                
+
                 <div className="bg-indigo-700 p-4 rounded-lg border-2 border-indigo-600">
                   <h3 className="font-bold text-yellow-300 mb-3 flex items-center">
                     <FaUsers className="mr-2" /> Jugadores
                   </h3>
                   <div className="max-h-60 overflow-y-auto">
                     {state.torneoSeleccionado.participantes?.length > 0 ? (
-                      state.torneoSeleccionado.participantes.map((jugador, index) => (
-                        <div key={jugador.id} className="flex items-center gap-3 py-2 border-b border-indigo-500 last:border-0">
-                          <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center overflow-hidden text-yellow-300 font-bold">
-                            {jugador.avatar ? (
-                              <img src={jugador.avatar} alt="Avatar" className="w-full h-full object-cover" />
-                            ) : (
-                              <span>{index + 1}</span>
+                      state.torneoSeleccionado.participantes.map(
+                        (jugador, index) => (
+                          <div
+                            key={jugador.id}
+                            className="flex items-center gap-3 py-2 border-b border-indigo-500 last:border-0"
+                          >
+                            <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center overflow-hidden text-yellow-300 font-bold">
+                              {jugador.avatar ? (
+                                <img
+                                  src={jugador.avatar}
+                                  alt="Avatar"
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <span>{index + 1}</span>
+                              )}
+                            </div>
+                            <span
+                              className={
+                                jugador.id === user?.id ||
+                                jugador.user_id === user?.id
+                                  ? "text-yellow-300 font-bold"
+                                  : "text-indigo-200"
+                              }
+                            >
+                              {jugador.nombre || "Jugador anónimo"}
+                            </span>
+                            {(jugador.id === user?.id ||
+                              jugador.user_id === user?.id) && (
+                              <span className="ml-auto bg-blue-800 text-blue-200 px-2 py-1 rounded-full text-xs">
+                                Tú
+                              </span>
                             )}
                           </div>
-                          <span className={jugador.id === user?.id || jugador.user_id === user?.id ? "text-yellow-300 font-bold" : "text-indigo-200"}>
-                            {jugador.nombre || "Jugador anónimo"}
-                          </span>
-                          {(jugador.id === user?.id || jugador.user_id === user?.id) && (
-                            <span className="ml-auto bg-blue-800 text-blue-200 px-2 py-1 rounded-full text-xs">Tú</span>
-                          )}
-                        </div>
-                      ))
+                        )
+                      )
                     ) : (
-                      <p className="text-indigo-400">No hay participantes aún</p>
+                      <p className="text-indigo-400">
+                        No hay participantes aún
+                      </p>
                     )}
                   </div>
                 </div>
               </div>
 
-              {state.torneoSeleccionado.estado === 'en_curso' && (  
+              {state.torneoSeleccionado.estado === "en_curso" && (
                 <div className="mt-6">
                   <h3 className="text-lg font-bold text-yellow-300 mb-4 flex items-center">
-                    <FaTrophy className="mr-2" /> 
+                    <FaTrophy className="mr-2" />
                     Partidas Planeadas
                   </h3>
-                  
-                  <MatchesSection 
+
+                  <MatchesSection
                     partidas={state.torneoSeleccionado.partidas}
-                    participantCount={state.torneoSeleccionado.participantes?.length || 0}
+                    participantCount={
+                      state.torneoSeleccionado.participantes?.length || 0
+                    }
                     participants={state.torneoSeleccionado.participantes || []}
                   />
                 </div>
               )}
-              
+
               <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
                 {state.torneoSeleccionado?.participanteActual && (
                   <button
@@ -735,38 +881,52 @@ const Torneo = () => {
                   </button>
                 )}
 
-                {user && 
-                state.torneoSeleccionado && 
-                (user.id === state.torneoSeleccionado.creadorId) && 
-                !state.torneoSeleccionado.torneo_en_curso && (
-                  <button
-                    onClick={manejarInicio}
-                    className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-full text-white font-bold"
-                    disabled={state.loading.action || state.torneoSeleccionado.participantes.length < 2}
-                    title={state.torneoSeleccionado.participantes.length < 2 ? "Se necesitan al menos 2 participantes" : ""}
-                  >
-                    {state.loading.action ? (
-                      <FaSpinner className="animate-spin" />
-                    ) : (
-                      <>
-                        <FaPlay /> Iniciar
-                      </>
-                    )}
-                  </button>
-                )}
+                {user &&
+                  state.torneoSeleccionado &&
+                  user.id === state.torneoSeleccionado.creadorId &&
+                  !state.torneoSeleccionado.torneo_en_curso && (
+                    <button
+                      onClick={manejarInicio}
+                      className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-full text-white font-bold"
+                      disabled={
+                        state.loading.action ||
+                        state.torneoSeleccionado.participantes.length < 2
+                      }
+                      title={
+                        state.torneoSeleccionado.participantes.length < 2
+                          ? "Se necesitan al menos 2 participantes"
+                          : ""
+                      }
+                    >
+                      {state.loading.action ? (
+                        <FaSpinner className="animate-spin" />
+                      ) : (
+                        <>
+                          <FaPlay /> Iniciar
+                        </>
+                      )}
+                    </button>
+                  )}
               </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {torneosFiltrados.length > 0 ? (
-                torneosFiltrados.map(torneo => (
+                torneosFiltrados.map((torneo) => (
                   <CardTorneo key={torneo.id} torneo={torneo} />
                 ))
               ) : (
                 <div className="col-span-full text-center py-8">
-                  <p className="text-indigo-400 mb-2">No se encontraron torneos</p>
-                  <button 
-                    onClick={() => setState(prev => ({ ...prev, filtros: { ...prev.filtros, busqueda: "" } }))}
+                  <p className="text-indigo-400 mb-2">
+                    No se encontraron torneos
+                  </p>
+                  <button
+                    onClick={() =>
+                      setState((prev) => ({
+                        ...prev,
+                        filtros: { ...prev.filtros, busqueda: "" },
+                      }))
+                    }
                     className="text-blue-400 hover:text-blue-300 font-medium"
                   >
                     Limpiar búsqueda
@@ -777,59 +937,79 @@ const Torneo = () => {
           )}
         </div>
       </div>
-      
+
       {/* Modal de contraseña */}
       {state.modal.password && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-gradient-to-br from-indigo-800 to-indigo-900 p-6 rounded-xl border-2 border-indigo-600 shadow-xl w-full max-w-md">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold text-yellow-300">Torneo Privado</h3>
-              <button 
-                onClick={() => setState(prev => ({ 
-                  ...prev, 
-                  modal: { ...prev.modal, password: false },
-                  passwordInput: ""
-                }))}
+              <h3 className="text-xl font-bold text-yellow-300">
+                Torneo Privado
+              </h3>
+              <button
+                onClick={() =>
+                  setState((prev) => ({
+                    ...prev,
+                    modal: { ...prev.modal, password: false },
+                    passwordInput: "",
+                  }))
+                }
                 className="text-indigo-300 hover:text-white"
               >
                 <FaTimes />
               </button>
             </div>
-            
-            <p className="text-indigo-300 mb-4">Ingresa la contraseña para unirte al torneo:</p>
-            
+
+            <p className="text-indigo-300 mb-4">
+              Ingresa la contraseña para unirte al torneo:
+            </p>
+
             <input
               type="password"
               className="w-full px-4 py-3 bg-indigo-900/50 text-white rounded-lg border-2 border-indigo-600 focus:border-yellow-400"
               placeholder="Contraseña del torneo"
               value={state.passwordInput}
-              onChange={(e) => setState(prev => ({ ...prev, passwordInput: e.target.value }))}
-              onKeyPress={(e) => e.key === 'Enter' && state.passwordInput && confirmarUnion(state.torneoParaUnirse.id, state.passwordInput)}
+              onChange={(e) =>
+                setState((prev) => ({ ...prev, passwordInput: e.target.value }))
+              }
+              onKeyPress={(e) =>
+                e.key === "Enter" &&
+                state.passwordInput &&
+                confirmarUnion(state.torneoParaUnirse.id, state.passwordInput)
+              }
             />
-            
+
             <div className="flex justify-end gap-2 mt-4">
               <button
-                onClick={() => setState(prev => ({ 
-                  ...prev, 
-                  modal: { ...prev.modal, password: false },
-                  passwordInput: ""
-                }))}
+                onClick={() =>
+                  setState((prev) => ({
+                    ...prev,
+                    modal: { ...prev.modal, password: false },
+                    passwordInput: "",
+                  }))
+                }
                 className="px-4 py-2 bg-indigo-700 hover:bg-indigo-600 rounded-full text-white"
               >
                 Cancelar
               </button>
               <button
-                onClick={() => confirmarUnion(state.torneoParaUnirse.id, state.passwordInput)}
+                onClick={() =>
+                  confirmarUnion(state.torneoParaUnirse.id, state.passwordInput)
+                }
                 className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-full text-white"
                 disabled={state.loading.action || !state.passwordInput}
               >
-                {state.loading.action ? <FaSpinner className="animate-spin" /> : "Confirmar"}
+                {state.loading.action ? (
+                  <FaSpinner className="animate-spin" />
+                ) : (
+                  "Confirmar"
+                )}
               </button>
             </div>
           </div>
         </div>
       )}
-      
+
       {/* Modal de creación */}
       {state.modal.crear && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -838,27 +1018,33 @@ const Torneo = () => {
               <h3 className="text-xl font-bold text-yellow-300 flex items-center gap-2">
                 <FaTrophy /> Nuevo Torneo
               </h3>
-              <button 
-                onClick={() => setState(prev => ({ 
-                  ...prev, 
-                  modal: { ...prev.modal, crear: false },
-                  form: initialState.form,
-                  formErrors: initialState.formErrors
-                }))}
+              <button
+                onClick={() =>
+                  setState((prev) => ({
+                    ...prev,
+                    modal: { ...prev.modal, crear: false },
+                    form: initialState.form,
+                    formErrors: initialState.formErrors,
+                  }))
+                }
                 className="text-indigo-300 hover:text-white p-1 rounded-full hover:bg-indigo-700 transition-colors"
               >
                 <FaTimes />
               </button>
             </div>
-            
+
             <div className="space-y-4">
               <div>
-                <label className="block text-indigo-300 mb-2 font-medium">Nombre*</label>
+                <label className="block text-indigo-300 mb-2 font-medium">
+                  Nombre*
+                </label>
                 <input
                   type="text"
                   name="nombre"
                   className={`w-full px-4 py-3 bg-indigo-900/50 text-white rounded-lg border-2 ${
-                    state.formErrors.nombre ? 'border-red-500' : 'border-indigo-600 focus:border-yellow-400'
+                    state.formErrors.nombre
+                      ? "border-red-500"
+                      : "border-indigo-600 focus:border-yellow-400"
                   } focus:ring-0`}
                   value={state.form.nombre}
                   onChange={handleChange}
@@ -870,13 +1056,17 @@ const Torneo = () => {
                   </p>
                 )}
               </div>
-              
+
               <div>
-                <label className="block text-indigo-300 mb-2 font-medium">Descripción*</label>
+                <label className="block text-indigo-300 mb-2 font-medium">
+                  Descripción*
+                </label>
                 <textarea
                   name="descripcion"
                   className={`w-full px-4 py-3 bg-indigo-900/50 text-white rounded-lg border-2 ${
-                    state.formErrors.descripcion ? 'border-red-500' : 'border-indigo-600 focus:border-yellow-400'
+                    state.formErrors.descripcion
+                      ? "border-red-500"
+                      : "border-indigo-600 focus:border-yellow-400"
                   } focus:ring-0`}
                   rows="3"
                   value={state.form.descripcion}
@@ -889,9 +1079,11 @@ const Torneo = () => {
                   </p>
                 )}
               </div>
-              
+
               <div>
-                <label className="block text-indigo-300 mb-2 font-medium">Premio*</label>
+                <label className="block text-indigo-300 mb-2 font-medium">
+                  Premio*
+                </label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-yellow-400">
                     <FaCoins />
@@ -900,7 +1092,9 @@ const Torneo = () => {
                     type="text"
                     name="premio"
                     className={`w-full pl-10 pr-4 py-3 bg-indigo-900/50 text-white rounded-lg border-2 ${
-                      state.formErrors.premio ? 'border-red-500' : 'border-indigo-600 focus:border-yellow-400'
+                      state.formErrors.premio
+                        ? "border-red-500"
+                        : "border-indigo-600 focus:border-yellow-400"
                     } focus:ring-0`}
                     value={state.form.premio}
                     onChange={handleChange}
@@ -913,7 +1107,7 @@ const Torneo = () => {
                   </p>
                 )}
               </div>
-              
+
               <div className="flex items-center gap-3 p-3 bg-indigo-800/50 rounded-lg">
                 <input
                   type="checkbox"
@@ -923,14 +1117,19 @@ const Torneo = () => {
                   onChange={handleChange}
                   className="rounded text-yellow-400 focus:ring-yellow-400 h-5 w-5"
                 />
-                <label htmlFor="esPrivado" className="text-indigo-300 font-medium">
+                <label
+                  htmlFor="esPrivado"
+                  className="text-indigo-300 font-medium"
+                >
                   Torneo privado (requiere contraseña)
                 </label>
               </div>
-              
+
               {state.form.esPrivado && (
                 <div>
-                  <label className="block text-indigo-300 mb-2 font-medium">Contraseña*</label>
+                  <label className="block text-indigo-300 mb-2 font-medium">
+                    Contraseña*
+                  </label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-yellow-400">
                       <FaLock />
@@ -939,7 +1138,9 @@ const Torneo = () => {
                       type="password"
                       name="contrasena"
                       className={`w-full pl-10 pr-4 py-3 bg-indigo-900/50 text-white rounded-lg border-2 ${
-                        state.formErrors.contrasena ? 'border-red-500' : 'border-indigo-600 focus:border-yellow-400'
+                        state.formErrors.contrasena
+                          ? "border-red-500"
+                          : "border-indigo-600 focus:border-yellow-400"
                       } focus:ring-0`}
                       value={state.form.contrasena}
                       onChange={handleChange}
@@ -953,7 +1154,7 @@ const Torneo = () => {
                   )}
                 </div>
               )}
-              
+
               <button
                 onClick={manejarCreacion}
                 className="w-full py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold rounded-lg shadow-lg hover:shadow-green-500/30 transition-all mt-4 flex items-center justify-center gap-2"

@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unknown-property */
 /* eslint-disable no-case-declarations */
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useParams, useNavigate, useLocation  } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { socketService } from "../services/websocket/socketService";
 import background from "../assets/backgroundAlineacion.png";
 import { getProfile } from "../services/api/profileApi";
@@ -26,7 +26,7 @@ import {
   GiSwordwoman,
 } from "react-icons/gi";
 
-document.body.style.overflow = "auto"; 
+document.body.style.overflow = "auto";
 
 const Partida = () => {
   const nextRoundStartRef = useRef(null);
@@ -41,7 +41,7 @@ const Partida = () => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [showMenu, setShowMenu] = useState(false);
   const isDesktop = windowWidth >= 1024;
-  
+
   const selectedCardRef = useRef(null);
   const opponentCardsRef = useRef([]);
 
@@ -114,6 +114,10 @@ const Partida = () => {
     winner: null,
   });
   useEffect(() => setShowMenu(false), [gameState.phase]);
+  const phaseRef = useRef(gameState.phase);
+  useEffect(() => {
+    phaseRef.current = gameState.phase;
+  }, [gameState.phase]);
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -525,13 +529,19 @@ const Partida = () => {
     const turno = payload?.dataConTurno;
     if (!turno) return;
 
-    // Si ya estamos bloqueados esperando al "Continuar", encolamos
+    // Si estamos mostrando el resultado, encolamos
+    if (phaseRef.current === "result") {
+      nextRoundStartRef.current = payload;
+      return;
+    }
+
+    // Si estamos bloqueados, también encolamos
     if (waitingNextRoundRef.current) {
       nextRoundStartRef.current = payload;
       return;
     }
 
-    // Procesamos inmediatamente
+    // Procesamos
     waitingNextRoundRef.current = false;
     nextRoundStartRef.current = null;
 
@@ -648,15 +658,23 @@ const Partida = () => {
     const opponentSkill = isPlayerJ1 ? habilidad_j2 : habilidad_j1;
 
     let roundResult;
-    
+
     if (data.data.ganador === null) {
       roundResult = "empate";
     } else {
-      roundResult = data.data.ganador.toString() === jugadorId.toString()
-        ? "ganado" 
-        : "perdido";
+      roundResult =
+        data.data.ganador.toString() === jugadorId.toString()
+          ? "ganado"
+          : "perdido";
     }
-    console.log("Ganador de la ronda:", data.data.ganador.toString(), "Token ID:", jugadorId.toString(), "Resultado:", roundResult);
+    console.log(
+      "Ganador de la ronda:",
+      data.data.ganador.toString(),
+      "Token ID:",
+      jugadorId.toString(),
+      "Resultado:",
+      roundResult
+    );
 
     setGameState((prev) => ({
       ...prev,
@@ -703,11 +721,11 @@ const Partida = () => {
   const handleSurrender = () => {
     socketService.surrender(matchId);
 
-    setGameState(prev => ({
+    setGameState((prev) => ({
       ...prev,
       phase: "ended",
-      winner: null, 
-      isDraw: false
+      winner: null,
+      isDraw: false,
     }));
 
     setShowMenu(false);
@@ -720,7 +738,7 @@ const Partida = () => {
     width: "48px",
     height: "48px",
     fontSize: "24px",
-    backgroundColor: "#374151", 
+    backgroundColor: "#374151",
     color: "white",
     borderRadius: "50%",
     border: "none",
@@ -734,16 +752,16 @@ const Partida = () => {
   };
 
   const containerStyle = {
-    background: `url(${background}) fixed center/cover`, 
+    background: `url(${background}) fixed center/cover`,
     minHeight: "100vh",
-    width: "100vw", 
+    width: "100vw",
     overflowY: "auto",
     padding: "1rem",
     boxSizing: "border-box",
     display: "flex",
     flexDirection: "column",
   };
-  
+
   const headerStyle = {
     display: "flex",
     justifyContent: "space-between",
@@ -823,7 +841,7 @@ const Partida = () => {
     marginTop: "1.5rem",
     boxShadow: "0 4px 6px rgba(0, 0, 0, 0.3)",
     transition: "all 0.2s ease",
-    width: "100%", 
+    width: "100%",
     margin: "1rem 0",
   };
 
@@ -836,16 +854,16 @@ const Partida = () => {
     borderRadius: "10px",
     boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
     position: "fixed",
-    top: "20px",         
-    bottom: "20px",      
+    top: "20px",
+    bottom: "20px",
     left: "50%",
-    transform: "translateX(-50%)", 
+    transform: "translateX(-50%)",
     zIndex: 50,
     width: isDesktop ? "min(40vw, 500px)" : "90%",
-    maxHeight: "calc(100vh - 40px)", 
+    maxHeight: "calc(100vh - 40px)",
     overflowY: "auto",
     boxSizing: "border-box",
-    minHeight: 0,       
+    minHeight: 0,
   };
 
   const modalStyle = {
@@ -930,7 +948,7 @@ const Partida = () => {
     flexGrow: 1,
     display: "flex",
     width: "100%",
-    minHeight: "calc(100vh - 100px)", 
+    minHeight: "calc(100vh - 100px)",
     maxWidth: isDesktop ? "1400px" : "100%",
     margin: "0 auto",
     position: "relative",
@@ -1131,7 +1149,13 @@ const Partida = () => {
               >
                 <CartaGrande jugador={gameState.selectedCard} />
 
-                <div style={{ ...skillsContainerStyle, marginTop: "1.2rem", flexShrink: 0 }}>
+                <div
+                  style={{
+                    ...skillsContainerStyle,
+                    marginTop: "1.2rem",
+                    flexShrink: 0,
+                  }}
+                >
                   {["ataque", "control", "defensa"].map((skill) => (
                     <motion.button
                       key={skill}
@@ -1348,7 +1372,12 @@ const Partida = () => {
 
         const isWinner = gameState.winner?.toString() === currentPlayerId;
         const isDraw = gameState.isDraw;
-        console.log("isWinner:", gameState.winner?.toString(), "isDraw:", isDraw);
+        console.log(
+          "isWinner:",
+          gameState.winner?.toString(),
+          "isDraw:",
+          isDraw
+        );
         console.log("gameState:", gameState);
         return (
           <ModalWrapper
@@ -1370,10 +1399,10 @@ const Partida = () => {
                   marginBottom: "1rem",
                   fontWeight: 900,
                   background: isDraw
-                  ? "linear-gradient(90deg,#facc15,#eab308)"
-                  : isWinner 
-                  ? "linear-gradient(90deg,#06d6a0,#3b82f6)"
-                  : "linear-gradient(90deg,#ef4444,#b91c1c)",
+                    ? "linear-gradient(90deg,#facc15,#eab308)"
+                    : isWinner
+                    ? "linear-gradient(90deg,#06d6a0,#3b82f6)"
+                    : "linear-gradient(90deg,#ef4444,#b91c1c)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   textShadow: "0 0 12px rgba(255,255,255,0.2)",
@@ -1387,20 +1416,20 @@ const Partida = () => {
 
               {/* Puntuaciones */}
               <motion.div
-              style={{
-                fontSize: "clamp(1.8rem,5vw,2.5rem)",
-                fontWeight: "bold",
-                marginBottom: "1.5rem",
-                color: "white",
-              }}
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
+                style={{
+                  fontSize: "clamp(1.8rem,5vw,2.5rem)",
+                  fontWeight: "bold",
+                  marginBottom: "1.5rem",
+                  color: "white",
+                }}
+                initial={{ scale: 0.8 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.4, duration: 0.5 }}
               >
-              {gameState.scores[jugadorId.toString()]} -{" "}
-              {Object.entries(gameState.scores)
-                .filter(([key]) => key !== jugadorId.toString())
-                .map(([value]) => value)}
+                {gameState.scores[jugadorId.toString()]} -{" "}
+                {Object.entries(gameState.scores)
+                  .filter(([key]) => key !== jugadorId.toString())
+                  .map(([value]) => value)}
               </motion.div>
 
               {/* Cambio de puntos */}
@@ -1558,27 +1587,26 @@ const Partida = () => {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 20 }}
         >
-          {!isTournamentMatch && (
-            gameState.phase === "paused" ? (
-              <button 
-                onClick={handleResume} 
+          {!isTournamentMatch &&
+            (gameState.phase === "paused" ? (
+              <button
+                onClick={handleResume}
                 style={menuItemStyle}
                 className="hover:bg-emerald-600/50"
               >
                 <FaPlay /> Reanudar
               </button>
             ) : (
-              <button 
-                onClick={handlePause} 
+              <button
+                onClick={handlePause}
                 style={menuItemStyle}
                 className="hover:bg-yellow-600/50"
               >
                 <FaPause /> Pausar
               </button>
-            )
-          )}
-          <button 
-            onClick={handleSurrender} 
+            ))}
+          <button
+            onClick={handleSurrender}
             style={menuItemStyle}
             className="hover:bg-red-600/50"
           >

@@ -206,7 +206,9 @@ export default function ClasificacionJugadores() {
       }}
     >
       <div className="absolute inset-0 bg-black bg-opacity-60" />
-
+      <div className="fixed top-4 left-4 z-40 md:top-10 md:left-10">
+        <BackButton onClick={handleBackClick} />
+      </div>
       {showScreen && (
         <motion.div
           initial={{ scale: 0 }}
@@ -218,11 +220,6 @@ export default function ClasificacionJugadores() {
           }}
           className="relative z-10 w-full max-w-5xl px-4 py-8 text-white"
         >
-          <BackButton
-            onClick={handleBackClick}
-            className="absolute top-0 left-4 text-white z-20"
-          />
-
           {/* Main card */}
           <div className="relative bg-gradient-to-br from-gray-900 to-gray-800 p-8 rounded-xl border-2 border-purple-500 shadow-2xl">
             {/* Decorative elements */}
