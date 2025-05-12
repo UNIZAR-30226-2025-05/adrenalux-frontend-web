@@ -4,7 +4,7 @@ import {
   FaSearch, FaPlus, FaUserFriends, FaTrophy, 
   FaUsers, FaCalendarAlt, FaCoins, FaSignOutAlt, 
   FaLock, FaSpinner, FaTimes, FaArrowLeft,
-  FaPlay, FaExclamationTriangle
+  FaPlay, FaExclamationTriangle, FaMedal, FaFire
 } from "react-icons/fa";
 import { tournamentApi } from "../services/api/tournamentApi";
 import { getToken } from "../services/api/authApi";
@@ -53,7 +53,6 @@ const Torneo = () => {
     }
   }, []);
 
-  // Cargar torneos al montar el componente
   useEffect(() => {
     const cargarTorneos = async () => {
       try {
@@ -75,7 +74,6 @@ const Torneo = () => {
     cargarTorneos();
   }, []);
 
-  // Verificar torneos del usuario
   useEffect(() => {
     const checkUserTorneos = async () => {
       if (user && !state.initialCheckDone && !state.loading.global) {
@@ -106,7 +104,6 @@ const Torneo = () => {
       contrasena: ""
     };
 
-    // Validación del nombre (mínimo 4 caracteres)
     if (!state.form.nombre.trim()) {
       errors.nombre = "El nombre es obligatorio";
       isValid = false;
@@ -115,13 +112,11 @@ const Torneo = () => {
       isValid = false;
     }
 
-    // Validación de la descripción (no puede ser nulo)
     if (!state.form.descripcion.trim()) {
       errors.descripcion = "La descripción es obligatoria";
       isValid = false;
     }
 
-    // Validación del premio (debe ser un número)
     if (!state.form.premio.trim()) {
       errors.premio = "El premio es obligatorio";
       isValid = false;
@@ -130,7 +125,6 @@ const Torneo = () => {
       isValid = false;
     }
 
-    // Validación de la contraseña (si es torneo privado)
     if (state.form.esPrivado && !state.form.contrasena.trim()) {
       errors.contrasena = "La contraseña es obligatoria para torneos privados";
       isValid = false;
@@ -154,7 +148,7 @@ const Torneo = () => {
       },
       formErrors: {
         ...prev.formErrors,
-        [name]: "" // Limpiar el error cuando el usuario modifica el campo
+        [name]: ""
       }
     }));
   };
@@ -394,10 +388,10 @@ const Torneo = () => {
     if (!partidas || partidas.length === 0) {
       return (
         <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-600 rounded w-1/3"></div>
+          <div className="h-8 bg-indigo-700 rounded w-1/3"></div>
           <div className="space-y-2">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-20 bg-gray-600 rounded"></div>
+              <div key={i} className="h-20 bg-indigo-700 rounded"></div>
             ))}
           </div>
         </div>
@@ -408,8 +402,8 @@ const Torneo = () => {
       <>
         {rounds.quarters.length > 0 && (
           <div className="mb-6">
-            <h4 className="text-md font-semibold text-yellow-400 mb-2">
-              Cuartos de Final
+            <h4 className="text-md font-bold text-yellow-300 mb-2 bg-indigo-900 p-2 rounded-t-lg flex items-center">
+              <FaTrophy className="text-yellow-300 mr-2" /> Cuartos de Final
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {rounds.quarters.map(match => (
@@ -425,8 +419,8 @@ const Torneo = () => {
         
         {rounds.semis.length > 0 && (
           <div className="mb-6">
-            <h4 className="text-md font-semibold text-yellow-400 mb-2">
-              Semifinales
+            <h4 className="text-md font-bold text-yellow-300 mb-2 bg-indigo-900 p-2 rounded-t-lg flex items-center">
+              <FaMedal className="text-yellow-300 mr-2" /> Semifinales
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {rounds.semis.map(match => (
@@ -442,8 +436,8 @@ const Torneo = () => {
         
         {rounds.final.length > 0 && (
           <div className="mb-6">
-            <h4 className="text-md font-semibold text-yellow-400 mb-2">
-              Final
+            <h4 className="text-md font-bold text-yellow-300 mb-2 bg-indigo-900 p-2 rounded-t-lg flex items-center">
+              <FaFire className="text-yellow-300 mr-2" /> Final
             </h4>
             <div className="grid grid-cols-1 gap-4">
               {rounds.final.map(match => (
@@ -481,24 +475,24 @@ const Torneo = () => {
     };
   
     return (
-      <div className="bg-gray-700 rounded-lg p-4 border border-gray-600 hover:border-yellow-400 transition-colors">
+      <div className="bg-indigo-800 rounded-lg p-4 border-2 border-indigo-600 hover:border-yellow-400 transition-colors">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm text-gray-300">{formatFecha(match.fecha)}</span>
+          <span className="text-sm text-indigo-300">{formatFecha(match.fecha)}</span>
           {winner && (
-            <span className="text-xs bg-green-800 text-green-200 px-2 py-1 rounded">
+            <span className="text-xs bg-green-800 text-green-200 px-2 py-1 rounded-full">
               Finalizada
             </span>
           )}
         </div>
         <div className="flex items-center justify-around">
-          <div className={`text-center ${winner?.id === player1?.id ? 'text-green-400' : 'text-white'}`}>
-            <p className="font-medium">{player1?.nombre || 'Por definir'}</p>
-            {player1 && <span className="text-xs text-gray-400">Lv. {player1.nivel}</span>}
+          <div className={`text-center p-2 rounded-lg ${winner?.id === player1?.id ? 'bg-indigo-900 text-yellow-300' : 'text-white'}`}>
+            <p className="font-bold">{player1?.nombre || 'Por definir'}</p>
+            {player1 && <span className="text-xs bg-indigo-700 px-2 py-1 rounded-full">Lv. {player1.nivel}</span>}
           </div>
-          <span className="mx-2 text-yellow-400">vs</span>
-          <div className={`text-center ${winner?.id === player2?.id ? 'text-green-400' : 'text-white'}`}>
-            <p className="font-medium">{player2?.nombre || 'Por definir'}</p>
-            {player2 && <span className="text-xs text-gray-400">Lv. {player2.nivel}</span>}
+          <span className="mx-2 text-yellow-300 font-bold text-xl">VS</span>
+          <div className={`text-center p-2 rounded-lg ${winner?.id === player2?.id ? 'bg-indigo-900 text-yellow-300' : 'text-white'}`}>
+            <p className="font-bold">{player2?.nombre || 'Por definir'}</p>
+            {player2 && <span className="text-xs bg-indigo-700 px-2 py-1 rounded-full">Lv. {player2.nivel}</span>}
           </div>
         </div>
       </div>
@@ -512,35 +506,35 @@ const Torneo = () => {
     const isLoading = state.loading.action && state.loading.torneoId === torneo.id;
     
     return (
-      <div className="bg-gray-700 rounded-lg p-4 border border-gray-600 hover:border-yellow-400 transition-colors">
+      <div className="bg-indigo-800 rounded-lg p-4 border-2 border-indigo-600 hover:border-yellow-300 transition-colors shadow-lg">
         <div className="flex justify-between items-start mb-2">
-          <h3 className="text-lg font-semibold text-white">{torneo.nombre}</h3>
+          <h3 className="text-lg font-bold text-yellow-300">{torneo.nombre}</h3>
           {torneo.requiereContraseña && <FaLock className="text-red-400" />}
         </div>
-        <p className="text-gray-300 text-sm mb-3 line-clamp-2">{torneo.descripcion}</p>
+        <p className="text-indigo-200 text-sm mb-3 line-clamp-2">{torneo.descripcion}</p>
         
         <div className="flex justify-between text-sm mb-3">
-          <span className="text-yellow-400">
-            <FaUsers className="inline mr-1" />
+          <span className="text-yellow-300 bg-indigo-900 px-2 py-1 rounded-full flex items-center">
+            <FaUsers className="mr-1" />
             {torneo.participantes}/{torneo.maxParticipantes}
           </span>
-          <span className="text-yellow-400">
-            <FaCoins className="inline mr-1" />
+          <span className="text-yellow-300 bg-indigo-900 px-2 py-1 rounded-full flex items-center">
+            <FaCoins className="mr-1" />
             {torneo.premio}
           </span>
-          <span className={enCurso ? "text-red-400" : "text-green-400"}>
+          <span className={`px-2 py-1 rounded-full flex items-center ${enCurso ? "bg-red-900 text-red-300" : "bg-green-900 text-green-300"}`}>
             {enCurso ? "En curso" : "Pendiente"}
           </span>
         </div>
         
         <button
           onClick={() => esParticipante ? verDetalles(torneo.id) : manejarUnion(torneo)}
-          className={`w-full py-1 rounded text-sm font-medium ${
+          className={`w-full py-2 rounded-full text-sm font-bold ${
             esParticipante 
-              ? "bg-blue-500 hover:bg-blue-600" 
+              ? "bg-blue-600 hover:bg-blue-700" 
               : estaLleno || enCurso
-                ? "bg-gray-500 cursor-not-allowed"
-                : "bg-green-500 hover:bg-green-600"
+                ? "bg-gray-600 cursor-not-allowed"
+                : "bg-green-600 hover:bg-green-700"
           } text-white`}
           disabled={isLoading || estaLleno || enCurso}
         >
@@ -563,7 +557,7 @@ const Torneo = () => {
   if (state.loading.global) {
     return (
       <div className="fixed inset-0 flex justify-center items-center bg-cover bg-center" style={{backgroundImage: `url(${background})`}}>
-        <FaSpinner className="animate-spin text-4xl text-white" />
+        <FaSpinner className="animate-spin text-4xl text-yellow-300" />
       </div>
     );
   }
@@ -571,19 +565,19 @@ const Torneo = () => {
   if (state.error) {
     return (
       <div className="fixed inset-0 flex justify-center items-center bg-cover bg-center" style={{backgroundImage: `url(${background})`}}>
-        <div className="text-center bg-gray-800 bg-opacity-90 p-6 rounded-lg">
+        <div className="text-center bg-indigo-900 bg-opacity-90 p-6 rounded-lg border-2 border-red-500">
           <h3 className="text-xl text-red-400 mb-4">Error</h3>
-          <p className="text-gray-300 mb-6">{state.error}</p>
+          <p className="text-indigo-200 mb-6">{state.error}</p>
           <div className="flex gap-4 justify-center">
             <button 
               onClick={() => navigate("/home")}
-              className="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded"
+              className="px-4 py-2 bg-indigo-700 hover:bg-indigo-600 rounded-full"
             >
               Volver
             </button>
             <button 
               onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded"
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-full"
             >
               Reintentar
             </button>
@@ -603,21 +597,21 @@ const Torneo = () => {
           className="absolute left-4 top-20"
         />
         
-        <div className="bg-gray-800 bg-opacity-90 rounded-xl p-6 border border-gray-700 shadow-lg">
+        <div className="bg-indigo-900 bg-opacity-90 rounded-xl p-6 border-2 border-indigo-700 shadow-lg">
           <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-            <h1 className="text-2xl font-bold text-white flex items-center">
-              <FaTrophy className="text-yellow-400 mr-2" /> 
-              {state.torneoSeleccionado ? state.torneoSeleccionado.nombre : "Torneos Disponibles"}
+            <h1 className="text-2xl font-bold text-yellow-300 flex items-center">
+              <FaTrophy className="text-yellow-300 mr-2" /> 
+              {state.torneoSeleccionado ? state.torneoSeleccionado.nombre : "🏆 TOURNAMENTS RANKING 🏆"}
             </h1>
             
             {!state.torneoSeleccionado && (
               <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                 <div className="relative flex-grow">
-                  <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-indigo-300" />
                   <input
                     type="text"
                     placeholder="Buscar torneos..."
-                    className="w-full pl-10 pr-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:ring-2 focus:ring-yellow-400"
+                    className="w-full pl-10 pr-4 py-2 bg-indigo-800 text-white rounded-full border-2 border-indigo-600 focus:ring-2 focus:ring-yellow-300 focus:border-yellow-300"
                     value={state.filtros.busqueda}
                     onChange={(e) => setState(prev => ({ 
                       ...prev, 
@@ -629,7 +623,7 @@ const Torneo = () => {
                 {user && (
                   <button 
                     onClick={() => setState(prev => ({ ...prev, modal: { ...prev.modal, crear: true } }))}
-                    className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 rounded-lg text-white font-medium"
+                    className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-full text-white font-bold shadow-lg"
                     disabled={state.loading.action}
                   >
                     {state.loading.action ? (
@@ -646,115 +640,120 @@ const Torneo = () => {
           </div>
           
           {state.error && (
-            <div className="mb-4 p-3 bg-red-500 bg-opacity-20 border border-red-400 text-red-200 rounded-lg">
+            <div className="mb-4 p-3 bg-red-600 bg-opacity-20 border-2 border-red-500 text-red-200 rounded-lg">
               {state.error}
             </div>
           )}
           
           {state.torneoSeleccionado && !state.torneoSeleccionado.ganador_id ? (
-            <div className="bg-gray-700 rounded-lg p-6 border border-gray-600">
+            <div className="bg-indigo-800 rounded-lg p-6 border-2 border-indigo-600 shadow-xl">
               <div className="grid md:grid-cols-2 gap-6 mb-6">
-                <div className="bg-gray-600 p-4 rounded-lg">
-                  <h3 className="font-semibold text-white mb-3 flex items-center">
-                    <FaCalendarAlt className="mr-2 text-yellow-400" /> Detalles
+                <div className="bg-indigo-700 p-4 rounded-lg border-2 border-indigo-600">
+                  <h3 className="font-bold text-yellow-300 mb-3 flex items-center">
+                    <FaCalendarAlt className="mr-2" /> Detalles del Torneo
                   </h3>
-                  <div className="text-gray-200 space-y-2">
-                    <p><span className="font-medium">Descripción:</span> {state.torneoSeleccionado.descripcion}</p>
-                    <p><span className="font-medium">Estado:</span> {state.torneoSeleccionado.estado === "en_curso" ? "En curso" : "Pendiente"}</p>
-                    <p><span className="font-medium">Premio:</span> {state.torneoSeleccionado.premio}</p>
-                    <p><span className="font-medium">Participantes:</span> {state.torneoSeleccionado.participantes?.length || 0}/{state.torneoSeleccionado.maxParticipantes}</p>
-                    {state.torneoSeleccionado.estado == 'en_curso' && (
-                      <p><span className="font-medium">Inicio:</span> {new Date(state.torneoSeleccionado.fechaInicio).toLocaleString()}</p>
+                  <div className="text-indigo-100 space-y-2">
+                    <p><span className="font-bold text-yellow-200">Descripción:</span> {state.torneoSeleccionado.descripcion}</p>
+                    <p><span className="font-bold text-yellow-200">Estado:</span> 
+                      <span className={`ml-2 px-2 py-1 rounded-full text-sm ${state.torneoSeleccionado.estado === "en_curso" ? "bg-red-900 text-red-300" : "bg-green-900 text-green-300"}`}>
+                        {state.torneoSeleccionado.estado === "en_curso" ? "En curso" : "Pendiente"}
+                      </span>
+                    </p>
+                    <p><span className="font-bold text-yellow-200">Premio:</span> 
+                      <span className="ml-2 bg-yellow-900 text-yellow-300 px-2 py-1 rounded-full text-sm">{state.torneoSeleccionado.premio}</span>
+                    </p>
+                    <p><span className="font-bold text-yellow-200">Participantes:</span> 
+                      <span className="ml-2 bg-indigo-900 text-indigo-300 px-2 py-1 rounded-full text-sm">
+                        {state.torneoSeleccionado.participantes?.length || 0}/{state.torneoSeleccionado.maxParticipantes}
+                      </span>
+                    </p>
+                    {state.torneoSeleccionado.estado === 'en_curso' && (
+                      <p><span className="font-bold text-yellow-200">Inicio:</span> {new Date(state.torneoSeleccionado.fechaInicio).toLocaleString()}</p>
                     )}
                   </div>
                 </div>
                 
-                <div className="bg-gray-600 p-4 rounded-lg">
-                  <h3 className="font-semibold text-white mb-3 flex items-center">
-                    <FaUsers className="mr-2 text-yellow-400" /> Jugadores
+                <div className="bg-indigo-700 p-4 rounded-lg border-2 border-indigo-600">
+                  <h3 className="font-bold text-yellow-300 mb-3 flex items-center">
+                    <FaUsers className="mr-2" /> Jugadores
                   </h3>
                   <div className="max-h-60 overflow-y-auto">
                     {state.torneoSeleccionado.participantes?.length > 0 ? (
-                      state.torneoSeleccionado.participantes.map(jugador => (
-                        <div key={jugador.id} className="flex items-center gap-3 py-2 border-b border-gray-500 last:border-0">
-                          <div className="w-8 h-8 rounded-full bg-gray-500 flex items-center justify-center overflow-hidden">
+                      state.torneoSeleccionado.participantes.map((jugador, index) => (
+                        <div key={jugador.id} className="flex items-center gap-3 py-2 border-b border-indigo-500 last:border-0">
+                          <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center overflow-hidden text-yellow-300 font-bold">
                             {jugador.avatar ? (
                               <img src={jugador.avatar} alt="Avatar" className="w-full h-full object-cover" />
                             ) : (
-                              <span className="text-sm font-medium">{jugador.nombre?.charAt(0) || "?"}</span>
+                              <span>{index + 1}</span>
                             )}
                           </div>
-                          <span className={jugador.id === user?.id || jugador.user_id === user?.id ? "text-green-400 font-medium" : "text-gray-200"}>
+                          <span className={jugador.id === user?.id || jugador.user_id === user?.id ? "text-yellow-300 font-bold" : "text-indigo-200"}>
                             {jugador.nombre || "Jugador anónimo"}
                           </span>
+                          {(jugador.id === user?.id || jugador.user_id === user?.id) && (
+                            <span className="ml-auto bg-blue-800 text-blue-200 px-2 py-1 rounded-full text-xs">Tú</span>
+                          )}
                         </div>
                       ))
                     ) : (
-                      <p className="text-gray-400">No hay participantes aún</p>
+                      <p className="text-indigo-400">No hay participantes aún</p>
                     )}
                   </div>
                 </div>
               </div>
 
-              {state.torneoSeleccionado.estado == 'en_curso' && (  
+              {state.torneoSeleccionado.estado === 'en_curso' && (  
                 <div className="mt-6">
-                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-                    <FaTrophy className="mr-2 text-yellow-400" /> 
+                  <h3 className="text-lg font-bold text-yellow-300 mb-4 flex items-center">
+                    <FaTrophy className="mr-2" /> 
                     Partidas Planeadas
                   </h3>
                   
-                  {state.torneoSeleccionado.partidas?.length > 0 ? (
-                    <MatchesSection 
-                      partidas={state.torneoSeleccionado.partidas}
-                      participantCount={state.torneoSeleccionado.participantes?.length || 0}
-                      participants={state.torneoSeleccionado.participantes || []}
-                    />
-                  ) : (
-                    <p className="text-gray-400">No hay partidas programadas todavía.</p>
-                  )}
+                  <MatchesSection 
+                    partidas={state.torneoSeleccionado.partidas}
+                    participantCount={state.torneoSeleccionado.participantes?.length || 0}
+                    participants={state.torneoSeleccionado.participantes || []}
+                  />
                 </div>
               )}
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
-              {state.torneoSeleccionado.estado !== 'en_curso' && (
-                <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
-                  {state.torneoSeleccionado?.participanteActual && (
-                    <button
-                      onClick={() => manejarAbandono(state.torneoSeleccionado.id)}
-                      className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-white font-medium"
-                      disabled={state.loading.action}
-                    >
-                      {state.loading.action ? (
-                        <FaSpinner className="animate-spin" />
-                      ) : (
-                        <>
-                          <FaSignOutAlt /> Abandonar Torneo
-                        </>
-                      )}
-                    </button>
-                  )}
+                {state.torneoSeleccionado?.participanteActual && (
+                  <button
+                    onClick={() => manejarAbandono(state.torneoSeleccionado.id)}
+                    className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-full text-white font-bold"
+                    disabled={state.loading.action}
+                  >
+                    {state.loading.action ? (
+                      <FaSpinner className="animate-spin" />
+                    ) : (
+                      <>
+                        <FaSignOutAlt /> Abandonar
+                      </>
+                    )}
+                  </button>
+                )}
 
-                  {user && 
-                  state.torneoSeleccionado && 
-                  (user.id === state.torneoSeleccionado.creadorId) && 
-                  !state.torneoSeleccionado.torneo_en_curso && (
-                    <button
-                      onClick={manejarInicio}
-                      className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 rounded-lg text-white font-medium"
-                      disabled={state.loading.action || state.torneoSeleccionado.participantes.length < 2}
-                      title={state.torneoSeleccionado.participantes.length < 2 ? "Se necesitan al menos 2 participantes" : ""}
-                    >
-                      {state.loading.action ? (
-                        <FaSpinner className="animate-spin" />
-                      ) : (
-                        <>
-                          <FaPlay /> Iniciar Torneo
-                        </>
-                      )}
-                    </button>
-                  )}
-                </div>
-              )}
+                {user && 
+                state.torneoSeleccionado && 
+                (user.id === state.torneoSeleccionado.creadorId) && 
+                !state.torneoSeleccionado.torneo_en_curso && (
+                  <button
+                    onClick={manejarInicio}
+                    className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-full text-white font-bold"
+                    disabled={state.loading.action || state.torneoSeleccionado.participantes.length < 2}
+                    title={state.torneoSeleccionado.participantes.length < 2 ? "Se necesitan al menos 2 participantes" : ""}
+                  >
+                    {state.loading.action ? (
+                      <FaSpinner className="animate-spin" />
+                    ) : (
+                      <>
+                        <FaPlay /> Iniciar
+                      </>
+                    )}
+                  </button>
+                )}
               </div>
             </div>
           ) : (
@@ -765,7 +764,7 @@ const Torneo = () => {
                 ))
               ) : (
                 <div className="col-span-full text-center py-8">
-                  <p className="text-gray-400 mb-2">No se encontraron torneos</p>
+                  <p className="text-indigo-400 mb-2">No se encontraron torneos</p>
                   <button 
                     onClick={() => setState(prev => ({ ...prev, filtros: { ...prev.filtros, busqueda: "" } }))}
                     className="text-blue-400 hover:text-blue-300 font-medium"
@@ -781,47 +780,47 @@ const Torneo = () => {
       
       {/* Modal de contraseña */}
       {state.modal.password && (
-        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-700 p-6 rounded-lg max-w-md w-full border border-gray-600">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gradient-to-br from-indigo-800 to-indigo-900 p-6 rounded-xl border-2 border-indigo-600 shadow-xl w-full max-w-md">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-semibold text-white">Torneo Privado</h3>
+              <h3 className="text-xl font-bold text-yellow-300">Torneo Privado</h3>
               <button 
                 onClick={() => setState(prev => ({ 
                   ...prev, 
                   modal: { ...prev.modal, password: false },
                   passwordInput: ""
                 }))}
-                className="text-gray-400 hover:text-white"
+                className="text-indigo-300 hover:text-white"
               >
                 <FaTimes />
               </button>
             </div>
             
-            <p className="text-gray-300 mb-4">Ingresa la contraseña para unirte al torneo:</p>
+            <p className="text-indigo-300 mb-4">Ingresa la contraseña para unirte al torneo:</p>
             
             <input
               type="password"
-              className="w-full px-4 py-2 bg-gray-600 text-white rounded mb-4 border border-gray-500 focus:ring-2 focus:ring-yellow-400"
+              className="w-full px-4 py-3 bg-indigo-900/50 text-white rounded-lg border-2 border-indigo-600 focus:border-yellow-400"
               placeholder="Contraseña del torneo"
               value={state.passwordInput}
               onChange={(e) => setState(prev => ({ ...prev, passwordInput: e.target.value }))}
               onKeyPress={(e) => e.key === 'Enter' && state.passwordInput && confirmarUnion(state.torneoParaUnirse.id, state.passwordInput)}
             />
             
-            <div className="flex justify-end gap-2">
+            <div className="flex justify-end gap-2 mt-4">
               <button
                 onClick={() => setState(prev => ({ 
                   ...prev, 
                   modal: { ...prev.modal, password: false },
                   passwordInput: ""
                 }))}
-                className="px-4 py-2 bg-gray-500 hover:bg-gray-400 rounded text-white"
+                className="px-4 py-2 bg-indigo-700 hover:bg-indigo-600 rounded-full text-white"
               >
                 Cancelar
               </button>
               <button
                 onClick={() => confirmarUnion(state.torneoParaUnirse.id, state.passwordInput)}
-                className="px-4 py-2 bg-green-500 hover:bg-green-600 rounded text-white"
+                className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-full text-white"
                 disabled={state.loading.action || !state.passwordInput}
               >
                 {state.loading.action ? <FaSpinner className="animate-spin" /> : "Confirmar"}
@@ -833,29 +832,20 @@ const Torneo = () => {
       
       {/* Modal de creación */}
       {state.modal.crear && (
-        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-700 p-6 rounded-lg max-w-md w-full border border-gray-600">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gradient-to-br from-indigo-800 to-indigo-900 p-6 rounded-xl border-2 border-indigo-600 shadow-2xl w-full max-w-md">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-semibold text-white">Nuevo Torneo</h3>
+              <h3 className="text-xl font-bold text-yellow-300 flex items-center gap-2">
+                <FaTrophy /> Nuevo Torneo
+              </h3>
               <button 
                 onClick={() => setState(prev => ({ 
                   ...prev, 
                   modal: { ...prev.modal, crear: false },
-                  form: {
-                    nombre: "",
-                    descripcion: "",
-                    premio: "",
-                    contrasena: "",
-                    esPrivado: false
-                  },
-                  formErrors: {
-                    nombre: "",
-                    descripcion: "",
-                    premio: "",
-                    contrasena: ""
-                  }
+                  form: initialState.form,
+                  formErrors: initialState.formErrors
                 }))}
-                className="text-gray-400 hover:text-white"
+                className="text-indigo-300 hover:text-white p-1 rounded-full hover:bg-indigo-700 transition-colors"
               >
                 <FaTimes />
               </button>
@@ -863,81 +853,102 @@ const Torneo = () => {
             
             <div className="space-y-4">
               <div>
-                <label className="block text-gray-300 mb-1">Nombre*</label>
+                <label className="block text-indigo-300 mb-2 font-medium">Nombre*</label>
                 <input
                   type="text"
                   name="nombre"
-                  className={`w-full px-4 py-2 bg-gray-600 text-white rounded border ${state.formErrors.nombre ? 'border-red-500' : 'border-gray-500'}`}
+                  className={`w-full px-4 py-3 bg-indigo-900/50 text-white rounded-lg border-2 ${
+                    state.formErrors.nombre ? 'border-red-500' : 'border-indigo-600 focus:border-yellow-400'
+                  } focus:ring-0`}
                   value={state.form.nombre}
                   onChange={handleChange}
-                  required
+                  placeholder="Nombre del torneo"
                 />
                 {state.formErrors.nombre && (
-                  <p className="text-red-400 text-sm mt-1 flex items-center">
-                    <FaExclamationTriangle className="mr-1" /> {state.formErrors.nombre}
+                  <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
+                    <FaExclamationTriangle /> {state.formErrors.nombre}
                   </p>
                 )}
               </div>
               
               <div>
-                <label className="block text-gray-300 mb-1">Descripción*</label>
+                <label className="block text-indigo-300 mb-2 font-medium">Descripción*</label>
                 <textarea
                   name="descripcion"
-                  className={`w-full px-4 py-2 bg-gray-600 text-white rounded border ${state.formErrors.descripcion ? 'border-red-500' : 'border-gray-500'}`}
+                  className={`w-full px-4 py-3 bg-indigo-900/50 text-white rounded-lg border-2 ${
+                    state.formErrors.descripcion ? 'border-red-500' : 'border-indigo-600 focus:border-yellow-400'
+                  } focus:ring-0`}
                   rows="3"
                   value={state.form.descripcion}
                   onChange={handleChange}
-                  required
+                  placeholder="Descripción del torneo"
                 />
                 {state.formErrors.descripcion && (
-                  <p className="text-red-400 text-sm mt-1 flex items-center">
-                    <FaExclamationTriangle className="mr-1" /> {state.formErrors.descripcion}
+                  <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
+                    <FaExclamationTriangle /> {state.formErrors.descripcion}
                   </p>
                 )}
               </div>
               
               <div>
-                <label className="block text-gray-300 mb-1">Premio* (número)</label>
-                <input
-                  type="text"
-                  name="premio"
-                  className={`w-full px-4 py-2 bg-gray-600 text-white rounded border ${state.formErrors.premio ? 'border-red-500' : 'border-gray-500'}`}
-                  value={state.form.premio}
-                  onChange={handleChange}
-                  required
-                />
+                <label className="block text-indigo-300 mb-2 font-medium">Premio*</label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-yellow-400">
+                    <FaCoins />
+                  </span>
+                  <input
+                    type="text"
+                    name="premio"
+                    className={`w-full pl-10 pr-4 py-3 bg-indigo-900/50 text-white rounded-lg border-2 ${
+                      state.formErrors.premio ? 'border-red-500' : 'border-indigo-600 focus:border-yellow-400'
+                    } focus:ring-0`}
+                    value={state.form.premio}
+                    onChange={handleChange}
+                    placeholder="Cantidad de premio"
+                  />
+                </div>
                 {state.formErrors.premio && (
-                  <p className="text-red-400 text-sm mt-1 flex items-center">
-                    <FaExclamationTriangle className="mr-1" /> {state.formErrors.premio}
+                  <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
+                    <FaExclamationTriangle /> {state.formErrors.premio}
                   </p>
                 )}
               </div>
-              <div className="flex items-center gap-2">
+              
+              <div className="flex items-center gap-3 p-3 bg-indigo-800/50 rounded-lg">
                 <input
                   type="checkbox"
                   id="esPrivado"
                   name="esPrivado"
                   checked={state.form.esPrivado}
                   onChange={handleChange}
-                  className="rounded text-yellow-400 focus:ring-yellow-400"
+                  className="rounded text-yellow-400 focus:ring-yellow-400 h-5 w-5"
                 />
-                <label htmlFor="esPrivado" className="text-gray-300">Torneo privado</label>
+                <label htmlFor="esPrivado" className="text-indigo-300 font-medium">
+                  Torneo privado (requiere contraseña)
+                </label>
               </div>
               
               {state.form.esPrivado && (
                 <div>
-                  <label className="block text-gray-300 mb-1">Contraseña*</label>
-                  <input
-                    type="password"
-                    name="contrasena"
-                    className={`w-full px-4 py-2 bg-gray-600 text-white rounded border ${state.formErrors.contrasena ? 'border-red-500' : 'border-gray-500'}`}
-                    value={state.form.contrasena}
-                    onChange={handleChange}
-                    required={state.form.esPrivado}
-                  />
+                  <label className="block text-indigo-300 mb-2 font-medium">Contraseña*</label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-yellow-400">
+                      <FaLock />
+                    </span>
+                    <input
+                      type="password"
+                      name="contrasena"
+                      className={`w-full pl-10 pr-4 py-3 bg-indigo-900/50 text-white rounded-lg border-2 ${
+                        state.formErrors.contrasena ? 'border-red-500' : 'border-indigo-600 focus:border-yellow-400'
+                      } focus:ring-0`}
+                      value={state.form.contrasena}
+                      onChange={handleChange}
+                      placeholder="Contraseña del torneo"
+                    />
+                  </div>
                   {state.formErrors.contrasena && (
-                    <p className="text-red-400 text-sm mt-1 flex items-center">
-                      <FaExclamationTriangle className="mr-1" /> {state.formErrors.contrasena}
+                    <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
+                      <FaExclamationTriangle /> {state.formErrors.contrasena}
                     </p>
                   )}
                 </div>
@@ -945,13 +956,15 @@ const Torneo = () => {
               
               <button
                 onClick={manejarCreacion}
-                className="w-full py-2 bg-green-500 hover:bg-green-600 rounded text-white font-medium mt-4"
+                className="w-full py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold rounded-lg shadow-lg hover:shadow-green-500/30 transition-all mt-4 flex items-center justify-center gap-2"
                 disabled={state.loading.action}
               >
                 {state.loading.action ? (
-                  <FaSpinner className="animate-spin mx-auto" />
+                  <FaSpinner className="animate-spin" />
                 ) : (
-                  "Crear Torneo"
+                  <>
+                    <FaPlus /> Crear Torneo
+                  </>
                 )}
               </button>
             </div>
