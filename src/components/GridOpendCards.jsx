@@ -134,6 +134,25 @@ const GridOpenedCards = () => {
     }
   };
 
+  // Aura animation variants for Luxury XI cards
+  const luxuryXIAuraVariants = {
+    initial: { opacity: 0 },
+    animate: { 
+      opacity: [0.4, 0.8, 0.4],
+      scale: [1, 1.05, 1],
+      filter: [
+        "drop-shadow(0px 0px 10px rgba(255, 215, 0, 0.5))",
+        "drop-shadow(0px 0px 20px rgba(255, 215, 0, 0.8))",
+        "drop-shadow(0px 0px 10px rgba(255, 215, 0, 0.5))"
+      ]
+    },
+    transition: {
+      repeat: Infinity,
+      duration: 3,
+      repeatType: "mirror"
+    }
+  };
+
   // Generate confetti particles
   const generateConfetti = () => {
     return Array.from({ length: 50 }).map((_, i) => {
@@ -270,11 +289,102 @@ const GridOpenedCards = () => {
               transition={{ type: "spring", damping: 20 }}
               onClick={(e) => e.stopPropagation()}
             >
+              {/* Special aura effect for Luxury XI cards */}
+              {openedCards?.[selectedCardIndex]?.tipo_carta === "Luxury XI" && (
+                <motion.div 
+                  className="absolute inset-0 rounded-lg pointer-events-none"
+                  initial={{ opacity: 0 }}
+                  animate={{ 
+                    opacity: [0.4, 0.8, 0.4],
+                    scale: [1, 1.05, 1],
+                  }}
+                  transition={{ 
+                    repeat: Infinity, 
+                    duration: 3,
+                    repeatType: "mirror"
+                  }}
+                  style={{
+                    background: "radial-gradient(circle, rgba(255,215,0,0.3) 0%, rgba(255,215,0,0) 70%)",
+                    transform: "scale(1.2)",
+                    filter: "blur(8px) drop-shadow(0px 0px 10px rgba(255, 215, 0, 0.8))"
+                  }}
+                />
+              )}
+              
+              {/* Additional golden rays for Luxury XI */}
+              {openedCards?.[selectedCardIndex]?.tipo_carta === "Luxury XI" && (
+                <>
+                  {/* Rotating outer ring */}
+                  <motion.div 
+                    className="absolute inset-0 rounded-lg pointer-events-none"
+                    initial={{ opacity: 0, rotate: 0 }}
+                    animate={{ 
+                      opacity: 0.6,
+                      rotate: 360,
+                      scale: 1.4,
+                    }}
+                    transition={{ 
+                      repeat: Infinity, 
+                      duration: 20,
+                      ease: "linear"
+                    }}
+                    style={{
+                      background: "conic-gradient(from 0deg, rgba(255,215,0,0) 0%, rgba(255,215,0,0.2) 20%, rgba(255,215,0,0.3) 40%, rgba(255,215,0,0.2) 60%, rgba(255,215,0,0) 80%)",
+                      filter: "blur(5px)"
+                    }}
+                  />
+                  
+                  {/* Sun ray effect */}
+                  <motion.div 
+                    className="absolute inset-0 rounded-lg pointer-events-none"
+                    initial={{ opacity: 0 }}
+                    animate={{ 
+                      opacity: [0.3, 0.6, 0.3],
+                      scale: [1.2, 1.3, 1.2],
+                    }}
+                    transition={{ 
+                      repeat: Infinity, 
+                      duration: 4,
+                      repeatType: "mirror"
+                    }}
+                    style={{
+                      background: "radial-gradient(ellipse at center, rgba(255,215,0,0.3) 0%, rgba(255,215,0,0) 70%)",
+                      boxShadow: "0 0 40px 20px rgba(255,215,0,0.2)",
+                      filter: "blur(10px)"
+                    }}
+                  />
+                </>
+              )}
+              
               <Carta2 
                 jugador={openedCards?.[selectedCardIndex]}
                 width="clamp(12rem, 25vw, 18rem)"
                 height="clamp(18rem, 35vw, 26rem)"
               />
+              
+              {/* Pulsating border effect for Luxury XI */}
+              {openedCards?.[selectedCardIndex]?.tipo_carta === "Luxury XI" && (
+                <motion.div 
+                  className="absolute inset-0 rounded-lg pointer-events-none border-2"
+                  initial={{ opacity: 0 }}
+                  animate={{ 
+                    opacity: [0.4, 0.8, 0.4],
+                    boxShadow: [
+                      "0 0 10px 3px rgba(255,215,0,0.5), inset 0 0 5px 2px rgba(255,215,0,0.5)",
+                      "0 0 20px 5px rgba(255,215,0,0.8), inset 0 0 10px 4px rgba(255,215,0,0.8)",
+                      "0 0 10px 3px rgba(255,215,0,0.5), inset 0 0 5px 2px rgba(255,215,0,0.5)"
+                    ]
+                  }}
+                  transition={{ 
+                    repeat: Infinity, 
+                    duration: 2,
+                    repeatType: "mirror"
+                  }}
+                  style={{
+                    borderColor: "rgba(255,215,0,0.8)",
+                  }}
+                />
+              )}
               
               <motion.button
                 className="absolute -top-4 -right-4 bg-white rounded-full p-1 shadow-lg"
