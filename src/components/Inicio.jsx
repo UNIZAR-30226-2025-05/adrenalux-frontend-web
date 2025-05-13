@@ -28,24 +28,47 @@ const Inicio = () => {
     if (token) {
       navigate("/home");
     }
+    
+    // Ensure body has proper scrolling enabled
     document.documentElement.classList.add("bg-black");
     document.body.className =
-      "bg-gradient-to-b from-gray-900 to-black overflow-x-hidden";
+      "bg-gradient-to-b from-gray-900 to-black";
+    
+    // Remove the overflow-x-hidden to allow vertical scrolling
+    document.body.style.overflowY = "auto";
+    document.body.style.overflowX = "hidden";
+    document.body.style.height = "auto";
+    document.documentElement.style.height = "auto";
 
     return () => {
       document.documentElement.classList.remove("bg-black");
       document.body.className = "";
+      document.body.style.overflowY = "";
+      document.body.style.overflowX = "";
+      document.body.style.height = "";
+      document.documentElement.style.height = "";
     };
   }, [token, navigate]);
 
   // Función para hacer scroll suave a la sección de descarga
   const scrollToDownloadSection = () => {
-    downloadSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (downloadSectionRef.current) {
+      // Using smoothscroll polyfill compatible approach
+      window.scrollTo({
+        top: downloadSectionRef.current.offsetTop,
+        behavior: "smooth"
+      });
+    }
   };
 
   // Función para hacer scroll a la sección principal
   const scrollToMainSection = () => {
-    mainSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (mainSectionRef.current) {
+      window.scrollTo({
+        top: mainSectionRef.current.offsetTop,
+        behavior: "smooth"
+      });
+    }
   };
 
   // Detectar cuando la sección es visible
@@ -97,7 +120,8 @@ const Inicio = () => {
       initial="hidden"
       animate="visible"
       variants={containerVariants}
-      className="flex flex-col text-white relative h-screen min-h-screen w-full max-w-full bg-black"
+      className="flex flex-col text-white relative w-full max-w-full bg-black"
+      // Removed h-screen and min-h-screen to allow scrolling
     >
       {/* Navbar */}
       <header className="fixed top-0 left-0 w-full px-4 py-4 md:px-8 md:py-6 flex justify-between items-center z-50 backdrop-blur-2xl bg-black/30 border-b border-white/10">
@@ -130,7 +154,8 @@ const Inicio = () => {
         </nav>
       </header>
 
-      <main className="flex-1 bg-gradient-to-b from-gray-900 to-black w-full max-w-full">
+      <main className="flex-1 bg-gradient-to-b from-gray-900 to-black w-full max-w-full pt-24">
+        {/* Added padding-top to account for fixed header */}
         <div className="relative px-4 md:px-8 lg:px-16 w-full max-w-full">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-16">
             <motion.section
@@ -257,14 +282,16 @@ const Inicio = () => {
           </div>
         </div>
 
-        {/* Botón de scroll hacia abajo */}
+        {/* Botón de scroll hacia abajo - ajustado posicionamiento */}
         <motion.button
-          ref={mainSectionRef}
           onClick={scrollToMainSection}
-          className="absolute bottom-10 left-1/2 transform -translate-x-1/2 py-3 px-4 rounded-full bg-white/5 text-white shadow-md hover:shadow-lg transition-all duration-300"
+          className="mx-auto mt-8 mb-4 py-3 px-4 rounded-full bg-white/5 text-white shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center"
         >
           <span className="text-2xl">&#8595;</span> {/* Flecha hacia abajo */}
         </motion.button>
+
+        {/* Sección de referencia para main section */}
+        <div ref={mainSectionRef}></div>
 
         {/* Sección de características */}
         <section className="py-20 px-6 md:px-16 lg:px-32 text-white relative z-10">
@@ -409,7 +436,7 @@ const Inicio = () => {
             </motion.div>
           </motion.div>
 
-          {/* Android Download CTA Section - Añadido ref para scroll */}
+          {/* Android Download CTA Section */}
           <motion.div
             ref={downloadSectionRef}
             initial="hidden"
