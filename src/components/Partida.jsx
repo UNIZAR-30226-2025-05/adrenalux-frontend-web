@@ -25,12 +25,13 @@ import {
 import { GiSoccerBall } from "react-icons/gi";
 import { IoMdFootball } from "react-icons/io";
 import { useTranslation } from "react-i18next";
-const { t } = useTranslation();
 
 // Prevent body scrolling
 document.body.style.overflow = "hidden";
 
 const Partida = () => {
+  const { t } = useTranslation();
+
   const nextRoundStartRef = useRef(null);
   const waitingNextRoundRef = useRef(false);
   const { matchId } = useParams();
@@ -1064,7 +1065,7 @@ const Partida = () => {
                     )}
                   </div>
                   <div className="mt-2 text-lg font-bold text-white">
-                    t{"match.you"}
+                    {t("match.you")}
                   </div>
                   <div className="text-xl font-bold mt-1 bg-gradient-to-r from-blue-400 to-green-400 text-transparent bg-clip-text">
                     {playerVal} {stat}
@@ -1085,7 +1086,7 @@ const Partida = () => {
                     )}
                   </div>
                   <div className="mt-2 text-lg font-bold text-white">
-                    t{"profile.rival"}
+                    {t("profile.rival")}
                   </div>
                   <div className="text-xl font-bold mt-1 bg-gradient-to-r from-blue-400 to-green-400 text-transparent bg-clip-text">
                     {rivalVal} {stat}
@@ -1094,7 +1095,7 @@ const Partida = () => {
               </div>
 
               <div className="text-2xl font-bold text-white mb-6 bg-gradient-to-r from-blue-400 to-green-400 px-4 py-2 rounded-lg shadow-md">
-                t{"match.score"}: {gameState.scores.player} -{" "}
+                {t("match.score")}: {gameState.scores.player} -{" "}
                 {Object.values(gameState.scores).find(
                   (score) => score !== gameState.scores.player
                 )}
@@ -1132,7 +1133,7 @@ const Partida = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                t{"match.continue"}
+                {t("match.continue")}
               </motion.button>
             </motion.div>
           </ModalWrapper>
@@ -1196,7 +1197,7 @@ const Partida = () => {
                   transition={{ delay: 0.6, duration: 0.5 }}
                 >
                   {gameState.puntosChange[currentPlayerId] >= 0 ? "+" : ""}
-                  {gameState.puntosChange[currentPlayerId]} t{"match.points"}
+                  {gameState.puntosChange[currentPlayerId]} {t("match.points")}
                 </motion.div>
               )}
 
@@ -1218,7 +1219,7 @@ const Partida = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                t{"match.backHome"}
+                {t("match.backHome")}
               </motion.button>
             </motion.div>
           </ModalWrapper>
@@ -1237,7 +1238,7 @@ const Partida = () => {
                 <div className="absolute inset-0 rounded-full bg-blue-400 opacity-20 blur-md" />
               </div>
               <h2 className="text-2xl font-bold text-white mb-4">
-                t{"match.loa"}
+                {t("match.loa")}
               </h2>
             </motion.div>
           </ModalWrapper>
@@ -1258,12 +1259,12 @@ const Partida = () => {
           }}
           transition={{ duration: 0.3 }}
         >
-          t{"match.you"}: {gameState.scores.player}
+          {t("match.you")}: {gameState.scores.player}
         </motion.div>
 
         <div style={roundStyle}>
           {" "}
-          t{"match.round"}
+          {t("match.round")}
           {gameState.roundNumber}/11
         </div>
 
@@ -1277,7 +1278,7 @@ const Partida = () => {
           }}
           transition={{ duration: 0.3 }}
         >
-          t{"profile.rival"}:{" "}
+          {t("profile.rival")}:{" "}
           {Object.values(gameState.scores).find(
             (score) => score !== gameState.scores.player
           )}
@@ -1312,7 +1313,7 @@ const Partida = () => {
                   style={menuItemStyle}
                   className="hover:bg-green-600/50"
                 >
-                  <FaPlay className="text-green-400" /> t{"match.resume"}
+                  <FaPlay className="text-green-400" /> {t("match.resume")}
                 </button>
               ) : (
                 <button
@@ -1320,7 +1321,7 @@ const Partida = () => {
                   style={menuItemStyle}
                   className="hover:bg-yellow-600/50"
                 >
-                  <FaPause className="text-yellow-400" /> t{"match.pause"}
+                  <FaPause className="text-yellow-400" /> {t("match.pause")}
                 </button>
               ))}
             <button
@@ -1328,7 +1329,7 @@ const Partida = () => {
               style={menuItemStyle}
               className="hover:bg-red-600/50"
             >
-              <FaFlag className="text-red-400" /> t{"match.surrender"}
+              <FaFlag className="text-red-400" /> {t("match.surrender")}
             </button>
           </motion.div>
         )}
