@@ -9,7 +9,7 @@ const MusicManager = () => {
   const location = useLocation();
 
   useEffect(() => {
-    const isSilentRoute = ["/", "/login", "/register"].includes(
+    const isSilentRoute = ["/", "/login", "/register, /terminos, /soporte, /política"].includes(
       location.pathname
     );
 
