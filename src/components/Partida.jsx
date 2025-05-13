@@ -24,6 +24,8 @@ import {
 } from "react-icons/gi";
 import { GiSoccerBall } from "react-icons/gi";
 import { IoMdFootball } from "react-icons/io";
+import { useTranslation } from "react-i18next";
+const { t } = useTranslation();
 
 // Prevent body scrolling
 document.body.style.overflow = "hidden";
@@ -787,10 +789,11 @@ const Partida = () => {
                 />
               </div>
               <h2 className="text-3xl font-bold text-white mb-4">
-                Esperando al oponente...
+                {t("match.waitingOpponent")}
               </h2>
               <p className="text-lg text-gray-300 mb-6">
-                Ronda {gameState.roundNumber}/11
+                {t("match.round")}
+                {gameState.roundNumber}/11
               </p>
               <div className="flex justify-center">
                 <motion.div
@@ -831,10 +834,10 @@ const Partida = () => {
                   <div className="absolute inset-0 rounded-full bg-red-400 opacity-20 blur-md" />
                 </div>
                 <h2 className="text-2xl font-bold text-white mb-4">
-                  Turno del rival
+                  {t("match.opponentTurn")}
                 </h2>
                 <p className="text-lg text-gray-300">
-                  Esperando a que elija su carta...
+                  {t("match.waitingCard")}
                 </p>
               </motion.div>
             </ModalWrapper>
@@ -867,14 +870,14 @@ const Partida = () => {
                     backdropFilter: "blur(8px)",
                   }}
                 >
-                  ¡TU TURNO!
+                  {t("match.yourTurn")}
                 </motion.div>
               )}
             </AnimatePresence>
 
             <div style={formationsContainerStyle}>
               <div style={formationStyle}>
-                <h3 style={playerNameStyle}>Tu equipo</h3>
+                <h3 style={playerNameStyle}>{t("match.yourTeam")}</h3>
                 <Formacion433
                   jugadores={gameState.availablePlayerCards}
                   onJugadorClick={handleCardSelect}
@@ -882,7 +885,7 @@ const Partida = () => {
               </div>
 
               <div style={formationStyle}>
-                <h3 style={playerNameStyle}>Oponente</h3>
+                <h3 style={playerNameStyle}> {t("match.opponent")}</h3>
                 <Formacion433
                   jugadores={gameState.opponentCards}
                   onJugadorClick={() => {}}
@@ -902,7 +905,7 @@ const Partida = () => {
 
                 <div style={{ margin: "1rem 0", width: "100%" }}>
                   <h3 className="text-lg font-bold text-white mb-3 text-center">
-                    Selecciona una habilidad:
+                    {t("match.selectSkill")}
                   </h3>
                   <div
                     style={{
@@ -943,7 +946,7 @@ const Partida = () => {
                     whileTap={{ scale: 0.95 }}
                     onClick={handleConfirmSelection}
                   >
-                    CONFIRMAR {gameState.selectedSkill.toUpperCase()}
+                    {t("match.confirm")} {gameState.selectedSkill.toUpperCase()}
                   </motion.button>
                 )}
               </motion.div>
@@ -970,10 +973,10 @@ const Partida = () => {
                 <div className="absolute inset-0 rounded-full bg-blue-400 opacity-20 blur-md" />
               </div>
               <h2 className="text-2xl font-bold text-white mb-4">
-                Esperando respuesta...
+                {t("match.waitingResponse2")}
               </h2>
               <p className="text-lg text-gray-300">
-                El rival está eligiendo su carta...
+                {t("match.waitingResponse3")}{" "}
               </p>
             </motion.div>
           </ModalWrapper>
@@ -992,10 +995,10 @@ const Partida = () => {
                 <div className="absolute inset-0 rounded-full bg-yellow-400 opacity-20 blur-md" />
               </div>
               <h2 className="text-2xl font-bold text-white mb-4">
-                Partida pausada
+                {t("match.gamePaused")}
               </h2>
               <p className="text-lg text-gray-300 mb-6">
-                La partida está actualmente en pausa
+                {t("match.gamePausedMessage")}
               </p>
               <motion.button
                 onClick={handleHome}
@@ -1011,7 +1014,7 @@ const Partida = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Volver a Inicio
+                {t("match.backHome")}
               </motion.button>
             </motion.div>
           </ModalWrapper>
@@ -1044,10 +1047,10 @@ const Partida = () => {
                 }`}
               >
                 {tie
-                  ? "¡EMPATE!"
+                  ? t("match.draw")
                   : playerWon
-                  ? "¡RONDA GANADA!"
-                  : "RONDA PERDIDA"}
+                  ? t("match.winner2")
+                  : t("match.l1")}
               </motion.h2>
 
               <div className="flex flex-col md:flex-row justify-center items-center gap-6 mb-6">
@@ -1060,7 +1063,9 @@ const Partida = () => {
                       </div>
                     )}
                   </div>
-                  <div className="mt-2 text-lg font-bold text-white">Tú</div>
+                  <div className="mt-2 text-lg font-bold text-white">
+                    t{"match.you"}
+                  </div>
                   <div className="text-xl font-bold mt-1 bg-gradient-to-r from-blue-400 to-green-400 text-transparent bg-clip-text">
                     {playerVal} {stat}
                   </div>
@@ -1079,7 +1084,9 @@ const Partida = () => {
                       </div>
                     )}
                   </div>
-                  <div className="mt-2 text-lg font-bold text-white">Rival</div>
+                  <div className="mt-2 text-lg font-bold text-white">
+                    t{"profile.rival"}
+                  </div>
                   <div className="text-xl font-bold mt-1 bg-gradient-to-r from-blue-400 to-green-400 text-transparent bg-clip-text">
                     {rivalVal} {stat}
                   </div>
@@ -1087,7 +1094,7 @@ const Partida = () => {
               </div>
 
               <div className="text-2xl font-bold text-white mb-6 bg-gradient-to-r from-blue-400 to-green-400 px-4 py-2 rounded-lg shadow-md">
-                Marcador: {gameState.scores.player} -{" "}
+                t{"match.score"}: {gameState.scores.player} -{" "}
                 {Object.values(gameState.scores).find(
                   (score) => score !== gameState.scores.player
                 )}
@@ -1125,7 +1132,7 @@ const Partida = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Continuar
+                t{"match.continue"}
               </motion.button>
             </motion.div>
           </ModalWrapper>
@@ -1161,7 +1168,11 @@ const Partida = () => {
                 animate={{ y: 0 }}
                 transition={{ delay: 0.2, type: "spring" }}
               >
-                {isDraw ? "¡EMPATE!" : isWinner ? "🏆 VICTORIA" : "😞 DERROTA"}
+                {isDraw
+                  ? t("match.draw")
+                  : isWinner
+                  ? t("match.victory")
+                  : t("match.defeat")}
               </motion.h1>
 
               <motion.div
@@ -1185,7 +1196,7 @@ const Partida = () => {
                   transition={{ delay: 0.6, duration: 0.5 }}
                 >
                   {gameState.puntosChange[currentPlayerId] >= 0 ? "+" : ""}
-                  {gameState.puntosChange[currentPlayerId]} puntos
+                  {gameState.puntosChange[currentPlayerId]} t{"match.points"}
                 </motion.div>
               )}
 
@@ -1207,7 +1218,7 @@ const Partida = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Volver al menú
+                t{"match.backHome"}
               </motion.button>
             </motion.div>
           </ModalWrapper>
@@ -1226,7 +1237,7 @@ const Partida = () => {
                 <div className="absolute inset-0 rounded-full bg-blue-400 opacity-20 blur-md" />
               </div>
               <h2 className="text-2xl font-bold text-white mb-4">
-                Cargando partida...
+                t{"match.loa"}
               </h2>
             </motion.div>
           </ModalWrapper>
@@ -1247,10 +1258,14 @@ const Partida = () => {
           }}
           transition={{ duration: 0.3 }}
         >
-          Tú: {gameState.scores.player}
+          t{"match.you"}: {gameState.scores.player}
         </motion.div>
 
-        <div style={roundStyle}>Ronda {gameState.roundNumber}/11</div>
+        <div style={roundStyle}>
+          {" "}
+          t{"match.round"}
+          {gameState.roundNumber}/11
+        </div>
 
         <motion.div
           style={{
@@ -1262,7 +1277,7 @@ const Partida = () => {
           }}
           transition={{ duration: 0.3 }}
         >
-          Rival:{" "}
+          t{"profile.rival"}:{" "}
           {Object.values(gameState.scores).find(
             (score) => score !== gameState.scores.player
           )}
@@ -1297,7 +1312,7 @@ const Partida = () => {
                   style={menuItemStyle}
                   className="hover:bg-green-600/50"
                 >
-                  <FaPlay className="text-green-400" /> Reanudar
+                  <FaPlay className="text-green-400" /> t{"match.resume"}
                 </button>
               ) : (
                 <button
@@ -1305,7 +1320,7 @@ const Partida = () => {
                   style={menuItemStyle}
                   className="hover:bg-yellow-600/50"
                 >
-                  <FaPause className="text-yellow-400" /> Pausar
+                  <FaPause className="text-yellow-400" /> t{"match.pause"}
                 </button>
               ))}
             <button
@@ -1313,7 +1328,7 @@ const Partida = () => {
               style={menuItemStyle}
               className="hover:bg-red-600/50"
             >
-              <FaFlag className="text-red-400" /> Rendirse
+              <FaFlag className="text-red-400" /> t{"match.surrender"}
             </button>
           </motion.div>
         )}

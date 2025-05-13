@@ -427,6 +427,7 @@
     "reward": "Premio",
     "participants": "Participantes",
     "status": "Estado",
+
     "inProgress": "En curso",
     "pending": "pendiente",
     "start": "Iniciar",
@@ -485,6 +486,69 @@
       "rewardRequired": "El premio es obligatorio",
       "rewardInvalid": "El premio debe ser un número",
       "passwordRequired": "La contraseña es obligatoria para torneos privados"
+    }
+  },
+  "match": {
+    "title": "Partida",
+    "yourTeam": "Tu equipo",
+    "opponent": "Oponente",
+    "round": "Ronda",
+    "roundsTotal": "Ronda {{current}} de {{total}}",
+    "waitingOpponent": "Esperando al oponente...",
+    "yourTurn": "¡Tu turno!",
+    "opponentTurn": "Turno del rival",
+    "selectSkill": "Selecciona una habilidad:",
+    "confirmSkill": "Confirmar {{skill}}",
+    "continue": "Continuar",
+    "victory": "🏆 ¡VICTORIA!",
+    "defeat": "😞 DERROTA",
+    "draw": "¡EMPATE!",
+    "score": "Marcador",
+    "winner": "Ganador",
+    "confirm": "CONFIRMAR",
+
+    "winner2": "¡RONDA GANADA!",
+    "l1": "RONDA PERDIDA",
+
+    "you": "TÚ",
+    "opponentSelected": "El rival ha elegido: {{position}}. Debes elegir una carta de la misma posición.",
+    "mustSelectPosition": "Debes seleccionar una carta de posición: {{position}}.",
+    "notYourTurn": "¡No es tu turno!",
+    "waitingResponse": "Esperando respuesta del rival...",
+    "waitingResponse2": "Esperando respuesta...",
+    "waitingResponse3": "El rival está eligiendo su carta...",
+
+    "waitingCard": "Esperando a que el rival elija su carta...",
+    "gamePaused": "Partida pausada",
+    "gamePausedMessage": "La partida está actualmente en pausa.",
+    "resume": "Reanudar",
+    "pause": "Pausar",
+    "surrender": "Rendirse",
+    "backHome": "Volver al menú",
+    "matchEnded": "La partida ha terminado.",
+    "pointsEarned": "+{{points}} puntos",
+    "pointsLost": "-{{points}} puntos",
+    "points": "puntos",
+    "loa": "Cargando partida...",
+
+    "dateNotAvailable": "Fecha no disponible",
+    "skills": {
+      "attack": "Ataque",
+      "defense": "Defensa",
+      "control": "Control"
+    },
+    "phases": {
+      "waiting": "Esperando...",
+      "selection": "Seleccionando...",
+      "response": "Respondiendo...",
+      "paused": "Pausada",
+      "result": "Resultado",
+      "ended": "Finalizada"
+    },
+    "errors": {
+      "noActiveTemplate": "No tienes ninguna plantilla activa.",
+      "mustSelectSkill": "Debes seleccionar una habilidad.",
+      "mustSelectCard": "Debes seleccionar una carta."
     }
   }
 }
