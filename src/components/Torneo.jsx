@@ -4,6 +4,7 @@ import {
   FaSearch,
   FaPlus,
   FaUserFriends,
+  FaFire,
   FaTrophy,
   FaUsers,
   FaCalendarAlt,
@@ -874,7 +875,8 @@ const Torneo = () => {
               )}
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
-                {state.torneoSeleccionado?.participanteActual && (
+                {state.torneoSeleccionado?.participanteActual && 
+                 state.torneoSeleccionado.estado !== "en_curso" && (
                   <button
                     onClick={() => manejarAbandono(state.torneoSeleccionado.id)}
                     className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-full text-white font-bold"
@@ -893,7 +895,7 @@ const Torneo = () => {
                 {user &&
                   state.torneoSeleccionado &&
                   user.id === state.torneoSeleccionado.creadorId &&
-                  !state.torneoSeleccionado.torneo_en_curso && (
+                  state.torneoSeleccionado.estado !== "en_curso" && (
                     <button
                       onClick={manejarInicio}
                       className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-full text-white font-bold"
