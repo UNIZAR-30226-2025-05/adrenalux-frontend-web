@@ -22,6 +22,7 @@ import { jwtDecode } from "jwt-decode";
 import NavBarGame from "./layout/game/NavbarGame";
 import BackButton from "./layout/game/BackButton";
 import background from "../assets/background.png";
+import { useTranslation } from "react-i18next";
 
 const initialState = {
   torneos: [],
@@ -51,6 +52,7 @@ const initialState = {
 const Torneo = () => {
   const navigate = useNavigate();
   const [state, setState] = useState(initialState);
+  const { t } = useTranslation();
 
   const user = useMemo(() => {
     const token = getToken();
@@ -119,28 +121,28 @@ const Torneo = () => {
     };
 
     if (!state.form.nombre.trim()) {
-      errors.nombre = "El nombre es obligatorio";
+      errors.nombre = t("tournament.errors.nameRequired");
       isValid = false;
     } else if (state.form.nombre.trim().length < 4) {
-      errors.nombre = "El nombre debe tener al menos 4 caracteres";
+      errors.nombre = t("tournament.errors.nameLength");
       isValid = false;
     }
 
     if (!state.form.descripcion.trim()) {
-      errors.descripcion = "La descripción es obligatoria";
+      errors.descripcion = t("tournament.errors.descriptionRequired");
       isValid = false;
     }
 
     if (!state.form.premio.trim()) {
-      errors.premio = "El premio es obligatorio";
+      errors.premio = t("tournament.errors.rewardRequired");
       isValid = false;
     } else if (isNaN(Number(state.form.premio))) {
-      errors.premio = "El premio debe ser un número";
+      errors.premio = t("tournament.errors.rewardInvalid");
       isValid = false;
     }
 
     if (state.form.esPrivado && !state.form.contrasena.trim()) {
-      errors.contrasena = "La contraseña es obligatoria para torneos privados";
+      errors.contrasena = t("tournament.errors.passwordRequired");
       isValid = false;
     }
 
@@ -174,7 +176,7 @@ const Torneo = () => {
     const estaDisponible =
       !state.filtros.soloDisponibles ||
       (torneo.participantes < torneo.maxParticipantes &&
-        torneo.estado === "pendiente");
+        torneo.estado === t("tournament.pending"));
     return coincideBusqueda && estaDisponible && torneo.ganador_id == null;
   });
 
@@ -427,7 +429,8 @@ const Torneo = () => {
         {rounds.quarters.length > 0 && (
           <div className="mb-6">
             <h4 className="text-md font-bold text-yellow-300 mb-2 bg-indigo-900 p-2 rounded-t-lg flex items-center">
-              <FaTrophy className="text-yellow-300 mr-2" /> Cuartos de Final
+              <FaTrophy className="text-yellow-300 mr-2" />{" "}
+              {t("tournament.quarters")}
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {rounds.quarters.map((match) => (
@@ -444,7 +447,8 @@ const Torneo = () => {
         {rounds.semis.length > 0 && (
           <div className="mb-6">
             <h4 className="text-md font-bold text-yellow-300 mb-2 bg-indigo-900 p-2 rounded-t-lg flex items-center">
-              <FaMedal className="text-yellow-300 mr-2" /> Semifinales
+              <FaMedal className="text-yellow-300 mr-2" />{" "}
+              {t("tournament.semifinals")}
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {rounds.semis.map((match) => (
@@ -461,7 +465,8 @@ const Torneo = () => {
         {rounds.final.length > 0 && (
           <div className="mb-6">
             <h4 className="text-md font-bold text-yellow-300 mb-2 bg-indigo-900 p-2 rounded-t-lg flex items-center">
-              <FaFire className="text-yellow-300 mr-2" /> Final
+              <FaFire className="text-yellow-300 mr-2" />{" "}
+              {t("tournament.final")}
             </h4>
             <div className="grid grid-cols-1 gap-4">
               {rounds.final.map((match) => (
@@ -506,7 +511,7 @@ const Torneo = () => {
           </span>
           {winner && (
             <span className="text-xs bg-green-800 text-green-200 px-2 py-1 rounded-full">
-              Finalizada
+              {t("tournament.final2")}
             </span>
           )}
         </div>
@@ -636,13 +641,13 @@ const Torneo = () => {
               onClick={() => navigate("/home")}
               className="px-4 py-2 bg-indigo-700 hover:bg-indigo-600 rounded-full"
             >
-              Volver
+              {t("tournament.back")}
             </button>
             <button
               onClick={() => window.location.reload()}
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-full"
             >
-              Reintentar
+              {t("tournament.retry")}
             </button>
           </div>
         </div>
@@ -667,7 +672,7 @@ const Torneo = () => {
               <FaTrophy className="text-yellow-300 mr-2" />
               {state.torneoSeleccionado
                 ? state.torneoSeleccionado.nombre
-                : "🏆 TOURNAMENTS RANKING 🏆"}
+                : t("tournament.title")}
             </h1>
 
             {!state.torneoSeleccionado && (
@@ -676,7 +681,7 @@ const Torneo = () => {
                   <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-indigo-300" />
                   <input
                     type="text"
-                    placeholder="Buscar torneos..."
+                    placeholder={t("tournament.pl5")}
                     className="w-full pl-10 pr-4 py-2 bg-indigo-800 text-white rounded-full border-2 border-indigo-600 focus:ring-2 focus:ring-yellow-300 focus:border-yellow-300"
                     value={state.filtros.busqueda}
                     onChange={(e) =>
@@ -707,7 +712,7 @@ const Torneo = () => {
                     htmlFor="soloDisponibles"
                     className="text-gray-300 text-sm"
                   >
-                    Sólo disponibles
+                    {t("tournament.onlyAvailable")}
                   </label>
                 </div>
                 {user && (
@@ -725,7 +730,8 @@ const Torneo = () => {
                       <FaSpinner className="animate-spin" />
                     ) : (
                       <>
-                        <FaPlus /> Crear
+                        <FaPlus />
+                        {t("tournament.create")}
                       </>
                     )}
                   </button>
@@ -745,17 +751,19 @@ const Torneo = () => {
               <div className="grid md:grid-cols-2 gap-6 mb-6">
                 <div className="bg-indigo-700 p-4 rounded-lg border-2 border-indigo-600">
                   <h3 className="font-bold text-yellow-300 mb-3 flex items-center">
-                    <FaCalendarAlt className="mr-2" /> Detalles del Torneo
+                    <FaCalendarAlt className="mr-2" /> {t("tournament.details")}
                   </h3>
                   <div className="text-indigo-100 space-y-2">
                     <p>
                       <span className="font-bold text-yellow-200">
-                        Descripción:
+                        {t("tournament.description")}
                       </span>{" "}
                       {state.torneoSeleccionado.descripcion}
                     </p>
                     <p>
-                      <span className="font-bold text-yellow-200">Estado:</span>
+                      <span className="font-bold text-yellow-200">
+                        {t("tournament.status")}:
+                      </span>
                       <span
                         className={`ml-2 px-2 py-1 rounded-full text-sm ${
                           state.torneoSeleccionado.estado === "en_curso"
@@ -764,19 +772,22 @@ const Torneo = () => {
                         }`}
                       >
                         {state.torneoSeleccionado.estado === "en_curso"
-                          ? "En curso"
-                          : "Pendiente"}
+                          ? t("tournament.inProgress")
+                          : t("tournament.pending")}
                       </span>
                     </p>
                     <p>
-                      <span className="font-bold text-yellow-200">Premio:</span>
+                      <span className="font-bold text-yellow-200">
+                        {" "}
+                        {t("tournament.p1")}{" "}
+                      </span>
                       <span className="ml-2 bg-yellow-900 text-yellow-300 px-2 py-1 rounded-full text-sm">
                         {state.torneoSeleccionado.premio}
                       </span>
                     </p>
                     <p>
                       <span className="font-bold text-yellow-200">
-                        Participantes:
+                        {t("tournament.participants")}
                       </span>
                       <span className="ml-2 bg-indigo-900 text-indigo-300 px-2 py-1 rounded-full text-sm">
                         {state.torneoSeleccionado.participantes?.length || 0}/
@@ -786,7 +797,7 @@ const Torneo = () => {
                     {state.torneoSeleccionado.estado === "en_curso" && (
                       <p>
                         <span className="font-bold text-yellow-200">
-                          Inicio:
+                          {t("tournament.start")}
                         </span>{" "}
                         {new Date(
                           state.torneoSeleccionado.fechaInicio
@@ -798,7 +809,7 @@ const Torneo = () => {
 
                 <div className="bg-indigo-700 p-4 rounded-lg border-2 border-indigo-600">
                   <h3 className="font-bold text-yellow-300 mb-3 flex items-center">
-                    <FaUsers className="mr-2" /> Jugadores
+                    <FaUsers className="mr-2" /> {t("tournament.players")}
                   </h3>
                   <div className="max-h-60 overflow-y-auto">
                     {state.torneoSeleccionado.participantes?.length > 0 ? (
@@ -827,21 +838,19 @@ const Torneo = () => {
                                   : "text-indigo-200"
                               }
                             >
-                              {jugador.nombre || "Jugador anónimo"}
+                              {jugador.nombre || t("tournament.anoM")}
                             </span>
                             {(jugador.id === user?.id ||
                               jugador.user_id === user?.id) && (
                               <span className="ml-auto bg-blue-800 text-blue-200 px-2 py-1 rounded-full text-xs">
-                                Tú
+                                {t("tournament.you")}
                               </span>
                             )}
                           </div>
                         )
                       )
                     ) : (
-                      <p className="text-indigo-400">
-                        No hay participantes aún
-                      </p>
+                      <p className="text-indigo-400">{t("tournament.info")}</p>
                     )}
                   </div>
                 </div>
@@ -851,7 +860,7 @@ const Torneo = () => {
                 <div className="mt-6">
                   <h3 className="text-lg font-bold text-yellow-300 mb-4 flex items-center">
                     <FaTrophy className="mr-2" />
-                    Partidas Planeadas
+                    {t("tournament.info2")}
                   </h3>
 
                   <MatchesSection
@@ -875,7 +884,7 @@ const Torneo = () => {
                       <FaSpinner className="animate-spin" />
                     ) : (
                       <>
-                        <FaSignOutAlt /> Abandonar
+                        <FaSignOutAlt /> {t("tournament.leave")}
                       </>
                     )}
                   </button>
@@ -894,7 +903,7 @@ const Torneo = () => {
                       }
                       title={
                         state.torneoSeleccionado.participantes.length < 2
-                          ? "Se necesitan al menos 2 participantes"
+                          ? t("tournament.info3")
                           : ""
                       }
                     >
@@ -902,7 +911,7 @@ const Torneo = () => {
                         <FaSpinner className="animate-spin" />
                       ) : (
                         <>
-                          <FaPlay /> Iniciar
+                          <FaPlay /> {t("tournament.start")}
                         </>
                       )}
                     </button>
@@ -918,7 +927,7 @@ const Torneo = () => {
               ) : (
                 <div className="col-span-full text-center py-8">
                   <p className="text-indigo-400 mb-2">
-                    No se encontraron torneos
+                    {t("tournament.noTournaments")}
                   </p>
                   <button
                     onClick={() =>
@@ -929,7 +938,7 @@ const Torneo = () => {
                     }
                     className="text-blue-400 hover:text-blue-300 font-medium"
                   >
-                    Limpiar búsqueda
+                    {t("tournament.clean")}
                   </button>
                 </div>
               )}
@@ -944,7 +953,7 @@ const Torneo = () => {
           <div className="bg-gradient-to-br from-indigo-800 to-indigo-900 p-6 rounded-xl border-2 border-indigo-600 shadow-xl w-full max-w-md">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-bold text-yellow-300">
-                Torneo Privado
+                {t("tournament.privateTournament")}
               </h3>
               <button
                 onClick={() =>
@@ -960,14 +969,12 @@ const Torneo = () => {
               </button>
             </div>
 
-            <p className="text-indigo-300 mb-4">
-              Ingresa la contraseña para unirte al torneo:
-            </p>
+            <p className="text-indigo-300 mb-4">{t("tournament.passw")}</p>
 
             <input
               type="password"
               className="w-full px-4 py-3 bg-indigo-900/50 text-white rounded-lg border-2 border-indigo-600 focus:border-yellow-400"
-              placeholder="Contraseña del torneo"
+              placeholder={t("tournament.pl4")}
               value={state.passwordInput}
               onChange={(e) =>
                 setState((prev) => ({ ...prev, passwordInput: e.target.value }))
@@ -990,7 +997,7 @@ const Torneo = () => {
                 }
                 className="px-4 py-2 bg-indigo-700 hover:bg-indigo-600 rounded-full text-white"
               >
-                Cancelar
+                {t("tournament.cancel")}
               </button>
               <button
                 onClick={() =>
@@ -1002,7 +1009,7 @@ const Torneo = () => {
                 {state.loading.action ? (
                   <FaSpinner className="animate-spin" />
                 ) : (
-                  "Confirmar"
+                  t("tournament.confirm")
                 )}
               </button>
             </div>
@@ -1016,7 +1023,7 @@ const Torneo = () => {
           <div className="bg-gradient-to-br from-indigo-800 to-indigo-900 p-6 rounded-xl border-2 border-indigo-600 shadow-2xl w-full max-w-md">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-bold text-yellow-300 flex items-center gap-2">
-                <FaTrophy /> Nuevo Torneo
+                <FaTrophy /> {t("tournament.new")}
               </h3>
               <button
                 onClick={() =>
@@ -1036,7 +1043,7 @@ const Torneo = () => {
             <div className="space-y-4">
               <div>
                 <label className="block text-indigo-300 mb-2 font-medium">
-                  Nombre*
+                  {t("tournament.name")}
                 </label>
                 <input
                   type="text"
@@ -1048,7 +1055,7 @@ const Torneo = () => {
                   } focus:ring-0`}
                   value={state.form.nombre}
                   onChange={handleChange}
-                  placeholder="Nombre del torneo"
+                  placeholder={t("tournament.pl3")}
                 />
                 {state.formErrors.nombre && (
                   <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
@@ -1059,7 +1066,7 @@ const Torneo = () => {
 
               <div>
                 <label className="block text-indigo-300 mb-2 font-medium">
-                  Descripción*
+                  {t("tournament.description2")}
                 </label>
                 <textarea
                   name="descripcion"
@@ -1071,7 +1078,7 @@ const Torneo = () => {
                   rows="3"
                   value={state.form.descripcion}
                   onChange={handleChange}
-                  placeholder="Descripción del torneo"
+                  placeholder={t("tournament.pl2")}
                 />
                 {state.formErrors.descripcion && (
                   <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
@@ -1082,7 +1089,7 @@ const Torneo = () => {
 
               <div>
                 <label className="block text-indigo-300 mb-2 font-medium">
-                  Premio*
+                  {t("tournament.prize")}
                 </label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-yellow-400">
@@ -1098,7 +1105,7 @@ const Torneo = () => {
                     } focus:ring-0`}
                     value={state.form.premio}
                     onChange={handleChange}
-                    placeholder="Cantidad de premio"
+                    placeholder={t("tournament.pl1")}
                   />
                 </div>
                 {state.formErrors.premio && (
@@ -1121,14 +1128,14 @@ const Torneo = () => {
                   htmlFor="esPrivado"
                   className="text-indigo-300 font-medium"
                 >
-                  Torneo privado (requiere contraseña)
+                  {t("tournament.tp")}
                 </label>
               </div>
 
               {state.form.esPrivado && (
                 <div>
                   <label className="block text-indigo-300 mb-2 font-medium">
-                    Contraseña*
+                    {t("tournament.pw")}
                   </label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-yellow-400">
@@ -1144,7 +1151,7 @@ const Torneo = () => {
                       } focus:ring-0`}
                       value={state.form.contrasena}
                       onChange={handleChange}
-                      placeholder="Contraseña del torneo"
+                      placeholder={t("tournament.pl4")}
                     />
                   </div>
                   {state.formErrors.contrasena && (
@@ -1164,7 +1171,7 @@ const Torneo = () => {
                   <FaSpinner className="animate-spin" />
                 ) : (
                   <>
-                    <FaPlus /> Crear Torneo
+                    <FaPlus /> {t("tournament.createTournament")}
                   </>
                 )}
               </button>

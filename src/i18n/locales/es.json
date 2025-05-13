@@ -109,8 +109,9 @@
     "name": "Nombre",
     "suggestion": "Consejo: Haz click en un jugador para ver sus estadísticas detalladas",
     "me": "TÚ",
+    "winRate": "Ratio Ganados",
+
     "close": "CERRAR"
-    
   },
   "shop": {
     "filter": "Filtros",
@@ -144,7 +145,6 @@
     "dailyLabel": " (Diaria)",
     "loadingAllCards": "Cargando todas las cartas...",
     "insufficient_coins": "¡No tienes suficientes AdrenaCoins para comprar esta carta!"
-
   },
   "auth": {
     "title": "Inicio de sesión",
@@ -254,6 +254,14 @@
     "id": "ID:",
     "player": "Jugador",
     "rival": "Rival",
+    "matches": "Partidas",
+    "stats": "Stadísticas",
+    "winRate": "Ratio Ganados",
+
+    "xpProgress": "XP Progreso",
+    "totalMatches": "Partidos Totales",
+    "winStreak": "Racha de Ganados",
+    "matchStats": "Estadísticas de Partidos",
 
     "copy": "Copiar",
     "achievements": "Logros",
@@ -293,7 +301,8 @@
     "addFriendModal": {
       "title": "Ingresa el código de amigo",
       "placeholder": "Código de amigo"
-    }
+    },
+    "requestSent": "Solicitud Enviada"
   },
   "home": {
     "tournament": "Torneo",
@@ -399,6 +408,83 @@
     "success": {
       "title": "¡Registro Exitoso!",
       "message": "Tu cuenta ha sido creada exitosamente. Inicia sesión para comenzar a jugar."
+    }
+  },
+  "tournament": {
+    "title": "🏆 RANKING TORNEOS 🏆",
+    "createTournament": "Crear Torneo",
+    "create": "Crear",
+    "anoM": "Jugador anónimo",
+
+    "joinTournament": "Unirse al Torneo",
+    "privateTournament": "Torneo Privado",
+    "enterPassword": "Introduce la contraseña del torneo",
+    "password": "Contraseña",
+    "confirm": "Confirmar",
+    "cancel": "Cancelar",
+    "details": "Detalles del Torneo",
+    "description": "Descripción",
+    "reward": "Premio",
+    "participants": "Participantes",
+    "status": "Estado",
+    "inProgress": "En curso",
+    "pending": "pendiente",
+    "start": "Iniciar",
+    "leave": "Abandonar",
+    "searchPlaceholder": "Buscar torneos...",
+    "onlyAvailable": "Sólo disponibles",
+    "full": "Lleno",
+    "ongoing": "En curso",
+    "join": "Unirse",
+    "viewDetails": "Ver Detalles",
+    "quarters": "Cuartos de Final",
+    "semifinals": "Semifinales",
+    "final": "Final",
+    "matches": "Partidas",
+    "players": "Jugadores",
+    "back": "Volver",
+    "createSuccess": "¡Torneo creado exitosamente!",
+    "createError": "Error al crear el torneo.",
+    "joinError": "Error al unirse al torneo.",
+    "startError": "Error al iniciar el torneo.",
+    "leaveError": "Error al abandonar el torneo.",
+    "noTournaments": "No se encontraron torneos.",
+    "loading": "Cargando torneos...",
+    "winner": "Ganador",
+    "you": "TÚ",
+    "info": "No hay participantes aún ",
+    "info2": "Partidas Planeadas",
+    "info3": "Se necesitan al menos 2 participantes",
+    "clean": "Limpiar búsqueda",
+    "passw": "Ingresa la contraseña para unirte al torneo:",
+    "new": "Nuevo Torneo",
+    "name": "Nombre*",
+    "description2": "Descripción*",
+    "prize": "Premio*",
+    "p1": "Premio:",
+    "pl1": "Cantidad de premio",
+    "pl2": "Descripción del torneo",
+    "pl3": "Nombre del torneo",
+    "pl4": "Contraseña del torneo",
+    "pl5": "Buscar torneos...",
+    "tp": "Torneo privado (requiere contraseña)",
+    "pw": "Contraseña*",
+    "final2": "Finalizada",
+    "dateNotAvailable": "Fecha no disponible",
+    "retry": "Reintentar",
+
+    "rounds": {
+      "quarters": "Cuartos de Final",
+      "semis": "Semifinales",
+      "final": "Final"
+    },
+    "errors": {
+      "nameRequired": "El nombre es obligatorio",
+      "nameLength": "El nombre debe tener al menos 4 caracteres",
+      "descriptionRequired": "La descripción es obligatoria",
+      "rewardRequired": "El premio es obligatorio",
+      "rewardInvalid": "El premio debe ser un número",
+      "passwordRequired": "La contraseña es obligatoria para torneos privados"
     }
   }
 }

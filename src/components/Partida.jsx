@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { socketService } from "../services/websocket/socketService";
-import background from "../assets/backgroundAlineacion.png";
 import { getProfile } from "../services/api/profileApi";
 import {
   obtenerPlantillas,
@@ -14,10 +13,8 @@ import { jwtDecode } from "jwt-decode";
 import Formacion433 from "../components/layout/game/Formacion_4_3_3";
 import CartaGrande from "../components/layout/game/CartaMediana";
 import CartaMediana from "../components/layout/game/CartaMediana";
-
 import { motion, AnimatePresence } from "framer-motion";
 import ModalWrapper from "../components/layout/game/ModalWrapper";
-
 import { FaPause, FaPlay, FaFlag, FaHome, FaCog } from "react-icons/fa";
 import {
   GiSwordman,
@@ -28,7 +25,8 @@ import {
 import { GiSoccerBall } from "react-icons/gi";
 import { IoMdFootball } from "react-icons/io";
 
-document.body.style.overflow = "auto";
+// Prevent body scrolling
+document.body.style.overflow = "hidden";
 
 const Partida = () => {
   const nextRoundStartRef = useRef(null);
@@ -91,21 +89,10 @@ const Partida = () => {
     socketService.setOnMatchResumed(() => {
       setGameState((prev) => ({ ...prev, phase: "selection" }));
     });
-    /*
-    socketService.setOnMatchEnd((payload) => {
-      setGameState((prev) => ({
-        ...prev,
-        phase: "ended",
-        scores: payload.scores,
-        winner: payload.winner,
-        puntosDelta: payload.puntosDelta,
-      }));
-    });*/
 
     socketService.setOnRoundStart(handleRoundStart);
     socketService.setOnOpponentSelection(handleOpponentSelection);
     socketService.setOnRoundResult(handleRoundResult);
-    //socketService.setOnMatchEnd(handleMatchEnd);
     socketService.setOnMatchEnd((payload) => {
       console.log("[UI] 💥 match_ended → handleMatchEnd payload:", payload);
       handleMatchEnd(payload);
@@ -125,7 +112,6 @@ const Partida = () => {
           token
         );
 
-        // Map cards to compatible format
         const playerCards = Array.isArray(jugadores_plantilla?.data)
           ? (() => {
               const counters = {
@@ -344,7 +330,6 @@ const Partida = () => {
 
   const handleRoundStart = useCallback((payload) => {
     const turno = payload?.dataConTurno;
-    //matchEndedRef.current = false;
     if (matchEndedRef.current) {
       console.log("[UI] 🛑 Ignoring round_start after match_end", payload);
       return;
@@ -450,7 +435,6 @@ const Partida = () => {
     }
     const detalles = data.data.detalles;
     const { ganador, scores } = data.data;
-    // 1) Identificar tu carta seleccionada
     const myCardRef = selectedCardRef.current;
     if (!myCardRef) {
       console.error("ERROR: selectedCardRef es null en handleRoundResult");
@@ -460,7 +444,6 @@ const Partida = () => {
     const myCardId = myCardRef.id.toString();
     const isPlayerJ1 = detalles.carta_j1.id.toString() === myCardId;
 
-    // 2) Extraer habilidades y cartas
     const mySkill = isPlayerJ1 ? detalles.habilidad_j1 : detalles.habilidad_j2;
     const opponentRaw = isPlayerJ1 ? detalles.carta_j2 : detalles.carta_j1;
     const opponentSkill = isPlayerJ1
@@ -473,7 +456,6 @@ const Partida = () => {
       nextRoundStart: nextRoundStartRef.current,
     });
 
-    // 3) Formatear objeto de carta del oponente
     const formattedOpponentCard = {
       id: opponentRaw.id.toString(),
       nombre: opponentRaw.nombre,
@@ -489,7 +471,6 @@ const Partida = () => {
       posicion: opponentRaw.posicion,
     };
 
-    // 4) Determinar resultado de la ronda (sin lógica de fin de partido)
     const roundResult =
       ganador === null
         ? "empate"
@@ -497,34 +478,19 @@ const Partida = () => {
         ? "ganado"
         : "perdido";
 
-    // 5) Actualizar estado solo con el resultado de la ronda
     setGameState((prev) => ({
       ...prev,
-      phase: "result", // Cambia a fase de resultado
-      scores, // Actualiza marcadores
-      roundResult, // Resultado de la ronda
-      selectedSkill: mySkill, // Habilidad seleccionada
-      selectedCard: { ...myCardRef }, // Tu carta
-      opponentSelectedCard: formattedOpponentCard, // Carta del oponente
-      opponentSelectedSkill: opponentSkill, // Habilidad del oponente
+      phase: "result",
+      scores,
+      roundResult,
+      selectedSkill: mySkill,
+      selectedCard: { ...myCardRef },
+      opponentSelectedCard: formattedOpponentCard,
+      opponentSelectedSkill: opponentSkill,
     }));
 
-    // 6) Preparar para la próxima ronda (el backend decidirá si termina el partido)
     waitingNextRoundRef.current = true;
   };
-
-  /*const handleMatchEnd = (data) => {
-    setCurrentOpponentCard(null);
-    setHighlightedPosition(null);
-    setGameState((prev) => ({
-      ...prev,
-      phase: "ended",
-      scores: data.scores,
-      winner: data.winner,
-      puntosChange: data.puntosChange,
-      isDraw: data.isDraw,
-    }));
-  };*/
 
   const handleMatchEnd = (data) => {
     console.log("[UI] ↪️ handleMatchEnd()", data);
@@ -549,6 +515,8 @@ const Partida = () => {
     setShowMenu(false);
   };
 
+  const handleHome = () => navigate("/home");
+
   const handleSurrender = () => {
     socketService.surrender(matchId);
     setGameState((prev) => ({
@@ -562,147 +530,148 @@ const Partida = () => {
 
   // Styles
   const containerStyle = {
-    background: `linear-gradient(rgba(0, 0, 0, 0.7), url(${background}) fixed center/cover`,
-    minHeight: "100vh",
+    position: "fixed",
+    top: 0,
+    left: 0,
     width: "100vw",
-    overflowY: "auto",
-    padding: "1rem",
-    boxSizing: "border-box",
+    height: "100vh",
+    overflow: "hidden",
+    background: `linear-gradient(135deg, rgba(0, 51, 102, 0.9), rgba(0, 102, 51, 0.9)), url('https://images.unsplash.com/photo-1598887144775-3b7a51a6e9f7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') no-repeat center/cover`,
     display: "flex",
     flexDirection: "column",
-    position: "relative",
+    fontFamily: "'Montserrat', sans-serif",
   };
 
   const headerStyle = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: "1rem 1.5rem",
-    background: "rgba(15, 23, 42, 0.9)",
-    borderRadius: "16px",
-    marginBottom: "1.5rem",
-    boxShadow: "0 8px 16px rgba(0, 0, 0, 0.3)",
-    border: "1px solid rgba(124, 58, 237, 0.3)",
-    backdropFilter: "blur(8px)",
+    padding: "0.75rem 1rem",
+    background: "rgba(15, 23, 42, 0.95)",
+    borderRadius: "12px",
+    margin: "0.5rem 1rem",
+    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.5)",
+    border: "1px solid rgba(59, 130, 246, 0.4)",
+    backdropFilter: "blur(10px)",
+    zIndex: 10,
   };
 
   const scoreStyle = {
-    fontSize: "1.4rem",
-    fontWeight: "bold",
-    padding: "0.75rem 1.5rem",
-    borderRadius: "12px",
-    minWidth: "120px",
+    fontSize: "1.2rem",
+    fontWeight: "700",
+    padding: "0.5rem 1rem",
+    borderRadius: "10px",
     textAlign: "center",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-    border: "2px solid rgba(255, 255, 255, 0.1)",
-    backdropFilter: "blur(4px)",
+    boxShadow: "0 3px 6px rgba(0, 0, 0, 0.3)",
+    border: "1px solid rgba(255, 255, 255, 0.2)",
+    backdropFilter: "blur(5px)",
+    color: "#fff",
   };
 
   const roundStyle = {
-    fontSize: "1.4rem",
-    fontWeight: "bold",
-    padding: "0.75rem 1.5rem",
-    borderRadius: "12px",
-    background: "rgba(30, 41, 59, 0.9)",
-    color: "white",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-    border: "2px solid rgba(124, 58, 237, 0.3)",
-    backdropFilter: "blur(4px)",
+    fontSize: "1.2rem",
+    fontWeight: "700",
+    padding: "0.5rem 1rem",
+    borderRadius: "10px",
+    background: "rgba(30, 41, 59, 0.95)",
+    color: "#fff",
+    boxShadow: "0 3px 6px rgba(0, 0, 0, 0.3)",
+    border: "1px solid rgba(59, 130, 246, 0.4)",
+    backdropFilter: "blur(5px)",
   };
 
   const contentContainerStyle = {
-    flexGrow: 1,
+    flex: 1,
     display: "flex",
     width: "100%",
-    minHeight: "calc(100vh - 120px)",
-    maxWidth: isDesktop ? "1400px" : "100%",
+    maxWidth: isDesktop ? "1600px" : "100%",
     margin: "0 auto",
     position: "relative",
+    overflow: "hidden",
   };
 
   const formationsContainerStyle = {
     display: "grid",
     gridTemplateColumns: isDesktop ? "1fr 1fr" : "1fr",
-    gap: "2rem",
-    alignItems: "start",
+    gap: "1rem",
+    alignItems: "center",
     width: "100%",
-    padding: "1rem",
+    padding: "0.5rem",
+    height: "100%",
   };
 
   const formationStyle = {
-    flex: 1,
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    marginBottom: windowWidth < 768 ? "1rem" : "0",
-    background: "rgba(15, 23, 42, 0.8)",
-    borderRadius: "16px",
-    padding: "1.5rem",
-    boxShadow: "0 8px 16px rgba(0, 0, 0, 0.3)",
-    border: "1px solid rgba(124, 58, 237, 0.2)",
-    backdropFilter: "blur(4px)",
+    background: "rgba(15, 23, 42, 0.85)",
+    borderRadius: "12px",
+    padding: "1rem",
+    boxShadow: "0 6px 12px rgba(0, 0, 0, 0.4)",
+    border: "1px solid rgba(59, 130, 246, 0.3)",
+    backdropFilter: "blur(8px)",
+    height: "100%",
+    overflow: "hidden",
   };
 
   const playerNameStyle = {
-    color: "white",
-    fontSize: "1.8rem",
-    marginBottom: "1.5rem",
+    color: "#fff",
+    fontSize: "1.5rem",
+    marginBottom: "1rem",
     textAlign: "center",
-    fontWeight: "bold",
-    textShadow: "0 2px 8px rgba(0, 0, 0, 0.7)",
-    background: "linear-gradient(90deg, #3b82f6, #8b5cf6)",
+    fontWeight: "700",
+    textShadow: "0 2px 4px rgba(0, 0, 0, 0.6)",
+    background: "linear-gradient(90deg, #3b82f6, #10b981)",
     WebkitBackgroundClip: "text",
     WebkitTextFillColor: "transparent",
-    padding: "0.5rem 1rem",
-    borderRadius: "8px",
+    padding: "0.3rem 0.8rem",
+    borderRadius: "6px",
   };
 
   const selectedCardContainerStyle = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    background:
-      "linear-gradient(135deg, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 0.98))",
-    padding: "2rem",
-    borderRadius: "20px",
-    boxShadow: "0 12px 24px rgba(0, 0, 0, 0.5)",
+    background: "rgba(15, 23, 42, 0.95)",
+    padding: "1.5rem",
+    borderRadius: "16px",
+    boxShadow: "0 8px 16px rgba(0, 0, 0, 0.5)",
     position: "fixed",
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    zIndex: 50,
-    width: isDesktop ? "min(40vw, 500px)" : "90%",
-    maxHeight: "90vh",
-    overflowY: "auto",
-    border: "2px solid rgba(124, 58, 237, 0.5)",
+    zIndex: 100,
+    width: isDesktop ? "min(35vw, 450px)" : "85vw",
+    maxHeight: "80vh",
+    overflow: "hidden",
+    border: "2px solid rgba(59, 130, 246, 0.5)",
     backdropFilter: "blur(12px)",
   };
 
   const skillButtonStyle = {
-    padding: "0.75rem 1.5rem",
-    borderRadius: "12px",
+    padding: "0.6rem 1.2rem",
+    borderRadius: "10px",
     border: "none",
     cursor: "pointer",
-    background: "linear-gradient(135deg, #3b82f6, #6366f1)",
-    color: "white",
-    fontWeight: "bold",
-    fontSize: "1rem",
-    width: windowWidth < 500 ? "100%" : "auto",
+    background: "linear-gradient(135deg, #3b82f6, #10b981)",
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: "0.95rem",
     transition: "all 0.2s ease",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
-    minWidth: "120px",
+    boxShadow: "0 3px 6px rgba(0, 0, 0, 0.3)",
+    minWidth: "100px",
   };
 
   const confirmButtonStyle = {
-    padding: "1rem 2rem",
-    borderRadius: "12px",
+    padding: "0.8rem 1.5rem",
+    borderRadius: "10px",
     border: "none",
     cursor: "pointer",
-    background: "linear-gradient(135deg, #10b981, #06d6a0)",
-    color: "white",
-    fontWeight: "bold",
-    fontSize: "1.1rem",
-    marginTop: "1.5rem",
+    background: "linear-gradient(135deg, #10b981, #34d399)",
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: "1rem",
+    marginTop: "1rem",
     boxShadow: "0 4px 8px rgba(0, 0, 0, 0.4)",
     transition: "all 0.2s ease",
     width: "100%",
@@ -710,13 +679,13 @@ const Partida = () => {
 
   const optionsButtonStyle = {
     position: "fixed",
-    bottom: "2vh",
-    left: "2vw",
-    width: "60px",
-    height: "60px",
-    fontSize: "24px",
-    background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-    color: "white",
+    bottom: "1.5rem",
+    left: "1.5rem",
+    width: "50px",
+    height: "50px",
+    fontSize: "1.5rem",
+    background: "linear-gradient(135deg, #3b82f6, #10b981)",
+    color: "#fff",
     borderRadius: "50%",
     border: "none",
     cursor: "pointer",
@@ -724,56 +693,69 @@ const Partida = () => {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)",
-    transition: "all 0.25s ease",
-    border: "2px solid rgba(255, 255, 255, 0.1)",
+    boxShadow: "0 6px 12px rgba(0, 0, 0, 0.4)",
+    transition: "all 0.2s ease",
+    border: "1px solid rgba(255, 255, 255, 0.2)",
   };
 
   const menuStyle = {
     position: "fixed",
-    bottom: "calc(2vh + 80px)",
-    left: "2vw",
-    background: "rgba(15, 23, 42, 0.98)",
-    border: "1px solid rgba(124, 58, 237, 0.5)",
-    borderRadius: "16px",
-    minWidth: "220px",
+    bottom: "calc(1.5rem + 60px)",
+    left: "1.5rem",
+    background: "rgba(15, 23, 42, 0.95)",
+    border: "1px solid rgba(59, 130, 246, 0.4)",
+    borderRadius: "12px",
+    minWidth: "200px",
     zIndex: 120,
-    boxShadow: "0 16px 32px rgba(0, 0, 0, 0.5)",
+    boxShadow: "0 8px 16px rgba(0, 0, 0, 0.5)",
     overflow: "hidden",
-    backdropFilter: "blur(12px)",
+    backdropFilter: "blur(10px)",
   };
 
   const menuItemStyle = {
-    padding: "1rem 1.5rem",
-    color: "white",
+    padding: "0.8rem 1.2rem",
+    color: "#fff",
     textAlign: "left",
     width: "100%",
     borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
     display: "flex",
     alignItems: "center",
-    gap: "1rem",
-    fontSize: "1.1rem",
+    gap: "0.8rem",
+    fontSize: "1rem",
     transition: "all 0.2s ease",
   };
 
   const alertStyle = {
     position: "fixed",
-    top: "20px",
+    top: "1rem",
     left: "50%",
     transform: "translateX(-50%)",
-    background: "linear-gradient(135deg, #f59e0b, #f97316)",
-    color: "white",
-    padding: "1rem 2rem",
-    borderRadius: "12px",
-    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)",
+    background: "linear-gradient(135deg, #f59e0b, #d97706)",
+    color: "#fff",
+    padding: "0.8rem 1.5rem",
+    borderRadius: "10px",
+    boxShadow: "0 6px 12px rgba(0, 0, 0, 0.4)",
     zIndex: 1000,
-    fontSize: "1.1rem",
-    fontWeight: "bold",
+    fontSize: "1rem",
+    fontWeight: "600",
     textAlign: "center",
-    maxWidth: "90%",
+    maxWidth: "80%",
     animation: "fadeInOut 4s ease-in-out",
     border: "1px solid rgba(255, 255, 255, 0.2)",
-    backdropFilter: "blur(4px)",
+    backdropFilter: "blur(8px)",
+  };
+
+  const modalStyle = {
+    background: "rgba(15, 23, 42, 0.95)",
+    borderRadius: "16px",
+    padding: "1.5rem",
+    boxShadow: "0 8px 16px rgba(0, 0, 0, 0.5)",
+    border: "2px solid rgba(59, 130, 246, 0.4)",
+    backdropFilter: "blur(12px)",
+    maxWidth: isDesktop ? "600px" : "90vw",
+    maxHeight: "80vh",
+    overflow: "hidden",
+    textAlign: "center",
   };
 
   const renderPhase = () => {
@@ -782,22 +764,21 @@ const Partida = () => {
         return (
           <ModalWrapper>
             <motion.div
+              style={modalStyle}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3 }}
-              className="text-center p-8"
             >
-              <div className="relative mb-8">
+              <div className="relative mb-6">
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-                  className="relative z-10"
                 >
-                  <IoMdFootball className="text-7xl text-yellow-400 mx-auto" />
+                  <IoMdFootball className="text-6xl text-yellow-400 mx-auto" />
                 </motion.div>
                 <motion.div
-                  className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-500 to-amber-500 opacity-20 blur-md"
-                  animate={{ scale: [1, 1.5, 1] }}
+                  className="absolute inset-0 rounded-full bg-yellow-400 opacity-20 blur-md"
+                  animate={{ scale: [1, 1.3, 1] }}
                   transition={{
                     repeat: Infinity,
                     duration: 2,
@@ -805,19 +786,16 @@ const Partida = () => {
                   }}
                 />
               </div>
-
-              <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400 mb-6">
+              <h2 className="text-3xl font-bold text-white mb-4">
                 Esperando al oponente...
               </h2>
-              <p className="text-2xl text-gray-300 mb-8">
+              <p className="text-lg text-gray-300 mb-6">
                 Ronda {gameState.roundNumber}/11
               </p>
-
               <div className="flex justify-center">
                 <motion.div
-                  className="h-4 bg-gray-800 rounded-full overflow-hidden w-3/4"
-                  initial={{ width: "0%" }}
-                  animate={{ width: "75%" }}
+                  className="h-3 bg-gray-800 rounded-full overflow-hidden w-2/3"
+                  animate={{ width: "66%" }}
                   transition={{
                     duration: 2,
                     repeat: Infinity,
@@ -825,9 +803,8 @@ const Partida = () => {
                   }}
                 >
                   <motion.div
-                    className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
-                    initial={{ x: "-100%" }}
-                    animate={{ x: "100%" }}
+                    className="h-full bg-gradient-to-r from-blue-400 to-green-400"
+                    animate={{ x: ["-100%", "100%"] }}
                     transition={{
                       duration: 2,
                       repeat: Infinity,
@@ -845,18 +822,18 @@ const Partida = () => {
           return (
             <ModalWrapper>
               <motion.div
+                style={modalStyle}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="text-center p-8"
               >
                 <div className="mb-6 relative">
-                  <GiSwordman className="text-7xl text-red-500 mx-auto animate-pulse" />
-                  <div className="absolute inset-0 rounded-full bg-red-500 opacity-20 blur-md" />
+                  <GiSwordman className="text-6xl text-red-400 mx-auto animate-pulse" />
+                  <div className="absolute inset-0 rounded-full bg-red-400 opacity-20 blur-md" />
                 </div>
-                <h2 className="text-3xl font-bold text-white mb-4">
+                <h2 className="text-2xl font-bold text-white mb-4">
                   Turno del rival
                 </h2>
-                <p className="text-xl text-gray-300">
+                <p className="text-lg text-gray-300">
                   Esperando a que elija su carta...
                 </p>
               </motion.div>
@@ -869,25 +846,25 @@ const Partida = () => {
             <AnimatePresence>
               {showTurnBanner && (
                 <motion.div
-                  initial={{ opacity: 0, y: -50, scale: 0.8 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  initial={{ opacity: 0, y: -50 }}
+                  animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -50 }}
                   style={{
                     position: "fixed",
-                    top: "20%",
+                    top: "10%",
                     left: "50%",
                     transform: "translateX(-50%)",
-                    background: "linear-gradient(90deg, #06d6a0, #3b82f6)",
-                    color: "white",
-                    padding: "1.5rem 3rem",
-                    borderRadius: "16px",
-                    fontSize: "2rem",
-                    fontWeight: "bold",
-                    textShadow: "0 2px 8px rgba(0,0,0,0.5)",
+                    background: "linear-gradient(90deg, #34d399, #3b82f6)",
+                    color: "#fff",
+                    padding: "1rem 2rem",
+                    borderRadius: "12px",
+                    fontSize: "1.5rem",
+                    fontWeight: "700",
+                    textShadow: "0 2px 4px rgba(0,0,0,0.5)",
                     zIndex: 9999,
-                    boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
-                    border: "2px solid rgba(255, 255, 255, 0.2)",
-                    backdropFilter: "blur(4px)",
+                    boxShadow: "0 6px 12px rgba(0,0,0,0.4)",
+                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                    backdropFilter: "blur(8px)",
                   }}
                 >
                   ¡TU TURNO!
@@ -917,20 +894,20 @@ const Partida = () => {
             {gameState.selectedCard && (
               <motion.div
                 style={selectedCardContainerStyle}
-                initial={{ opacity: 0, y: 30, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
               >
                 <CartaGrande jugador={gameState.selectedCard} />
 
-                <div style={{ margin: "1.5rem 0", width: "100%" }}>
-                  <h3 className="text-xl font-bold text-white mb-4 text-center">
+                <div style={{ margin: "1rem 0", width: "100%" }}>
+                  <h3 className="text-lg font-bold text-white mb-3 text-center">
                     Selecciona una habilidad:
                   </h3>
                   <div
                     style={{
                       display: "flex",
-                      gap: "1rem",
+                      gap: "0.8rem",
                       justifyContent: "center",
                       flexWrap: "wrap",
                     }}
@@ -942,11 +919,11 @@ const Partida = () => {
                           ...skillButtonStyle,
                           background:
                             gameState.selectedSkill === skill
-                              ? "linear-gradient(135deg, #22d3ee, #06d6a0)"
-                              : "linear-gradient(135deg, #3b82f6, #6366f1)",
+                              ? "linear-gradient(135deg, #34d399, #10b981)"
+                              : skillButtonStyle.background,
                           boxShadow:
                             gameState.selectedSkill === skill
-                              ? "0 0 16px rgba(6, 214, 160, 0.7)"
+                              ? "0 0 12px rgba(16, 185, 129, 0.7)"
                               : "none",
                         }}
                         whileHover={{ scale: 1.05 }}
@@ -978,32 +955,24 @@ const Partida = () => {
         return (
           <ModalWrapper>
             <motion.div
+              style={modalStyle}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3 }}
-              className="text-center p-8"
             >
-              <div className="mb-8 relative">
+              <div className="mb-6 relative">
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                  style={{
-                    width: "100px",
-                    height: "100px",
-                    margin: "0 auto",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
                 >
-                  <GiSoccerBall className="text-6xl text-blue-400" />
+                  <GiSoccerBall className="text-5xl text-blue-400 mx-auto" />
                 </motion.div>
-                <div className="absolute inset-0 rounded-full bg-blue-500 opacity-10 blur-md" />
+                <div className="absolute inset-0 rounded-full bg-blue-400 opacity-20 blur-md" />
               </div>
-              <h2 className="text-3xl font-bold text-blue-400 mb-4">
+              <h2 className="text-2xl font-bold text-white mb-4">
                 Esperando respuesta...
               </h2>
-              <p className="text-xl text-gray-300">
+              <p className="text-lg text-gray-300">
                 El rival está eligiendo su carta...
               </p>
             </motion.div>
@@ -1014,27 +983,35 @@ const Partida = () => {
         return (
           <ModalWrapper>
             <motion.div
+              style={modalStyle}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-center p-8"
             >
               <div className="mb-6 relative">
-                <FaPause className="text-7xl text-yellow-500 mx-auto" />
-                <div className="absolute inset-0 rounded-full bg-yellow-500 opacity-10 blur-md" />
+                <FaPause className="text-5xl text-yellow-400 mx-auto" />
+                <div className="absolute inset-0 rounded-full bg-yellow-400 opacity-20 blur-md" />
               </div>
-              <h2 className="text-3xl font-bold text-white mb-4">
+              <h2 className="text-2xl font-bold text-white mb-4">
                 Partida pausada
               </h2>
-              <p className="text-xl text-gray-300 mb-8">
+              <p className="text-lg text-gray-300 mb-6">
                 La partida está actualmente en pausa
               </p>
               <motion.button
-                onClick={handleResume}
-                className="bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-500 hover:to-emerald-400 text-white font-bold py-3 px-8 rounded-lg text-lg shadow-lg"
+                onClick={handleHome}
+                style={{
+                  padding: "0.8rem 1.5rem",
+                  borderRadius: "10px",
+                  background: "linear-gradient(135deg, #34d399, #10b981)",
+                  color: "#fff",
+                  fontWeight: "700",
+                  fontSize: "1rem",
+                  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.4)",
+                }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Reanudar partida
+                Volver a Inicio
               </motion.button>
             </motion.div>
           </ModalWrapper>
@@ -1050,15 +1027,15 @@ const Partida = () => {
         return (
           <ModalWrapper>
             <motion.div
+              style={modalStyle}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3 }}
-              className="text-center p-8"
             >
               <motion.h2
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className={`text-5xl font-bold mb-8 ${
+                className={`text-4xl font-bold mb-6 ${
                   tie
                     ? "text-yellow-400"
                     : playerWon
@@ -1073,23 +1050,23 @@ const Partida = () => {
                   : "RONDA PERDIDA"}
               </motion.h2>
 
-              <div className="flex flex-col md:flex-row justify-center items-center gap-8 mb-8">
+              <div className="flex flex-col md:flex-row justify-center items-center gap-6 mb-6">
                 <div className="text-center">
                   <div className="relative">
                     <CartaMediana jugador={gameState.selectedCard} />
                     {playerWon && (
-                      <div className="absolute -top-4 -right-4 bg-green-500 text-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg">
+                      <div className="absolute -top-3 -right-3 bg-green-500 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-md">
                         ✓
                       </div>
                     )}
                   </div>
-                  <div className="mt-3 text-xl font-bold text-white">Tú</div>
-                  <div className="text-2xl font-bold mt-2 bg-gradient-to-r from-blue-500 to-purple-500 text-transparent bg-clip-text">
+                  <div className="mt-2 text-lg font-bold text-white">Tú</div>
+                  <div className="text-xl font-bold mt-1 bg-gradient-to-r from-blue-400 to-green-400 text-transparent bg-clip-text">
                     {playerVal} {stat}
                   </div>
                 </div>
 
-                <div className="text-4xl font-bold text-white my-4 md:my-0">
+                <div className="text-3xl font-bold text-white my-3 md:my-0">
                   VS
                 </div>
 
@@ -1097,19 +1074,19 @@ const Partida = () => {
                   <div className="relative">
                     <CartaMediana jugador={gameState.opponentSelectedCard} />
                     {!playerWon && !tie && (
-                      <div className="absolute -top-4 -right-4 bg-red-500 text-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg">
+                      <div className="absolute -top-3 -right-3 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-md">
                         ✗
                       </div>
                     )}
                   </div>
-                  <div className="mt-3 text-xl font-bold text-white">Rival</div>
-                  <div className="text-2xl font-bold mt-2 bg-gradient-to-r from-blue-500 to-purple-500 text-transparent bg-clip-text">
+                  <div className="mt-2 text-lg font-bold text-white">Rival</div>
+                  <div className="text-xl font-bold mt-1 bg-gradient-to-r from-blue-400 to-green-400 text-transparent bg-clip-text">
                     {rivalVal} {stat}
                   </div>
                 </div>
               </div>
 
-              <div className="text-3xl font-bold text-white mb-8 bg-gradient-to-r from-blue-500 to-purple-500 px-6 py-3 rounded-lg shadow-lg">
+              <div className="text-2xl font-bold text-white mb-6 bg-gradient-to-r from-blue-400 to-green-400 px-4 py-2 rounded-lg shadow-md">
                 Marcador: {gameState.scores.player} -{" "}
                 {Object.values(gameState.scores).find(
                   (score) => score !== gameState.scores.player
@@ -1136,7 +1113,15 @@ const Partida = () => {
                     handleRoundStart(nextRoundStartRef.current);
                   }
                 }}
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3 px-8 rounded-lg text-lg shadow-lg"
+                style={{
+                  padding: "0.8rem 1.5rem",
+                  borderRadius: "10px",
+                  background: "linear-gradient(135deg, #3b82f6, #34d399)",
+                  color: "#fff",
+                  fontWeight: "700",
+                  fontSize: "1rem",
+                  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.4)",
+                }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -1159,20 +1144,20 @@ const Partida = () => {
         return (
           <ModalWrapper>
             <motion.div
+              style={modalStyle}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
-              className="text-center p-8"
             >
               <motion.h1
-                className={`text-6xl font-bold mb-8 ${
+                className={`text-5xl font-bold mb-6 ${
                   isDraw
                     ? "text-yellow-400"
                     : isWinner
                     ? "text-green-400"
                     : "text-red-400"
                 }`}
-                initial={{ y: -30 }}
+                initial={{ y: -20 }}
                 animate={{ y: 0 }}
                 transition={{ delay: 0.2, type: "spring" }}
               >
@@ -1180,7 +1165,7 @@ const Partida = () => {
               </motion.h1>
 
               <motion.div
-                className="text-5xl font-bold text-white mb-8 bg-gradient-to-r from-blue-500 to-purple-500 px-8 py-4 rounded-xl shadow-xl"
+                className="text-4xl font-bold text-white mb-6 bg-gradient-to-r from-blue-400 to-green-400 px-6 py-3 rounded-lg shadow-md"
                 initial={{ scale: 0.8 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.4, duration: 0.5 }}
@@ -1190,7 +1175,7 @@ const Partida = () => {
 
               {gameState.puntosChange && (
                 <motion.div
-                  className={`text-3xl font-bold mb-8 ${
+                  className={`text-2xl font-bold mb-6 ${
                     gameState.puntosChange[currentPlayerId] >= 0
                       ? "text-green-400"
                       : "text-red-400"
@@ -1206,13 +1191,19 @@ const Partida = () => {
 
               <motion.button
                 onClick={() => navigate("/home")}
-                className={`${
-                  isDraw
-                    ? "bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400"
+                style={{
+                  padding: "0.8rem 1.5rem",
+                  borderRadius: "10px",
+                  background: isDraw
+                    ? "linear-gradient(135deg, #facc15, #f59e0b)"
                     : isWinner
-                    ? "bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400"
-                    : "bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-400 hover:to-rose-400"
-                } text-white font-bold py-4 px-10 rounded-lg text-xl shadow-xl`}
+                    ? "linear-gradient(135deg, #34d399, #10b981)"
+                    : "linear-gradient(135deg, #ef4444, #dc2626)",
+                  color: "#fff",
+                  fontWeight: "700",
+                  fontSize: "1rem",
+                  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.4)",
+                }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -1225,15 +1216,19 @@ const Partida = () => {
       default:
         return (
           <ModalWrapper>
-            <div className="text-center p-8">
+            <motion.div
+              style={modalStyle}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
               <div className="mb-6 relative">
-                <GiSoccerBall className="text-7xl text-blue-400 mx-auto animate-spin" />
-                <div className="absolute inset-0 rounded-full bg-blue-500 opacity-10 blur-md" />
+                <GiSoccerBall className="text-5xl text-blue-400 mx-auto animate-spin" />
+                <div className="absolute inset-0 rounded-full bg-blue-400 opacity-20 blur-md" />
               </div>
-              <h2 className="text-3xl font-bold text-white mb-4">
+              <h2 className="text-2xl font-bold text-white mb-4">
                 Cargando partida...
               </h2>
-            </div>
+            </motion.div>
           </ModalWrapper>
         );
     }
@@ -1241,16 +1236,14 @@ const Partida = () => {
 
   return (
     <div style={containerStyle}>
-      {/* Header with scores */}
       <div style={headerStyle}>
         <motion.div
           style={{
             ...scoreStyle,
             background:
               gameState.scores.player > gameState.scores.opponent
-                ? "linear-gradient(135deg, rgba(16, 185, 129, 0.9), rgba(6, 214, 160, 0.9))"
-                : "linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9))",
-            color: "white",
+                ? "linear-gradient(135deg, #34d399, #10b981)"
+                : "linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95))",
           }}
           transition={{ duration: 0.3 }}
         >
@@ -1264,9 +1257,8 @@ const Partida = () => {
             ...scoreStyle,
             background:
               gameState.scores.opponent > gameState.scores.player
-                ? "linear-gradient(135deg, rgba(239, 68, 68, 0.9), rgba(220, 38, 38, 0.9))"
-                : "linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9))",
-            color: "white",
+                ? "linear-gradient(135deg, #ef4444, #dc2626)"
+                : "linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95))",
           }}
           transition={{ duration: 0.3 }}
         >
@@ -1281,7 +1273,6 @@ const Partida = () => {
         {gameState.phase === "selection" && renderPhase()}
       </div>
 
-      {/* Options button */}
       <motion.button
         onClick={() => setShowMenu((prev) => !prev)}
         style={optionsButtonStyle}
@@ -1291,7 +1282,6 @@ const Partida = () => {
         <FaCog />
       </motion.button>
 
-      {/* Options menu */}
       <AnimatePresence>
         {showMenu && (
           <motion.div
@@ -1305,9 +1295,9 @@ const Partida = () => {
                 <button
                   onClick={handleResume}
                   style={menuItemStyle}
-                  className="hover:bg-emerald-600/50"
+                  className="hover:bg-green-600/50"
                 >
-                  <FaPlay className="text-emerald-400" /> Reanudar
+                  <FaPlay className="text-green-400" /> Reanudar
                 </button>
               ) : (
                 <button
@@ -1329,7 +1319,6 @@ const Partida = () => {
         )}
       </AnimatePresence>
 
-      {/* Alert */}
       <AnimatePresence>
         {showAlert && (
           <motion.div
@@ -1343,7 +1332,6 @@ const Partida = () => {
         )}
       </AnimatePresence>
 
-      {/* Render phase modals */}
       {["waiting", "paused", "response", "result", "ended"].includes(
         gameState.phase
       ) && renderPhase()}

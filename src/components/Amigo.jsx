@@ -8,7 +8,7 @@ import {
   FaTrophy,
   FaUserFriends,
   FaBell,
-  FaSearch
+  FaSearch,
 } from "react-icons/fa";
 import { motion, AnimatePresence, AnimateSharedLayout } from "framer-motion";
 import background from "../assets/background.png";
@@ -51,56 +51,56 @@ export default function Amigo() {
   // Variantes para animaciones
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { 
+    visible: {
       opacity: 1,
-      transition: { 
+      transition: {
         when: "beforeChildren",
-        staggerChildren: 0.1
-      }
-    }
+        staggerChildren: 0.1,
+      },
+    },
   };
 
   const listItemVariants = {
     hidden: { y: 20, opacity: 0 },
-    visible: { 
-      y: 0, 
+    visible: {
+      y: 0,
       opacity: 1,
-      transition: { type: "spring", stiffness: 300, damping: 24 }
-    }
+      transition: { type: "spring", stiffness: 300, damping: 24 },
+    },
   };
 
   const buttonVariants = {
     hover: { scale: 1.1, boxShadow: "0px 0px 8px rgba(255, 255, 255, 0.5)" },
-    tap: { scale: 0.9 }
+    tap: { scale: 0.9 },
   };
 
   const tabVariants = {
     inactive: { backgroundColor: "rgba(0, 0, 0, 0.5)", scale: 1 },
-    active: { 
-      backgroundColor: "#2B5C94", 
+    active: {
+      backgroundColor: "#2B5C94",
       scale: 1.05,
-      transition: { type: "spring", stiffness: 300, damping: 15 }
-    }
+      transition: { type: "spring", stiffness: 300, damping: 15 },
+    },
   };
 
   const modalVariants = {
     hidden: { y: -50, opacity: 0 },
-    visible: { 
-      y: 0, 
+    visible: {
+      y: 0,
       opacity: 1,
-      transition: { type: "spring", stiffness: 300, damping: 25 }
+      transition: { type: "spring", stiffness: 300, damping: 25 },
     },
     exit: {
       y: 50,
       opacity: 0,
-      transition: { duration: 0.2 }
-    }
+      transition: { duration: 0.2 },
+    },
   };
 
   const overlayVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1 },
-    exit: { opacity: 0 }
+    exit: { opacity: 0 },
   };
 
   // Notificación de solicitud de amistad
@@ -210,7 +210,7 @@ export default function Amigo() {
   };
 
   // Filtro de búsqueda
-  const filteredFriends = amigos?.filter(amigo => 
+  const filteredFriends = amigos?.filter((amigo) =>
     amigo.username?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -220,7 +220,10 @@ export default function Amigo() {
         key={item.id || id}
         className="flex items-center justify-between bg-gradient-to-r from-[#0179A8] to-[#0190D2] rounded-lg p-3 mb-3 w-full backdrop-blur-sm shadow-lg"
         variants={listItemVariants}
-        whileHover={{ scale: 1.02, boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.2)" }}
+        whileHover={{
+          scale: 1.02,
+          boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.2)",
+        }}
         transition={{ type: "spring", stiffness: 500, damping: 30 }}
       >
         <div className="flex items-center space-x-3">
@@ -244,15 +247,15 @@ export default function Amigo() {
             </motion.div>
           )}
           <div className="flex flex-col">
-            <motion.p 
+            <motion.p
               className="text-sm text-white opacity-80"
               initial={{ x: -5, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.1 }}
             >
-              Nivel {item.level || '?'}
+              Nivel {item.level || "?"}
             </motion.p>
-            <motion.p 
+            <motion.p
               className="text-lg text-white font-bold shadow-text"
               initial={{ x: -10, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
@@ -337,7 +340,7 @@ export default function Amigo() {
 
   const LoadingSpinner = () => (
     <div className="flex justify-center items-center h-40">
-      <motion.div 
+      <motion.div
         className="h-16 w-16 rounded-full border-t-4 border-b-4 border-white"
         animate={{ rotate: 360 }}
         transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
@@ -354,9 +357,9 @@ export default function Amigo() {
     >
       <motion.div
         className="text-6xl text-gray-400 mb-4"
-        animate={{ 
+        animate={{
           scale: [1, 1.1, 1],
-          opacity: [0.7, 1, 0.7]
+          opacity: [0.7, 1, 0.7],
         }}
         transition={{ duration: 2, repeat: Infinity }}
       >
@@ -393,7 +396,7 @@ export default function Amigo() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
       >
-        <motion.h2 
+        <motion.h2
           className="text-2xl font-bold shadow-text"
           initial={{ x: -20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
@@ -410,9 +413,9 @@ export default function Amigo() {
           >
             <motion.div
               className="w-4 h-4 bg-blue-400 rounded-full"
-              animate={{ 
+              animate={{
                 scale: [1, 1.2, 1],
-                backgroundColor: ["#60A5FA", "#3B82F6", "#60A5FA"]
+                backgroundColor: ["#60A5FA", "#3B82F6", "#60A5FA"],
               }}
               transition={{ duration: 2, repeat: Infinity }}
             />
@@ -544,9 +547,13 @@ export default function Amigo() {
             <motion.span
               className="bg-red-500 text-xs px-2 py-1 rounded-full"
               initial={{ scale: 0 }}
-              animate={{ 
+              animate={{
                 scale: [1, 1.2, 1],
-                transition: { repeat: Infinity, repeatType: "mirror", duration: 1 }
+                transition: {
+                  repeat: Infinity,
+                  repeatType: "mirror",
+                  duration: 1,
+                },
               }}
             >
               {solicitudesRecibidas.length}
@@ -571,7 +578,7 @@ export default function Amigo() {
               animate="visible"
               exit="exit"
             >
-              <motion.h2 
+              <motion.h2
                 className="text-xl font-bold mb-6 text-center"
                 initial={{ y: -10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
@@ -583,7 +590,10 @@ export default function Amigo() {
                 <motion.button
                   onClick={handleDeleteFriend}
                   className="bg-gradient-to-br from-green-600 to-green-700 px-4 py-2 rounded hover:from-green-500 hover:to-green-600 transition shadow-lg"
-                  whileHover={{ scale: 1.05, boxShadow: "0px 0px 8px rgba(0, 255, 0, 0.3)" }}
+                  whileHover={{
+                    scale: 1.05,
+                    boxShadow: "0px 0px 8px rgba(0, 255, 0, 0.3)",
+                  }}
                   whileTap={{ scale: 0.95 }}
                 >
                   {t("friend.yes")}
@@ -591,7 +601,10 @@ export default function Amigo() {
                 <motion.button
                   onClick={() => setShowDeleteConfirmation(false)}
                   className="bg-gradient-to-br from-red-600 to-red-700 px-4 py-2 rounded hover:from-red-500 hover:to-red-600 transition shadow-lg"
-                  whileHover={{ scale: 1.05, boxShadow: "0px 0px 8px rgba(255, 0, 0, 0.3)" }}
+                  whileHover={{
+                    scale: 1.05,
+                    boxShadow: "0px 0px 8px rgba(255, 0, 0, 0.3)",
+                  }}
                   whileTap={{ scale: 0.95 }}
                 >
                   {t("friend.no")}
@@ -618,7 +631,7 @@ export default function Amigo() {
               animate="visible"
               exit="exit"
             >
-              <motion.h2 
+              <motion.h2
                 className="text-xl font-bold mb-4 text-center"
                 initial={{ y: -10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
@@ -643,7 +656,10 @@ export default function Amigo() {
                 <motion.button
                   onClick={handleAddFriend}
                   className="bg-gradient-to-br from-blue-600 to-blue-700 px-4 py-2 rounded hover:from-blue-500 hover:to-blue-600 transition shadow-lg"
-                  whileHover={{ scale: 1.05, boxShadow: "0px 0px 8px rgba(0, 0, 255, 0.3)" }}
+                  whileHover={{
+                    scale: 1.05,
+                    boxShadow: "0px 0px 8px rgba(0, 0, 255, 0.3)",
+                  }}
                   whileTap={{ scale: 0.95 }}
                 >
                   {t("friend.sendRequest")}
@@ -651,7 +667,10 @@ export default function Amigo() {
                 <motion.button
                   onClick={handleCloseAddFriendModal}
                   className="bg-gradient-to-br from-red-600 to-red-700 px-4 py-2 rounded hover:from-red-500 hover:to-red-600 transition shadow-lg"
-                  whileHover={{ scale: 1.05, boxShadow: "0px 0px 8px rgba(255, 0, 0, 0.3)" }}
+                  whileHover={{
+                    scale: 1.05,
+                    boxShadow: "0px 0px 8px rgba(255, 0, 0, 0.3)",
+                  }}
                   whileTap={{ scale: 0.95 }}
                 >
                   {t("friend.cancel")}

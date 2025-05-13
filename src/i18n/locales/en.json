@@ -109,6 +109,7 @@
     "name": "Name",
     "suggestion": "Tip: Click on a player to see their detailed stats",
     "me": "YOU",
+    "winRate": "Win Rate",
     "close": "CLOSE"
   },
   "shop": {
@@ -140,7 +141,6 @@
     "yes": "Yes",
     "no": "No",
     "insufficient_coins": "You don't have enough AdrenaCoins to buy this card!"
-
   },
   "auth": {
     "title": "Login",
@@ -244,6 +244,15 @@
     "id": "ID:",
     "player": "Player",
     "rival": "Rival",
+    "matches": "Matches",
+    "stats": "Stats",
+    "winRate": "Win Rate",
+
+    "xpProgress": "XP Progress",
+    "totalMatches": "Total Matches",
+    "winStreak": "Winning Streak",
+    "matchStats": "Match stats",
+
     "copy": "Copy",
     "achievements": "Achievements",
     "editing": {
@@ -282,7 +291,8 @@
     "addFriendModal": {
       "title": "Enter Friend Code",
       "placeholder": "Friend Code"
-    }
+    },
+    "requestSent": "Request Sent"
   },
   "home": {
     "tournament": "Tournament",
@@ -350,6 +360,84 @@
     "skills": {
       "s1": "ATTACK",
       "s2": "DEFENSE"
+    }
+  },
+  "tournament": {
+    "title": "🏆 TOURNAMENTS RANKING 🏆",
+    "createTournament": "Create Tournament",
+    "create": "Create",
+    "anoM": "Anonymous Player",
+
+    "joinTournament": "Join Tournament",
+    "privateTournament": "Private Tournament",
+    "enterPassword": "Enter the tournament password",
+    "password": "Password",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "details": "Tournament Details",
+    "description": "Description",
+    "reward": "Reward",
+    "participants": "Participants",
+    "status": "Status",
+
+    "inProgress": "In Progress",
+    "pending": "Pending",
+    "start": "Start",
+    "leave": "Leave",
+    "searchPlaceholder": "Search tournaments...",
+    "onlyAvailable": "Only Available",
+    "full": "Full",
+    "ongoing": "Ongoing",
+    "join": "Join",
+    "viewDetails": "View Details",
+    "quarters": "Quarterfinals",
+    "semifinals": "Semifinals",
+    "final": "Final",
+    "matches": "Matches",
+    "players": "Players",
+    "back": "Back",
+    "createSuccess": "Tournament created successfully!",
+    "createError": "Error creating tournament.",
+    "joinError": "Error joining tournament.",
+    "startError": "Error starting tournament.",
+    "leaveError": "Error leaving tournament.",
+    "noTournaments": "No tournaments found.",
+    "loading": "Loading tournaments...",
+    "winner": "Winner",
+    "you": "YOU",
+    "info": "No participants yet",
+    "info2": "Scheduled Matches",
+    "info3": "At least 2 participants are required",
+    "clean": "Clear search",
+    "passw": "Enter the password to join the tournament:",
+    "new": "New Tournament",
+    "name": "Name*",
+    "description2": "Description*",
+    "prize": "Reward*",
+    "p1": "Reward:",
+    "pl1": "Reward amount",
+    "pl2": "Tournament description",
+    "pl3": "Tournament name",
+    "pl4": "Tournament password",
+    "pl5": "Search tournaments...",
+    "tp": "Private tournament (requires password)",
+    "pw": "Password*",
+    "final2": "Finished",
+    "dateNotAvailable": "Date not available",
+    "retry": "Retry",
+
+    "rounds": {
+      "quarters": "Quarterfinals",
+      "semis": "Semifinals",
+      "final": "Final"
+    },
+    "errors": {
+      "nameRequired": "Name is required",
+      "nameLength": "Name must be at least 4 characters",
+      "descriptionRequired": "Description is required",
+      "rewardRequired": "Reward is required",
+      "rewardInvalid": "Reward must be a number",
+      "passwordRequired": "Password is required for private tournaments"
     }
   }
 }
