@@ -439,5 +439,68 @@
       "rewardInvalid": "Reward must be a number",
       "passwordRequired": "Password is required for private tournaments"
     }
+  },
+  "match": {
+    "title": "Match",
+    "yourTeam": "Your Team",
+    "opponent": "Opponent",
+    "round": "Round",
+    "roundsTotal": "Round {{current}} of {{total}}",
+    "waitingOpponent": "Waiting for the opponent...",
+    "yourTurn": "Your Turn!",
+    "opponentTurn": "Opponent's Turn",
+    "selectSkill": "Select a skill:",
+    "confirmSkill": "Confirm {{skill}}",
+    "continue": "Continue",
+    "victory": "🏆 VICTORY!",
+    "defeat": "😞 DEFEAT",
+    "draw": "DRAW!",
+    "score": "Score",
+    "winner": "Winner",
+    "confirm": "CONFIRM",
+
+    "winner2": "ROUND WON!",
+    "l1": "ROUND LOST",
+
+    "you": "YOU",
+    "opponentSelected": "Opponent selected: {{position}}. You must choose a card with the same position.",
+    "mustSelectPosition": "You must select a card of position: {{position}}.",
+    "notYourTurn": "It's not your turn!",
+    "waitingResponse": "Waiting for opponent's response...",
+    "waitingResponse2": "Waiting for response...",
+    "waitingResponse3": "Opponent is selecting a card...",
+
+    "waitingCard": "Waiting for opponent to select a card...",
+    "gamePaused": "Match Paused",
+    "gamePausedMessage": "The match is currently paused.",
+    "resume": "Resume",
+    "pause": "Pause",
+    "surrender": "Surrender",
+    "backHome": "Back to Menu",
+    "matchEnded": "The match has ended.",
+    "pointsEarned": "+{{points}} points",
+    "pointsLost": "-{{points}} points",
+    "points": "points",
+    "loa": "Loading match...",
+
+    "dateNotAvailable": "Date not available",
+    "skills": {
+      "attack": "Attack",
+      "defense": "Defense",
+      "control": "Control"
+    },
+    "phases": {
+      "waiting": "Waiting...",
+      "selection": "Selecting...",
+      "response": "Responding...",
+      "paused": "Paused",
+      "result": "Result",
+      "ended": "Finished"
+    },
+    "errors": {
+      "noActiveTemplate": "You don't have an active lineup.",
+      "mustSelectSkill": "You must select a skill.",
+      "mustSelectCard": "You must select a card."
+    }
   }
 }
