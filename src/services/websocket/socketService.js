@@ -113,50 +113,517 @@ class SocketService {
 
   handleIncomingRequest(data) {
     const { solicitanteUsername, exchangeId } = data;
-    const notificationDiv = document.createElement('div');
+    
+    // Create a container for the notification
+    const notificationDiv = document.createElement("div");
     notificationDiv.innerHTML = `
-      <div id="exchange-notification" style="
-        position: fixed; 
-        top: 20px; 
-        right: -300px; 
-        width: 250px; 
-        background:rgb(48, 43, 43); 
-        padding: 15px; 
-        border-radius: 10px; 
-        box-shadow: 0 0 10px rgba(0,0,0,0.3); 
-        z-index: 1000; 
-        opacity: 0; 
-        transition: right 0.5s ease-out, opacity 0.5s ease-out;
-      ">
-        <p style="margin-bottom: 15px; text-align: center;"><strong>${solicitanteUsername}</strong> quiere realizar un intercambio</p>
-        <div style="display: flex; justify-content: center; gap: 10px;">
-          <button id="accept-btn" style="padding: 5px 10px; background: #4caf50; color: white; border: none; border-radius: 5px; cursor: pointer;">Aceptar</button>
-          <button id="decline-btn" style="padding: 5px 10px; background: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer;">Rechazar</button>
+      <div id="exchange-notification" class="notification-container">
+        <div class="notification-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 1l4 4-4 4"></path>
+            <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+            <path d="M7 23l-4-4 4-4"></path>
+            <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+          </svg>
+        </div>
+        <div class="notification-content">
+          <h4>Solicitud de Intercambio</h4>
+          <p><strong>${solicitanteUsername}</strong> quiere realizar un intercambio</p>
+          <div class="notification-actions">
+            <button id="accept-btn" class="btn accept">Aceptar</button>
+            <button id="decline-btn" class="btn decline">Rechazar</button>
+          </div>
         </div>
       </div>
     `;
-
+  
+    // Add styles to the document if they don't exist yet
+    if (!document.getElementById('notification-styles')) {
+      const styleSheet = document.createElement('style');
+      styleSheet.id = 'notification-styles';
+      styleSheet.innerHTML = `
+        .notification-container {
+          position: fixed;
+          top: 20px;
+          right: -350px;
+          width: 300px;
+          background: #2a2a2a;
+          color: #fff;
+          padding: 15px;
+          border-radius: 12px;
+          box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+          z-index: 1000;
+          opacity: 0;
+          transition: right 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55), 
+                      opacity 0.6s ease-out,
+                      transform 0.5s ease;
+          display: flex;
+          align-items: center;
+          overflow: hidden;
+          transform: translateY(10px);
+        }
+        
+        .notification-container:hover {
+          transform: translateY(0) scale(1.02);
+          box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+        
+        .notification-container::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 5px;
+          height: 100%;
+          background: linear-gradient(to bottom, #4caf50, #2196F3);
+        }
+        
+        .notification-icon {
+          margin-right: 15px;
+          background: rgba(255,255,255,0.1);
+          border-radius: 50%;
+          padding: 10px;
+          color: #fff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        .notification-content {
+          flex: 1;
+        }
+        
+        .notification-content h4 {
+          margin: 0 0 5px 0;
+          font-weight: 600;
+          color: #fff;
+          font-size: 16px;
+        }
+        
+        .notification-content p {
+          margin: 0 0 15px 0;
+          font-size: 14px;
+          opacity: 0.9;
+        }
+        
+        .notification-actions {
+          display: flex;
+          gap: 10px;
+        }
+        
+        .btn {
+          padding: 8px 16px;
+          border: none;
+          border-radius: 6px;
+          font-weight: 600;
+          font-size: 14px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          outline: none;
+        }
+        
+        .btn:active {
+          transform: scale(0.95);
+        }
+        
+        .accept {
+          background: #4caf50;
+          color: white;
+        }
+        
+        .accept:hover {
+          background: #3d9140;
+          box-shadow: 0 2px 8px rgba(76, 175, 80, 0.4);
+        }
+        
+        .decline {
+          background: #f44336;
+          color: white;
+        }
+        
+        .decline:hover {
+          background: #d32f2f;
+          box-shadow: 0 2px 8px rgba(244, 67, 54, 0.4);
+        }
+        
+        @keyframes pulse {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.05); }
+          100% { transform: scale(1); }
+        }
+        
+        .notification-entry {
+          animation: pulse 2s infinite;
+        }
+      `;
+      document.head.appendChild(styleSheet);
+    }
+  
     document.body.appendChild(notificationDiv);
-
-    const notificationElement = document.getElementById('exchange-notification');
+  
+    // Get the notification element and add animation
+    const notificationElement = notificationDiv.firstElementChild;
+    
+    // Show notification with animation
     setTimeout(() => {
-      notificationElement.style.right = '20px';
-      notificationElement.style.opacity = '1';
+      // Calculate position based on screen size
+      const screenWidth = window.innerWidth;
+      const rightPosition = screenWidth <= 360 ? "10px" : "20px";
+      
+      notificationElement.style.right = rightPosition;
+      notificationElement.style.opacity = "1";
+      notificationElement.style.transform = "translateY(0)";
+      notificationElement.classList.add('notification-entry');
+      
+      // Remove pulse animation after 3 seconds
+      setTimeout(() => {
+        notificationElement.classList.remove('notification-entry');
+      }, 3000);
+      
+      // Add resize event listener to keep notification positioned correctly
+      const handleResize = () => {
+        const currentScreenWidth = window.innerWidth;
+        const newRightPosition = currentScreenWidth <= 360 ? "10px" : "20px";
+        notificationElement.style.right = newRightPosition;
+      };
+      
+      window.addEventListener('resize', handleResize);
+      
+      // Store the event listener reference on the element for cleanup
+      notificationElement._resizeHandler = handleResize;
     }, 100);
-
-    document.getElementById('accept-btn').addEventListener('click', () => {
-      this.socket.emit('accept_exchange', exchangeId);
-      console.log('Intercambio aceptado', exchangeId);
-      this.navigate(`/intercambio/${encodeURIComponent(exchangeId)}`);
-      document.body.removeChild(notificationDiv);
+  
+    // Add event listeners
+    notificationDiv.querySelector("#accept-btn").addEventListener("click", () => {
+      this.socket.emit("accept_exchange", exchangeId);
+      console.log("Intercambio aceptado", exchangeId);
+      
+      // Add exit animation
+      notificationElement.style.opacity = "0";
+      notificationElement.style.right = "-350px";
+      
+      // Remove from DOM and cleanup resize listener after animation completes
+      setTimeout(() => {
+        if (notificationElement._resizeHandler) {
+          window.removeEventListener('resize', notificationElement._resizeHandler);
+        }
+        document.body.removeChild(notificationDiv);
+        this.navigate(`/intercambio/${encodeURIComponent(exchangeId)}`);
+      }, 600);
     });
-
-    document.getElementById('decline-btn').addEventListener('click', () => {
-      this.socket.emit('accept_exchange', { exchangeId });
-      this.navigate('/home');
-      document.body.removeChild(notificationDiv);
+  
+    notificationDiv.querySelector("#decline-btn").addEventListener("click", () => {
+      this.socket.emit("decline_exchange", { exchangeId });
+      
+      // Add exit animation
+      notificationElement.style.opacity = "0";
+      notificationElement.style.right = "-350px";
+      
+      // Remove from DOM and cleanup resize listener after animation completes
+      setTimeout(() => {
+        if (notificationElement._resizeHandler) {
+          window.removeEventListener('resize', notificationElement._resizeHandler);
+        }
+        document.body.removeChild(notificationDiv);
+        this.navigate("/home");
+      }, 600);
     });
   }
+
+  handleIncomingRequestMatch(data) {
+    const { matchRequestId, solicitanteUsername } = data;
+    console.log(matchRequestId)
+    
+    // Create a container for the notification
+    const notificationDiv = document.createElement("div");
+    notificationDiv.innerHTML = `
+      <div id="match-notification" class="notification-container match-notification">
+        <div class="notification-icon match-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 3a2.85 2.85 0 0 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+          </svg>
+        </div>
+        <div class="notification-content">
+          <h4>Solicitud de Partido</h4>
+          <p><strong>${solicitanteUsername}</strong> quiere jugar un partido</p>
+          <div class="notification-actions">
+            <button id="accept-match-btn" class="btn accept">Aceptar</button>
+            <button id="decline-match-btn" class="btn decline">Rechazar</button>
+          </div>
+        </div>
+      </div>
+    `;
+  
+    // Add styles to the document if they don't exist yet
+        if (!document.getElementById('notification-styles')) {
+      const styleSheet = document.createElement('style');
+      styleSheet.id = 'notification-styles';
+      styleSheet.innerHTML = `
+        .notification-container {
+          position: fixed;
+          top: 20px;
+          right: -350px;
+          width: 85%;
+          max-width: 300px;
+          background: #2a2a2a;
+          color: #fff;
+          padding: 15px;
+          border-radius: 12px;
+          box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+          z-index: 1000;
+          opacity: 0;
+          transition: right 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55), 
+                      opacity 0.6s ease-out,
+                      transform 0.5s ease;
+          display: flex;
+          align-items: center;
+          overflow: hidden;
+          transform: translateY(10px);
+        }
+        
+        .notification-container:hover {
+          transform: translateY(0) scale(1.02);
+          box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+        
+        .notification-container::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 5px;
+          height: 100%;
+          background: linear-gradient(to bottom, #4caf50, #2196F3);
+        }
+        
+        .match-notification::before {
+          background: linear-gradient(to bottom, #ff9800, #ff5722);
+        }
+        
+        .notification-icon {
+          margin-right: 15px;
+          background: rgba(255,255,255,0.1);
+          border-radius: 50%;
+          padding: 10px;
+          color: #fff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+        
+        .match-icon {
+          background: rgba(255, 152, 0, 0.15);
+        }
+        
+        .notification-content {
+          flex: 1;
+          min-width: 0;
+        }
+        
+        .notification-content h4 {
+          margin: 0 0 5px 0;
+          font-weight: 600;
+          color: #fff;
+          font-size: 16px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        
+        .notification-content p {
+          margin: 0 0 15px 0;
+          font-size: 14px;
+          opacity: 0.9;
+          word-break: break-word;
+        }
+        
+        .notification-actions {
+          display: flex;
+          gap: 10px;
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+        
+        .btn {
+          padding: 8px 16px;
+          border: none;
+          border-radius: 6px;
+          font-weight: 600;
+          font-size: 14px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          outline: none;
+          flex: 1;
+          min-width: 80px;
+          text-align: center;
+        }
+        
+        .btn:active {
+          transform: scale(0.95);
+        }
+        
+        .accept {
+          background: #4caf50;
+          color: white;
+        }
+        
+        .accept:hover {
+          background: #3d9140;
+          box-shadow: 0 2px 8px rgba(76, 175, 80, 0.4);
+        }
+        
+        .decline {
+          background: #f44336;
+          color: white;
+        }
+        
+        .decline:hover {
+          background: #d32f2f;
+          box-shadow: 0 2px 8px rgba(244, 67, 54, 0.4);
+        }
+        
+        @keyframes pulse {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.05); }
+          100% { transform: scale(1); }
+        }
+        
+        .notification-entry {
+          animation: pulse 2s infinite;
+        }
+        
+        /* Responsive adjustments */
+        @media screen and (max-width: 576px) {
+          .notification-container {
+            top: 10px;
+            max-width: 260px;
+            padding: 12px;
+          }
+          
+          .notification-content h4 {
+            font-size: 15px;
+          }
+          
+          .notification-content p {
+            font-size: 13px;
+            margin-bottom: 10px;
+          }
+          
+          .btn {
+            padding: 6px 12px;
+            font-size: 13px;
+          }
+          
+          .notification-icon {
+            padding: 8px;
+          }
+          
+          .notification-icon svg {
+            width: 20px;
+            height: 20px;
+          }
+        }
+        
+        @media screen and (max-width: 360px) {
+          .notification-container {
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+            padding: 10px;
+          }
+          
+          .notification-icon {
+            margin-right: 0;
+            margin-bottom: 10px;
+          }
+          
+          .notification-actions {
+            width: 100%;
+          }
+        }
+      `;
+      document.head.appendChild(styleSheet);
+    }
+  
+    document.body.appendChild(notificationDiv);
+  
+    // Get the notification element and add animation
+    const notificationElement = notificationDiv.firstElementChild;
+    
+    // Show notification with animation
+    setTimeout(() => {
+      // Calculate position based on screen size
+      const screenWidth = window.innerWidth;
+      const rightPosition = screenWidth <= 360 ? "10px" : "20px";
+      
+      notificationElement.style.right = rightPosition;
+      notificationElement.style.opacity = "1";
+      notificationElement.style.transform = "translateY(0)";
+      notificationElement.classList.add('notification-entry');
+      
+      // Remove pulse animation after 3 seconds
+      setTimeout(() => {
+        notificationElement.classList.remove('notification-entry');
+      }, 3000);
+      
+      // Add resize event listener to keep notification positioned correctly
+      const handleResize = () => {
+        const currentScreenWidth = window.innerWidth;
+        const newRightPosition = currentScreenWidth <= 360 ? "10px" : "20px";
+        notificationElement.style.right = newRightPosition;
+      };
+      
+      window.addEventListener('resize', handleResize);
+      
+      // Store the event listener reference on the element for cleanup
+      notificationElement._resizeHandler = handleResize;
+    }, 100);
+  
+    // Add event listeners
+    notificationDiv.querySelector("#accept-match-btn").addEventListener("click", () => {
+      this.socket.emit("accept_match", matchRequestId);
+      console.log("Partido aceptado", matchRequestId);
+      
+      // Add exit animation
+      notificationElement.style.opacity = "0";
+      notificationElement.style.right = "-350px";
+      
+      // Remove from DOM and cleanup resize listener after animation completes
+      setTimeout(() => {
+        if (notificationElement._resizeHandler) {
+          window.removeEventListener('resize', notificationElement._resizeHandler);
+        }
+        document.body.removeChild(notificationDiv);
+        this.navigate(`/buscandoPartida`);
+      }, 600);
+    });
+  
+    notificationDiv.querySelector("#decline-match-btn").addEventListener("click", () => {
+      this.socket.emit("decline_match", { matchRequestId });
+      
+      // Add exit animation
+      notificationElement.style.opacity = "0";
+      notificationElement.style.right = "-350px";
+      
+      // Remove from DOM and cleanup resize listener after animation completes
+      setTimeout(() => {
+        if (notificationElement._resizeHandler) {
+          window.removeEventListener('resize', notificationElement._resizeHandler);
+        }
+        document.body.removeChild(notificationDiv);
+        this.navigate("/home");
+      }, 600);
+    });
+  }
+
+  sendChallengeRequest(receptorId, username) {
+    const id = String(receptorId); // convierte receptorId a string
+    this.socket.emit("request_match", {
+      receptorId: id,
+      solicitanteUsername: username,
+    });
+  }  
 
   handleExchangeAccepted(data) {
     console.log('Intercambio aceptado', data);
@@ -299,7 +766,18 @@ class SocketService {
 
   handleMatchFound(data) {
     console.log("Partida encontrada:", data);
-    this.navigate(`/partida/${encodeURIComponent(data.matchId)}`);
+
+    if (typeof this.onMatchFound === "function") {
+      this.onMatchFound(data);
+    }
+
+    setTimeout(() => {
+      this.navigate(`/partida/${encodeURIComponent(data.matchId)}`, {
+        state: {
+          tournamentMatch: data.tournamentMatch,
+        },
+      });
+    }, 5000);
   }
 
   async handleRoundStart(data) {
@@ -322,7 +800,7 @@ class SocketService {
         isPlayerTurn: isPlayerTurn
       };
 
-      await this.waitForFunction(() => typeof this.onRoundStart === "function", 2000);
+      await this.waitForFunction(() => typeof this.onRoundStart === "function", 20000);
   
       this.showTurnNotification(isPlayerTurn ? "¡TU TURNO!" : "Turno del rival", isPlayerTurn);
       this.onRoundStart({ dataConTurno });
