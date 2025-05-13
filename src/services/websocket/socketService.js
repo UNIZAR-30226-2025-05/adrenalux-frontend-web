@@ -71,8 +71,8 @@ class SocketService {
    *  MATCH ENDED - ahora enviamos la info al componente React
    * --------------------------------------------------------- */
   async handleMatchEnd(data) {
+    console.log("[SocketService] 🔔 handleMatchEnd()", data);
     try {
-      
       const payload = {
         scores: data.scores,
         puntosChange: data.puntosChange,
@@ -160,7 +160,7 @@ class SocketService {
 
   handleIncomingRequest(data) {
     const { solicitanteUsername, exchangeId } = data;
-    
+
     // Create a container for the notification
     const notificationDiv = document.createElement("div");
     notificationDiv.innerHTML = `
@@ -183,11 +183,11 @@ class SocketService {
         </div>
       </div>
     `;
-  
+
     // Add styles to the document if they don't exist yet
-    if (!document.getElementById('notification-styles')) {
-      const styleSheet = document.createElement('style');
-      styleSheet.id = 'notification-styles';
+    if (!document.getElementById("notification-styles")) {
+      const styleSheet = document.createElement("style");
+      styleSheet.id = "notification-styles";
       styleSheet.innerHTML = `
         .notification-container {
           position: fixed;
@@ -305,82 +305,92 @@ class SocketService {
       `;
       document.head.appendChild(styleSheet);
     }
-  
+
     document.body.appendChild(notificationDiv);
-  
+
     // Get the notification element and add animation
     const notificationElement = notificationDiv.firstElementChild;
-    
+
     // Show notification with animation
     setTimeout(() => {
       // Calculate position based on screen size
       const screenWidth = window.innerWidth;
       const rightPosition = screenWidth <= 360 ? "10px" : "20px";
-      
+
       notificationElement.style.right = rightPosition;
       notificationElement.style.opacity = "1";
       notificationElement.style.transform = "translateY(0)";
-      notificationElement.classList.add('notification-entry');
-      
+      notificationElement.classList.add("notification-entry");
+
       // Remove pulse animation after 3 seconds
       setTimeout(() => {
-        notificationElement.classList.remove('notification-entry');
+        notificationElement.classList.remove("notification-entry");
       }, 3000);
-      
+
       // Add resize event listener to keep notification positioned correctly
       const handleResize = () => {
         const currentScreenWidth = window.innerWidth;
         const newRightPosition = currentScreenWidth <= 360 ? "10px" : "20px";
         notificationElement.style.right = newRightPosition;
       };
-      
-      window.addEventListener('resize', handleResize);
-      
+
+      window.addEventListener("resize", handleResize);
+
       // Store the event listener reference on the element for cleanup
       notificationElement._resizeHandler = handleResize;
     }, 100);
-  
+
     // Add event listeners
-    notificationDiv.querySelector("#accept-btn").addEventListener("click", () => {
-      this.socket.emit("accept_exchange", exchangeId);
-      console.log("Intercambio aceptado", exchangeId);
-      
-      // Add exit animation
-      notificationElement.style.opacity = "0";
-      notificationElement.style.right = "-350px";
-      
-      // Remove from DOM and cleanup resize listener after animation completes
-      setTimeout(() => {
-        if (notificationElement._resizeHandler) {
-          window.removeEventListener('resize', notificationElement._resizeHandler);
-        }
-        document.body.removeChild(notificationDiv);
-        this.navigate(`/intercambio/${encodeURIComponent(exchangeId)}`);
-      }, 600);
-    });
-  
-    notificationDiv.querySelector("#decline-btn").addEventListener("click", () => {
-      this.socket.emit("decline_exchange", { exchangeId });
-      
-      // Add exit animation
-      notificationElement.style.opacity = "0";
-      notificationElement.style.right = "-350px";
-      
-      // Remove from DOM and cleanup resize listener after animation completes
-      setTimeout(() => {
-        if (notificationElement._resizeHandler) {
-          window.removeEventListener('resize', notificationElement._resizeHandler);
-        }
-        document.body.removeChild(notificationDiv);
-        this.navigate("/home");
-      }, 600);
-    });
+    notificationDiv
+      .querySelector("#accept-btn")
+      .addEventListener("click", () => {
+        this.socket.emit("accept_exchange", exchangeId);
+        console.log("Intercambio aceptado", exchangeId);
+
+        // Add exit animation
+        notificationElement.style.opacity = "0";
+        notificationElement.style.right = "-350px";
+
+        // Remove from DOM and cleanup resize listener after animation completes
+        setTimeout(() => {
+          if (notificationElement._resizeHandler) {
+            window.removeEventListener(
+              "resize",
+              notificationElement._resizeHandler
+            );
+          }
+          document.body.removeChild(notificationDiv);
+          this.navigate(`/intercambio/${encodeURIComponent(exchangeId)}`);
+        }, 600);
+      });
+
+    notificationDiv
+      .querySelector("#decline-btn")
+      .addEventListener("click", () => {
+        this.socket.emit("decline_exchange", { exchangeId });
+
+        // Add exit animation
+        notificationElement.style.opacity = "0";
+        notificationElement.style.right = "-350px";
+
+        // Remove from DOM and cleanup resize listener after animation completes
+        setTimeout(() => {
+          if (notificationElement._resizeHandler) {
+            window.removeEventListener(
+              "resize",
+              notificationElement._resizeHandler
+            );
+          }
+          document.body.removeChild(notificationDiv);
+          this.navigate("/home");
+        }, 600);
+      });
   }
-  
+
   handleIncomingRequestMatch(data) {
     const { matchRequestId, solicitanteUsername } = data;
-    console.log(matchRequestId)
-    
+    console.log(matchRequestId);
+
     // Create a container for the notification
     const notificationDiv = document.createElement("div");
     notificationDiv.innerHTML = `
@@ -400,11 +410,11 @@ class SocketService {
         </div>
       </div>
     `;
-  
+
     // Add styles to the document if they don't exist yet
-        if (!document.getElementById('notification-styles')) {
-      const styleSheet = document.createElement('style');
-      styleSheet.id = 'notification-styles';
+    if (!document.getElementById("notification-styles")) {
+      const styleSheet = document.createElement("style");
+      styleSheet.id = "notification-styles";
       styleSheet.innerHTML = `
         .notification-container {
           position: fixed;
@@ -592,76 +602,86 @@ class SocketService {
       `;
       document.head.appendChild(styleSheet);
     }
-  
+
     document.body.appendChild(notificationDiv);
-  
+
     // Get the notification element and add animation
     const notificationElement = notificationDiv.firstElementChild;
-    
+
     // Show notification with animation
     setTimeout(() => {
       // Calculate position based on screen size
       const screenWidth = window.innerWidth;
       const rightPosition = screenWidth <= 360 ? "10px" : "20px";
-      
+
       notificationElement.style.right = rightPosition;
       notificationElement.style.opacity = "1";
       notificationElement.style.transform = "translateY(0)";
-      notificationElement.classList.add('notification-entry');
-      
+      notificationElement.classList.add("notification-entry");
+
       // Remove pulse animation after 3 seconds
       setTimeout(() => {
-        notificationElement.classList.remove('notification-entry');
+        notificationElement.classList.remove("notification-entry");
       }, 3000);
-      
+
       // Add resize event listener to keep notification positioned correctly
       const handleResize = () => {
         const currentScreenWidth = window.innerWidth;
         const newRightPosition = currentScreenWidth <= 360 ? "10px" : "20px";
         notificationElement.style.right = newRightPosition;
       };
-      
-      window.addEventListener('resize', handleResize);
-      
+
+      window.addEventListener("resize", handleResize);
+
       // Store the event listener reference on the element for cleanup
       notificationElement._resizeHandler = handleResize;
     }, 100);
-  
+
     // Add event listeners
-    notificationDiv.querySelector("#accept-match-btn").addEventListener("click", () => {
-      this.socket.emit("accept_match", matchRequestId);
-      console.log("Partido aceptado", matchRequestId);
-      
-      // Add exit animation
-      notificationElement.style.opacity = "0";
-      notificationElement.style.right = "-350px";
-      
-      // Remove from DOM and cleanup resize listener after animation completes
-      setTimeout(() => {
-        if (notificationElement._resizeHandler) {
-          window.removeEventListener('resize', notificationElement._resizeHandler);
-        }
-        document.body.removeChild(notificationDiv);
-        this.navigate(`/buscandoPartida`);
-      }, 600);
-    });
-  
-    notificationDiv.querySelector("#decline-match-btn").addEventListener("click", () => {
-      this.socket.emit("decline_match", { matchRequestId });
-      
-      // Add exit animation
-      notificationElement.style.opacity = "0";
-      notificationElement.style.right = "-350px";
-      
-      // Remove from DOM and cleanup resize listener after animation completes
-      setTimeout(() => {
-        if (notificationElement._resizeHandler) {
-          window.removeEventListener('resize', notificationElement._resizeHandler);
-        }
-        document.body.removeChild(notificationDiv);
-        this.navigate("/home");
-      }, 600);
-    });
+    notificationDiv
+      .querySelector("#accept-match-btn")
+      .addEventListener("click", () => {
+        this.socket.emit("accept_match", matchRequestId);
+        console.log("Partido aceptado", matchRequestId);
+
+        // Add exit animation
+        notificationElement.style.opacity = "0";
+        notificationElement.style.right = "-350px";
+
+        // Remove from DOM and cleanup resize listener after animation completes
+        setTimeout(() => {
+          if (notificationElement._resizeHandler) {
+            window.removeEventListener(
+              "resize",
+              notificationElement._resizeHandler
+            );
+          }
+          document.body.removeChild(notificationDiv);
+          this.navigate(`/buscandoPartida`);
+        }, 600);
+      });
+
+    notificationDiv
+      .querySelector("#decline-match-btn")
+      .addEventListener("click", () => {
+        this.socket.emit("decline_match", { matchRequestId });
+
+        // Add exit animation
+        notificationElement.style.opacity = "0";
+        notificationElement.style.right = "-350px";
+
+        // Remove from DOM and cleanup resize listener after animation completes
+        setTimeout(() => {
+          if (notificationElement._resizeHandler) {
+            window.removeEventListener(
+              "resize",
+              notificationElement._resizeHandler
+            );
+          }
+          document.body.removeChild(notificationDiv);
+          this.navigate("/home");
+        }, 600);
+      });
   }
 
   handleExchangeAccepted(data) {
@@ -760,7 +780,7 @@ class SocketService {
       receptorId: id,
       solicitanteUsername: username,
     });
-  }  
+  }
 
   surrender(matchId) {
     if (!this.socket) {
@@ -809,7 +829,10 @@ class SocketService {
       this.handleOpponentSelection(data)
     );
     this.socket.on("round_result", (data) => this.handleRoundResult(data));
-    this.socket.on("match_ended", (data) => this.handleMatchEnd(data));
+    this.socket.on("match_ended", (data) => {
+      console.log("[SocketService] ⚡️ got match_ended from server:", data);
+      this.handleMatchEnd(data);
+    });
     this.socket.on("match_error", (data) => this.handleMatchError(data));
 
     this.socket.on("match_paused", (data) => this.handleMatchPaused(data));
@@ -848,9 +871,9 @@ class SocketService {
 
     setTimeout(() => {
       this.navigate(`/partida/${encodeURIComponent(data.matchId)}`, {
-        state: { 
-          tournamentMatch: data.tournamentMatch 
-        }
+        state: {
+          tournamentMatch: data.tournamentMatch,
+        },
       });
     }, 5000);
   }

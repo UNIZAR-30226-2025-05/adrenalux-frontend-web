@@ -57,6 +57,8 @@ const Partida = () => {
   const [highlightedPosition, setHighlightedPosition] = useState(null);
   const TOTAL_ROUNDS = 11;
 
+  const matchEndedRef = useRef(false);
+  console.log("[UI] 💡 mounting Partida – jugadorId =", jugadorId);
   const [gameState, setGameState] = useState({
     phase: "waiting",
     roundNumber: 1,
@@ -89,7 +91,7 @@ const Partida = () => {
     socketService.setOnMatchResumed(() => {
       setGameState((prev) => ({ ...prev, phase: "selection" }));
     });
-
+    /*
     socketService.setOnMatchEnd((payload) => {
       setGameState((prev) => ({
         ...prev,
@@ -98,12 +100,16 @@ const Partida = () => {
         winner: payload.winner,
         puntosDelta: payload.puntosDelta,
       }));
-    });
+    });*/
 
     socketService.setOnRoundStart(handleRoundStart);
     socketService.setOnOpponentSelection(handleOpponentSelection);
     socketService.setOnRoundResult(handleRoundResult);
-    socketService.setOnMatchEnd(handleMatchEnd);
+    //socketService.setOnMatchEnd(handleMatchEnd);
+    socketService.setOnMatchEnd((payload) => {
+      console.log("[UI] 💥 match_ended → handleMatchEnd payload:", payload);
+      handleMatchEnd(payload);
+    });
 
     const fetchData = async () => {
       try {
@@ -338,6 +344,16 @@ const Partida = () => {
 
   const handleRoundStart = useCallback((payload) => {
     const turno = payload?.dataConTurno;
+    //matchEndedRef.current = false;
+    if (matchEndedRef.current) {
+      console.log("[UI] 🛑 Ignoring round_start after match_end", payload);
+      return;
+    }
+    console.log("[UI] ↪️ handleRoundStart()", {
+      payload,
+      waitingNextRound: waitingNextRoundRef.current,
+    });
+
     if (!turno) return;
 
     if (waitingNextRoundRef.current) {
@@ -428,15 +444,19 @@ const Partida = () => {
   };
 
   const handleRoundResult = (data) => {
+    if (matchEndedRef.current) {
+      console.log("[UI] 🛑 Ignoring round_result after match_end", data);
+      return;
+    }
     const detalles = data.data.detalles;
     const { ganador, scores } = data.data;
-
     // 1) Identificar tu carta seleccionada
     const myCardRef = selectedCardRef.current;
     if (!myCardRef) {
       console.error("ERROR: selectedCardRef es null en handleRoundResult");
       return;
     }
+
     const myCardId = myCardRef.id.toString();
     const isPlayerJ1 = detalles.carta_j1.id.toString() === myCardId;
 
@@ -447,11 +467,17 @@ const Partida = () => {
       ? detalles.habilidad_j2
       : detalles.habilidad_j1;
 
+    console.log("[UI] ↪️ handleRoundResult()", {
+      data,
+      waitingNextRound: waitingNextRoundRef.current,
+      nextRoundStart: nextRoundStartRef.current,
+    });
+
     // 3) Formatear objeto de carta del oponente
     const formattedOpponentCard = {
       id: opponentRaw.id.toString(),
       nombre: opponentRaw.nombre,
-      alias: opponentRaw.alias,
+      alias: opponentRaw.alias || "",
       photo: opponentRaw.photo,
       ataque: opponentRaw.ataque,
       defensa: opponentRaw.defensa,
@@ -463,45 +489,46 @@ const Partida = () => {
       posicion: opponentRaw.posicion,
     };
 
-    // 4) Determinar resultado de la ronda
-    let roundResult;
-    if (ganador === null) {
-      roundResult = "empate";
-    } else {
-      roundResult =
-        ganador.toString() === jugadorId.toString() ? "ganado" : "perdido";
-    }
+    // 4) Determinar resultado de la ronda (sin lógica de fin de partido)
+    const roundResult =
+      ganador === null
+        ? "empate"
+        : ganador.toString() === jugadorId.toString()
+        ? "ganado"
+        : "perdido";
 
-    // 5) Calcular puntuaciones y rounds restantes
-    const playerScore = scores[jugadorId.toString()] || 0;
-    const opponentScore =
-      Object.entries(scores).find(
-        ([key]) => key !== jugadorId.toString()
-      )?.[1] || 0;
+    // 5) Actualizar estado solo con el resultado de la ronda
+    setGameState((prev) => ({
+      ...prev,
+      phase: "result", // Cambia a fase de resultado
+      scores, // Actualiza marcadores
+      roundResult, // Resultado de la ronda
+      selectedSkill: mySkill, // Habilidad seleccionada
+      selectedCard: { ...myCardRef }, // Tu carta
+      opponentSelectedCard: formattedOpponentCard, // Carta del oponente
+      opponentSelectedSkill: opponentSkill, // Habilidad del oponente
+    }));
 
-    // 6) Actualizar estado con posible clinch
-    setGameState((prev) => {
-      const roundsLeft = TOTAL_ROUNDS - prev.roundNumber;
-
-      return {
-        ...prev,
-        phase: "result",
-        scores,
-        roundResult,
-        selectedSkill: mySkill,
-        selectedCard: { ...myCardRef },
-        opponentSelectedCard: formattedOpponentCard,
-        opponentSelectedSkill: opponentSkill,
-      };
-    });
-
-    // 7) Preparamos el próximo onRoundStart
+    // 6) Preparar para la próxima ronda (el backend decidirá si termina el partido)
     waitingNextRoundRef.current = true;
   };
 
-  const handleMatchEnd = (data) => {
+  /*const handleMatchEnd = (data) => {
     setCurrentOpponentCard(null);
     setHighlightedPosition(null);
+    setGameState((prev) => ({
+      ...prev,
+      phase: "ended",
+      scores: data.scores,
+      winner: data.winner,
+      puntosChange: data.puntosChange,
+      isDraw: data.isDraw,
+    }));
+  };*/
+
+  const handleMatchEnd = (data) => {
+    console.log("[UI] ↪️ handleMatchEnd()", data);
+    matchEndedRef.current = true;
     setGameState((prev) => ({
       ...prev,
       phase: "ended",
@@ -1091,14 +1118,14 @@ const Partida = () => {
 
               <motion.button
                 onClick={() => {
+                  console.log(
+                    "[UI] ▶️ Continue clicked — waitingNextRound:",
+                    waitingNextRoundRef.current,
+                    "nextRoundStart:",
+                    nextRoundStartRef.current
+                  );
+
                   waitingNextRoundRef.current = false;
-                  if (gameState.roundNumber >= 11) {
-                    setGameState((prev) => ({
-                      ...prev,
-                      phase: "ended",
-                    }));
-                    return;
-                  }
                   setGameState((prev) => ({
                     ...prev,
                     phase: prev.isPlayerTurn ? "selection" : "waiting",
@@ -1107,7 +1134,6 @@ const Partida = () => {
                   }));
                   if (nextRoundStartRef.current) {
                     handleRoundStart(nextRoundStartRef.current);
-                    nextRoundStartRef.current = null;
                   }
                 }}
                 className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3 px-8 rounded-lg text-lg shadow-lg"
