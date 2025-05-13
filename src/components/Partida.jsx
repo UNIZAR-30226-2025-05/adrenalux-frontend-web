@@ -15,12 +15,9 @@ import CartaGrande from "../components/layout/game/CartaMediana";
 import CartaMediana from "../components/layout/game/CartaMediana";
 import { motion, AnimatePresence } from "framer-motion";
 import ModalWrapper from "../components/layout/game/ModalWrapper";
-import { FaPause, FaPlay, FaFlag, FaHome, FaCog } from "react-icons/fa";
+import { FaPause, FaPlay, FaFlag, FaCog } from "react-icons/fa";
 import {
   GiSwordman,
-  GiSwordsPower,
-  GiSwordWound,
-  GiSwordwoman,
 } from "react-icons/gi";
 import { GiSoccerBall } from "react-icons/gi";
 import { IoMdFootball } from "react-icons/io";
@@ -55,6 +52,7 @@ const Partida = () => {
   const [loadingPaused, setLoadingPaused] = useState(false);
   const [showTurnBanner, setShowTurnBanner] = useState(false);
   const [currentOpponentCard, setCurrentOpponentCard] = useState(null);
+  const [currentOpponentCards, setCurrentOpponentCards] = useState([]);
   const [highlightedPosition, setHighlightedPosition] = useState(null);
   const TOTAL_ROUNDS = 11;
 
@@ -328,11 +326,16 @@ const Partida = () => {
         posicionEspecifica = `defender${counters.defender}`;
     }
 
+    console.log(posicionEspecifica);
+
     return posicionEspecifica;
   };
 
+  const opponentSelectedCardRef = useRef(null);
+
   const handleRoundStart = useCallback((payload) => {
     const turno = payload?.dataConTurno;
+    
     if (matchEndedRef.current) {
       console.log("[UI] 🛑 Ignoring round_start after match_end", payload);
       return;
@@ -363,9 +366,7 @@ const Partida = () => {
       selectedSkill: null,
       opponentSelection: null,
       mySelection: null,
-      opponentCards: prev.opponentCards.length
-        ? prev.opponentCards
-        : opponentCardsRef.current,
+      opponentCards: opponentCardsRef.current,
     }));
 
     setShowTurnBanner(true);
@@ -373,18 +374,13 @@ const Partida = () => {
   }, []);
 
   const handleOpponentSelection = (data) => {
-    const currentOpponentCards =
-      opponentCardsRef.current.length > 0
-        ? [...opponentCardsRef.current]
-        : [...gameState.opponentCards];
-
     const opponentCard = {
       id: data.data.carta.id.toString(),
       nombre: data.data.carta.nombre,
       alias: data.data.carta.alias || "",
       posicion: getPositionForOpponentCard(
         data.data.carta,
-        currentOpponentCards
+        opponentCardsRef.current
       ),
       posicionType: data.data.carta.posicion.toLowerCase(),
       photo: data.data.carta.photo,
@@ -397,26 +393,14 @@ const Partida = () => {
       tipo_carta: data.data.carta.tipo_carta,
     };
 
+    opponentSelectedCardRef.current = opponentCard;
     setCurrentOpponentCard(opponentCard);
     setHighlightedPosition(data.data.carta.posicion);
-
-    const opponentCardExists = currentOpponentCards.some(
-      (card) => card.id === opponentCard.id
-    );
-
-    let updatedOpponentCards = currentOpponentCards;
-
-    if (!opponentCardExists) {
-      updatedOpponentCards = [...currentOpponentCards, opponentCard];
-    }
-
-    opponentCardsRef.current = updatedOpponentCards;
 
     setAlertMessage(
       `Oponente ha elegido: ${data.data.carta.posicion} - Debes elegir una carta de la misma posición`
     );
     setShowAlert(true);
-
     setTimeout(() => {
       setShowAlert(false);
     }, 5000);
@@ -436,9 +420,11 @@ const Partida = () => {
       console.log("[UI] 🛑 Ignoring round_result after match_end", data);
       return;
     }
+    
     const detalles = data.data.detalles;
     const { ganador, scores } = data.data;
     const myCardRef = selectedCardRef.current;
+    
     if (!myCardRef) {
       console.error("ERROR: selectedCardRef es null en handleRoundResult");
       return;
@@ -449,9 +435,7 @@ const Partida = () => {
 
     const mySkill = isPlayerJ1 ? detalles.habilidad_j1 : detalles.habilidad_j2;
     const opponentRaw = isPlayerJ1 ? detalles.carta_j2 : detalles.carta_j1;
-    const opponentSkill = isPlayerJ1
-      ? detalles.habilidad_j2
-      : detalles.habilidad_j1;
+    const opponentSkill = isPlayerJ1 ? detalles.habilidad_j2 : detalles.habilidad_j1;
 
     console.log("[UI] ↪️ handleRoundResult()", {
       data,
@@ -459,20 +443,53 @@ const Partida = () => {
       nextRoundStart: nextRoundStartRef.current,
     });
 
-    const formattedOpponentCard = {
-      id: opponentRaw.id.toString(),
-      nombre: opponentRaw.nombre,
-      alias: opponentRaw.alias || "",
-      photo: opponentRaw.photo,
-      ataque: opponentRaw.ataque,
-      defensa: opponentRaw.defensa,
-      control: opponentRaw.control,
-      equipo: opponentRaw.equipo,
-      escudo: opponentRaw.escudo,
-      pais: opponentRaw.pais,
-      tipo_carta: opponentRaw.tipo_carta,
-      posicion: opponentRaw.posicion,
-    };
+    if (!opponentCardsRef.current) {
+      opponentCardsRef.current = [];
+    }
+
+    let formattedOpponentCard;
+    
+    if (opponentSelectedCardRef.current && opponentSelectedCardRef.current.id === opponentRaw.id.toString()) {
+      formattedOpponentCard = opponentSelectedCardRef.current;
+      console.log("[UI] 🔄 Using stored opponent card reference:", formattedOpponentCard.nombre);
+    } else {
+      formattedOpponentCard = {
+        id: opponentRaw.id.toString(),
+        nombre: opponentRaw.nombre,
+        alias: opponentRaw.alias || "",
+        photo: opponentRaw.photo,
+        ataque: opponentRaw.ataque,
+        defensa: opponentRaw.defensa,
+        control: opponentRaw.control,
+        equipo: opponentRaw.equipo,
+        escudo: opponentRaw.escudo,
+        pais: opponentRaw.pais,
+        tipo_carta: opponentRaw.tipo_carta,
+        posicion: getPositionForOpponentCard(opponentRaw, opponentCardsRef.current),
+        posicionType: opponentRaw.posicion.toLowerCase(),
+      };
+      console.log("[UI] 🆕 Creating new opponent card:", formattedOpponentCard.nombre);
+    }
+
+    const cardExists = opponentCardsRef.current.some(
+      card => card.id === formattedOpponentCard.id
+    );
+
+    if (!cardExists) {
+      opponentCardsRef.current = [...opponentCardsRef.current, formattedOpponentCard];
+      console.log("[UI] 📝 Added opponent card to collection:", formattedOpponentCard.nombre);
+    }
+
+    if (
+      currentOpponentCard && 
+      currentOpponentCard.id !== formattedOpponentCard.id && 
+      !opponentCardsRef.current.some(card => card.id === currentOpponentCard.id)
+    ) {
+      opponentCardsRef.current = [...opponentCardsRef.current, currentOpponentCard];
+      console.log("[UI] 📝 Added current opponent card to collection:", currentOpponentCard.nombre);
+    }
+
+    opponentSelectedCardRef.current = null;
 
     const roundResult =
       ganador === null
@@ -480,6 +497,8 @@ const Partida = () => {
         : ganador.toString() === jugadorId.toString()
         ? "ganado"
         : "perdido";
+
+    setCurrentOpponentCards(opponentCardsRef.current);
 
     setGameState((prev) => ({
       ...prev,
@@ -490,7 +509,11 @@ const Partida = () => {
       selectedCard: { ...myCardRef },
       opponentSelectedCard: formattedOpponentCard,
       opponentSelectedSkill: opponentSkill,
+      opponentCards: [...opponentCardsRef.current],
     }));
+
+    console.log("[UI] 🎮 Updated opponent cards collection:", opponentCardsRef.current);
+    console.log("[UI] 🎮 Total opponent cards:", opponentCardsRef.current.length);
 
     waitingNextRoundRef.current = true;
   };

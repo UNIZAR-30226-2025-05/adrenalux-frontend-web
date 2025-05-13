@@ -46,6 +46,7 @@ const Formacion433 = ({ jugadores = [], onJugadorClick, highlightPositionType = 
     const positionsOfType = positionMapping[highlightPositionType] || [];
     
     // Encontrar la primera posición vacía del tipo especificado
+    console.log(jugadores)
     const firstEmptyPosition = positionsOfType.find(posId => {
       return !jugadores.some(j => j && j.posicion === posId);
     });
