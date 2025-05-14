@@ -548,7 +548,7 @@ export default function WelcomeLanding() {
                                   ))}
                                 </div>
                                 <div className="col-span-4 flex justify-around">
-                                  {[10, 11, 12].map((pos) => (
+                                  {[10, 11].map((pos) => (
                                     <motion.div
                                       key={`attacker-${pos}`}
                                       className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-white flex items-center justify-center"
