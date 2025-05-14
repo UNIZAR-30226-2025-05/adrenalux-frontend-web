@@ -11,7 +11,8 @@ function CartaMediana({
   width,
   height,
   small,
-  responsive = true
+  responsive = true,
+  showStats = false
 }) {
   const {
     alias,
@@ -19,7 +20,13 @@ function CartaMediana({
     escudo,
     photo,
     tipo_carta,
+    ataque,
+    control,
+    defensa
   } = jugador;
+
+  // Calcular media
+  const media = Math.round((ataque + control + defensa) / 3);
 
   const [windowWidth, setWindowWidth] = useState(
     typeof window !== 'undefined' ? window.innerWidth : 1024
@@ -40,19 +47,27 @@ function CartaMediana({
 
   const cardWidth = width || (responsive 
     ? (isMobile 
-        ? "clamp(4rem, 15vw, 8rem)"
-        : (small ? "clamp(6rem, 16vw, 13rem)" : "clamp(3rem, 8vw, 6.5rem)"))
+        ? showStats ? "clamp(5.5rem, 19vw, 10rem)" : "clamp(4rem, 15vw, 8rem)"
+        : (small 
+            ? showStats ? "clamp(8rem, 22vw, 16rem)" : "clamp(6rem, 16vw, 13rem)" 
+            : showStats ? "clamp(4rem, 11vw, 8rem)" : "clamp(3rem, 8vw, 6.5rem)"))
     : (isMobile 
-        ? "6rem"
-        : (small ? "10rem" : "5rem")));
+        ? showStats ? "8rem" : "6rem"
+        : (small 
+            ? showStats ? "13rem" : "10rem" 
+            : showStats ? "6.5rem" : "5rem")));
 
   const cardHeight = height || (responsive 
     ? (isMobile 
-        ? "clamp(6rem, 22vw, 12rem)"
-        : (small ? "clamp(8rem, 24vw, 18rem)" : "clamp(4rem, 12vw, 9rem)"))
+        ? showStats ? "clamp(8rem, 30vw, 15rem)" : "clamp(6rem, 22vw, 12rem)"
+        : (small 
+            ? showStats ? "clamp(11rem, 32vw, 22rem)" : "clamp(8rem, 24vw, 18rem)" 
+            : showStats ? "clamp(5.5rem, 16vw, 12rem)" : "clamp(4rem, 12vw, 9rem)"))
     : (isMobile 
-        ? "9rem"
-        : (small ? "14rem" : "7rem")));
+        ? showStats ? "12rem" : "9rem"
+        : (small 
+            ? showStats ? "18rem" : "14rem" 
+            : showStats ? "9rem" : "7rem")));
 
   const useSmallLayout = isMobile || small || (responsive && windowWidth < 640);
 
@@ -98,6 +113,37 @@ function CartaMediana({
     }
   };
 
+  // Tamaños para las cajas de stats
+  const getStatsBoxSize = () => {
+    if (isMobile) return showStats ? "w-4 h-4" : "w-3 h-3";
+    if (useSmallLayout) {
+      if (windowWidth < 480) return showStats ? "w-5 h-5" : "w-4 h-4";
+      if (windowWidth < 768) return showStats ? "w-6 h-6" : "w-5 h-5";
+      return showStats ? "w-7 h-7" : "w-6 h-6";
+    } else {
+      if (windowWidth < 480) return showStats ? "w-3 h-3" : "w-2 h-2";
+      if (windowWidth < 768) return showStats ? "w-4 h-4" : "w-3 h-3";
+      return showStats ? "w-4 h-4" : "w-3 h-3";
+    }
+  };
+
+  // Tamaños de fuente para los stats
+  const getStatsFontSize = () => {
+    if (isMobile) return showStats ? "text-[0.6rem]" : "text-[0.5rem]";
+    if (useSmallLayout) {
+      if (windowWidth < 480) return showStats ? "text-[0.85rem]" : "text-[0.7rem]";
+      if (windowWidth < 768) return showStats ? "text-[1rem]" : "text-[0.9rem]";
+      return showStats ? "text-[1.1rem]" : "text-[1rem]";
+    } else {
+      if (windowWidth < 480) return showStats ? "text-[0.35rem]" : "text-[0.25rem]";
+      if (windowWidth < 768) return showStats ? "text-[0.4rem]" : "text-[0.3rem]";
+      return showStats ? "text-[0.45rem]" : "text-[0.35rem]";
+    }
+  };
+
+  const statsBoxSize = getStatsBoxSize();
+  const statsFontSize = getStatsFontSize();
+
   return (
     <div
       className={`relative rounded-lg overflow-hidden ${useSmallLayout ? 'shadow-lg' : 'shadow-md'} transition-all duration-300 ${className}`}
@@ -114,11 +160,11 @@ function CartaMediana({
       <div
         className="absolute transition-all duration-300"
         style={{
-          bottom: (useSmallLayout || isMobile) ? "45%" : "46%",
+                        bottom: (useSmallLayout || isMobile) ? (showStats ? "46%" : "52%") : (showStats ? "46%" : "46%"),
           left: "50%",
           transform: "translateX(-50%)",
-          width: isMobile ? "40%" : (useSmallLayout ? "55%" : "45%"),
-          height: isMobile ? "35%" : (useSmallLayout ? "45%" : "35%"),
+          width: isMobile ? (showStats ? "45%" : "40%") : (useSmallLayout ? (showStats ? "60%" : "55%") : (showStats ? "50%" : "45%")),
+          height: isMobile ? (showStats ? "40%" : "35%") : (useSmallLayout ? (showStats ? "50%" : "45%") : (showStats ? "40%" : "35%")),
         }}
       >
         <img
@@ -149,7 +195,7 @@ function CartaMediana({
       <div
         className={`absolute text-white transition-all duration-300 ${textStyles.alias} ${getFontWeight()}`}
         style={{
-          bottom: "33%",
+          bottom: showStats ? "37%" : "33%",
           left: (useSmallLayout || isMobile) ? "15%" : "12%",
           width: "70%",
           whiteSpace: "nowrap",
@@ -161,6 +207,64 @@ function CartaMediana({
       >
         {alias}
       </div>
+
+      {/* Stats (solo si showStats es true) */}
+      {showStats && (
+        <>
+          <div 
+            className={`absolute left-1/2 transform -translate-x-1/2 flex gap-1`}
+            style={{
+              bottom: (useSmallLayout || isMobile) ? "32%" : "26%",
+            }}
+          >
+            {/* Ataque con gradiente de rojo */}
+            <div 
+              className={`${statsBoxSize} rounded-lg flex items-center justify-center text-white font-semibold shadow-md ${statsFontSize}`}
+              style={{ 
+                background: 'linear-gradient(135deg, #ff0000, #990000)'
+              }}
+            >
+              {ataque}
+            </div>
+            {/* Control con gradiente de azul */}
+            <div 
+              className={`${statsBoxSize} rounded-lg flex items-center justify-center text-white font-semibold shadow-md ${statsFontSize}`}
+              style={{ 
+                background: 'linear-gradient(135deg, #0066ff, #003399)'
+              }}
+            >
+              {control}
+            </div>
+            {/* Defensa con gradiente de verde */}
+            <div 
+              className={`${statsBoxSize} rounded-lg flex items-center justify-center text-white font-semibold shadow-md ${statsFontSize}`}
+              style={{ 
+                background: 'linear-gradient(135deg, #00cc00, #006600)'
+              }}
+            >
+              {defensa}
+            </div>
+          </div>
+
+          {/* Media */}
+          <div 
+            className="absolute left-1/2 transform -translate-x-1/2"
+            style={{
+              bottom: (useSmallLayout || isMobile) ? "22%" : "16%",
+            }}
+          >
+            {/* Media con gradiente amarillo/dorado */}
+            <div 
+              className={`${statsBoxSize} rounded-lg flex items-center justify-center text-white font-semibold shadow-md ${statsFontSize}`}
+              style={{ 
+                background: 'linear-gradient(135deg, #ffcc00, #cc9900)'
+              }}
+            >
+              {media}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -184,13 +288,15 @@ CartaMediana.propTypes = {
   width: PropTypes.string,
   height: PropTypes.string,
   small: PropTypes.bool,
-  responsive: PropTypes.bool
+  responsive: PropTypes.bool,
+  showStats: PropTypes.bool
 };
 
 CartaMediana.defaultProps = {
   className: "",
   small: false,
-  responsive: true
+  responsive: true,
+  showStats: false
 };
 
 export default CartaMediana;

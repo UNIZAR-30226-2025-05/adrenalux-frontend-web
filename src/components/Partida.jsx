@@ -700,7 +700,7 @@ const Partida = () => {
     borderRadius: "16px",
     boxShadow: "0 8px 16px rgba(0, 0, 0, 0.5)",
     position: "fixed",
-    top: "50%",
+    top: "20%",
     left: "50%",
     transform: "translate(-50%, -50%)",
     zIndex: 100,
@@ -962,7 +962,7 @@ const Partida = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
               >
-                <CartaGrande jugador={gameState.selectedCard} />
+                <CartaMediana jugador={gameState.selectedCard} showStats={true} />
 
                 <div style={{ margin: "1rem 0", width: "100%" }}>
                   <h3 className="text-lg font-bold text-white mb-3 text-center">
