@@ -4,6 +4,7 @@ import {
   FaSearch,
   FaPlus,
   FaUserFriends,
+  FaMedal,
   FaFire,
   FaTrophy,
   FaUsers,
