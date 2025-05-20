@@ -180,7 +180,11 @@
     "take2": "Withdraw from Market",
     "index": "Card Index",
     "index2": "Index",
-    "rarity": "Rarity"
+    "rarity": "Rarity",
+    "clearSearch": "Clean search",
+    "searchResults": "{{count}} result(s) found for \"{{term}}\"",
+    "searchPlaceholder": "Search player by name...",
+    "pricePlaceholder": "Enter the price"
   },
   "game": {
     "error": "You have no active lineup.",
@@ -439,6 +443,17 @@
       "rewardInvalid": "Reward must be a number",
       "passwordRequired": "Password is required for private tournaments"
     }
+  },
+  "cardsMenu": {
+    "openButton": "Open",
+    "confirmTitle": "Do you want to buy the pack {{name}} for {{price}} coins?",
+    "yes": "Yes",
+    "no": "No",
+    "noSelectedPack": "No pack selected.",
+    "notFound": "Selected pack not found.",
+    "openError": "Error opening the pack.",
+    "fetchError": "Error fetching packs.",
+    "noAvailable": "No packs available."
   },
   "match": {
     "title": "Match",

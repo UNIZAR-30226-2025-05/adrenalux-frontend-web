@@ -185,8 +185,22 @@
     "take2": "Retirar del mercado",
     "index": "Índice de Cartas",
     "index2": "Índice",
+    "rarity": "Rareza",
+    "searchPlaceholder": "Buscar jugador por nombre...",
+    "searchResults": "{{count}} resultado(s) encontrado(s) para \"{{term}}\"",
+    "pricePlaceholder": "Ingresa el precio"
 
-    "rarity": "Rareza"
+  },
+  "cardsMenu": {
+    "openButton": "Abrir",
+    "confirmTitle": "¿Quieres comprar el sobre {{name}} por {{price}} monedas?",
+    "yes": "Sí",
+    "no": "No",
+    "noSelectedPack": "No hay sobre seleccionado.",
+    "notFound": "No se encontró el sobre seleccionado.",
+    "openError": "Error al abrir el sobre.",
+    "fetchError": "Error obteniendo sobres.",
+    "noAvailable": "No hay sobres disponibles."
   },
   "game": {
     "error": "No tienes ninguna plantilla activa",

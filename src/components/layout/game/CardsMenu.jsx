@@ -5,6 +5,7 @@ import { abrirSobre, sobresDisponibles } from "../../../services/api/cardApi";
 import SobreRaro from "../../../assets/SobreRaro.png";
 import SobreEpico from "../../../assets/SobreEpico.png";
 import SobreComun from "../../../assets/SobreComun.png";
+import { useTranslation } from "react-i18next";
 
 export default function CardsMenu({ onOpenSobre }) {
   const [sobres, setSobres] = useState([]);
@@ -13,6 +14,8 @@ export default function CardsMenu({ onOpenSobre }) {
   const [transitioning, setTransitioning] = useState(false);
   const [exitAnimation, setExitAnimation] = useState(false);
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
 
   useEffect(() => {
     const fetchSobres = async () => {
@@ -256,8 +259,9 @@ export default function CardsMenu({ onOpenSobre }) {
         whileTap={{ scale: 0.95 }}
         transition={{ type: "spring", stiffness: 400 }}
       >
-        Abrir
+        {t("cardsMenu.openButton")}
       </motion.button>
+
 
       {/* Modal de confirmación */}
       <AnimatePresence>
@@ -275,9 +279,12 @@ export default function CardsMenu({ onOpenSobre }) {
               className="bg-white dark:bg-[#1C1A1A] p-4 sm:p-6 rounded-lg shadow-lg text-center text-white w-full max-w-md"
             >
               <p className="text-black dark:text-white mb-4 text-base sm:text-lg">
-                ¿Quieres comprar el sobre <strong>{currentCard.nombre}</strong> por{" "}
-                <strong>{currentCard.precio}</strong> monedas?
+                {t("cardsMenu.confirmTitle", {
+                  name: currentCard.nombre,
+                  price: currentCard.precio,
+                })}
               </p>
+
               <div className="flex justify-center gap-4">
                 <motion.button
                   className="px-3 py-1 sm:px-4 sm:py-2 rounded-lg text-white bg-[#44FE23] hover:opacity-90"
@@ -285,16 +292,18 @@ export default function CardsMenu({ onOpenSobre }) {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  Sí
+                  {t("cardsMenu.yes")}
                 </motion.button>
+
                 <motion.button
                   className="px-3 py-1 sm:px-4 sm:py-2 rounded-lg text-white bg-[#F62C2C] hover:opacity-90"
                   onClick={handleCancel}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  No
+                  {t("cardsMenu.no")}
                 </motion.button>
+
               </div>
             </motion.div>
           </motion.div>

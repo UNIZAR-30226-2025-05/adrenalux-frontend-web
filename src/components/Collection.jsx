@@ -17,9 +17,21 @@ import {
   getRaridades,
   getPosiciones,
 } from "../services/api/teamsApi";
+import { Search } from "lucide-react";
 
-import circle from "../assets/circle.png";
 import { useTranslation } from "react-i18next";
+
+const debounce = (func, wait) => {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+};
 
 // Enhanced Alert Component for Sale Success
 const SaleAlert = ({ player, price, visible, onClose }) => {
@@ -152,6 +164,8 @@ export default function Collection({ onBack }) {
   const { t } = useTranslation();
 
   const [isFlipped, setIsFlipped] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredCards, setFilteredCards] = useState([]);
   const [cards, setCards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCard, setSelectedCard] = useState(null);
@@ -205,6 +219,18 @@ export default function Collection({ onBack }) {
     return images[`../assets/${filename}`]?.default;
   };
 
+  useEffect(() => {
+  // Usar un identificador para cancelar actualizaciones pendientes
+  const timeoutId = setTimeout(() => {
+    if (cards.length > 0) {
+      filterCardsByName(searchTerm);
+    }
+  }, 10); // Retraso mínimo para permitir que la interfaz responda
+  
+  // Cleanup para evitar múltiples actualizaciones
+  return () => clearTimeout(timeoutId);
+}, [cards, searchTerm]);
+
   // Handle screen size detection and updates
   useEffect(() => {
     const handleResize = () => {
@@ -255,6 +281,7 @@ export default function Collection({ onBack }) {
     try {
       const data = await getCollection();
       const mappedData = data.map((card) => ({
+        // Mapeo existente
         alias: card.nombreCompleto || card.nombre || "Sin nombre",
         ataque: card.ataque ?? 0,
         control: card.control ?? 0,
@@ -274,6 +301,7 @@ export default function Collection({ onBack }) {
         mercadoCartaId: card.mercadoCartaId || null,
       }));
       setCards(mappedData);
+      setFilteredCards(mappedData); // Inicializa las cartas filtradas con todas las cartas
       setCurrentPage(1);
 
       // Add subtle animation to cards appearing
@@ -312,6 +340,107 @@ export default function Collection({ onBack }) {
     }
   };
 
+  const filterCardsByName = (term) => {
+  if (!term.trim()) {
+    setFilteredCards(cards);
+    setCurrentPage(1);
+    return;
+  }
+  
+  const normalizedTerm = term.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  
+  // Utiliza un mapeo más eficiente para reducir la complejidad
+  const cardMatches = {};
+  
+  // Pre-normaliza los datos más utilizados
+  const preProcessedCards = cards.map(card => ({
+    ...card,
+    _normalizedName: card.nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
+    _normalizedAlias: card.alias.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
+    _normalizedEquipo: card.equipo.toLowerCase(),
+    _normalizedPosicion: card.posicion.toLowerCase()
+  }));
+  
+  const filtered = preProcessedCards.filter(card => {
+    // Si ya hemos determinado que esta tarjeta coincide, usa el resultado almacenado
+    if (cardMatches[card.id] !== undefined) return cardMatches[card.id];
+    
+    // Busca en nombre y alias
+    const matches =
+      card._normalizedName.includes(normalizedTerm) || 
+      card._normalizedAlias.includes(normalizedTerm) ||
+      card._normalizedEquipo.includes(term.toLowerCase()) ||
+      card._normalizedPosicion.includes(term.toLowerCase());
+    
+    // Almacena el resultado para consultas futuras
+    cardMatches[card.id] = matches;
+    
+    return matches;
+  });
+  
+  setFilteredCards(filtered);
+  setCurrentPage(1);
+  
+  // Remueve la animación para búsquedas rápidas consecutivas
+  // Esto mejora significativamente el rendimiento
+  if (cardGridRef.current) {
+    cardGridRef.current.classList.remove("fade-out");
+    cardGridRef.current.classList.remove("fade-in");
+    
+    // Solo agregar un efecto sutil
+    requestAnimationFrame(() => {
+      if (cardGridRef.current) {
+        cardGridRef.current.classList.add("fade-in");
+      }
+    });
+  }
+};
+
+  // Componente de Buscador con mensaje de resultados integrado
+  const SearchBar = () => {
+  // Implementar debounce en la búsqueda
+  const handleSearchChange = debounce((value) => {
+    setSearchTerm(value);
+  }, 250); // 250ms de retraso para reducir las actualizaciones
+
+  return (
+    <div className="relative w-full max-w-md mx-auto">
+      <div className="relative group">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-blue-400 transition-colors" size={18} />
+        <input
+          type="text"
+          defaultValue={searchTerm}
+          onChange={(e) => handleSearchChange(e.target.value)}
+          placeholder={t("collection.searchPlaceholder") || "Buscar jugador por nombre..."}
+          className="w-full bg-black/50 border border-gray-700 rounded-full py-2 pl-10 pr-10 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+        />
+        {searchTerm && (
+          <button
+            onClick={() => {
+              setSearchTerm("");
+              // Limpiar el input manualmente ya que estamos usando defaultValue
+              document.querySelector('input[type="text"]').value = "";
+            }}
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+          >
+            <X size={16} />
+          </button>
+        )}
+      </div>
+      
+      {/* Mensaje de resultados de búsqueda integrado */}
+      {searchTerm.trim() && (
+        <div className="mt-2 text-center text-xs sm:text-sm">
+          {filteredCards.length === 0 
+            ? t("collection.noResults", { term: searchTerm }) || `No se encontraron resultados para "${searchTerm}"`
+            : t("collection.searchResults", { count: filteredCards.length, term: searchTerm }) || 
+              `Se encontraron ${filteredCards.length} resultados para "${searchTerm}"`}
+        </div>
+      )}
+    </div>
+  );
+};
+
   const handleRarityClick = async (rarityKey) => {
     try {
       console.log(rarityKey);
@@ -336,6 +465,7 @@ export default function Collection({ onBack }) {
   const updateCollection = (data) => {
     const cardsData = data || [];
     const mappedData = cardsData.map((card) => ({
+      // Mapeo existente
       alias: card.nombreCompleto || card.nombre || "Sin nombre",
       ataque: card.ataque ?? 0,
       control: card.control ?? 0,
@@ -360,6 +490,8 @@ export default function Collection({ onBack }) {
       cardGridRef.current.classList.add("fade-out");
       setTimeout(() => {
         setCards(mappedData);
+        setFilteredCards(mappedData); // Actualiza también las cartas filtradas
+        setSearchTerm(""); // Resetea el término de búsqueda
         setCurrentPage(1);
         setTimeout(() => {
           if (cardGridRef.current) {
@@ -370,13 +502,15 @@ export default function Collection({ onBack }) {
       }, 300);
     } else {
       setCards(mappedData);
+      setFilteredCards(mappedData); // Actualiza también las cartas filtradas
+      setSearchTerm(""); // Resetea el término de búsqueda
       setCurrentPage(1);
     }
   };
 
-  const totalPages = Math.ceil(cards.length / cardsPerPage);
+  const totalPages = Math.ceil(filteredCards.length / cardsPerPage);
   const startIndex = (currentPage - 1) * cardsPerPage;
-  const visibleCards = cards.slice(startIndex, startIndex + cardsPerPage);
+  const visibleCards = filteredCards.slice(startIndex, startIndex + cardsPerPage);
 
   // For responsive grid, calculate column counts based on screen size
   const getColumnCount = () => {
@@ -563,89 +697,52 @@ export default function Collection({ onBack }) {
 
   // Add CSS styles for animations
   useEffect(() => {
-    // Create style element for our animations
-    const styleEl = document.createElement("style");
-    styleEl.textContent = `
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-      
-      @keyframes fadeOut {
-        from { opacity: 1; transform: translateY(0); }
-        to { opacity: 0; transform: translateY(10px); }
-      }
-      
-      @keyframes slideLeft {
-        from { transform: translateX(0); }
-        to { transform: translateX(-15px); opacity: 0; }
-      }
-      
-      @keyframes slideRight {
-        from { transform: translateX(0); }
-        to { transform: translateX(15px); opacity: 0; }
-      }
-      
-      @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-        100% { transform: scale(1); }
-      }
-      
-      @keyframes shine {
-        0% { background-position: -100px; }
-        40%, 100% { background-position: 140px; }
-      }
-      
-      .fade-in {
-        animation: fadeIn 0.3s ease-out forwards;
-      }
-      
-      .fade-out {
-        animation: fadeOut 0.3s ease-in forwards;
-      }
-      
-      .slide-left {
-        animation: slideLeft 0.3s ease-in forwards;
-      }
-      
-      .slide-right {
-        animation: slideRight 0.3s ease-in forwards;
-      }
-      
-      .card-pulse {
-        animation: pulse 0.6s ease-in-out;
-      }
-      
-      .card-shine {
-        position: relative;
-        overflow: hidden;
-      }
-      
-      .card-shine::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(
-          to right, 
-          rgba(255, 255, 255, 0) 0%, 
-          rgba(255, 255, 255, 0.3) 50%, 
-          rgba(255, 255, 255, 0) 100%
-        );
-        transform: skewX(-25deg);
-        animation: shine 2s ease-in-out infinite;
-      }
-    `;
-    document.head.appendChild(styleEl);
+  // Create style element for our animations with optimized keyframes
+  const styleEl = document.createElement("style");
+  styleEl.textContent = `
+    @keyframes fadeIn {
+      from { opacity: 0.9; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0.9; }
+    }
+    
+    @keyframes slideLeft {
+      from { transform: translateX(0); }
+      to { transform: translateX(-8px); opacity: 0.8; }
+    }
+    
+    @keyframes slideRight {
+      from { transform: translateX(0); }
+      to { transform: translateX(8px); opacity: 0.8; }
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.2s ease-out forwards;
+    }
+    
+    .fade-out {
+      animation: fadeOut 0.2s ease-in forwards;
+    }
+    
+    .slide-left {
+      animation: slideLeft 0.2s ease-in forwards;
+    }
+    
+    .slide-right {
+      animation: slideRight 0.2s ease-in forwards;
+    }
+  `;
+  document.head.appendChild(styleEl);
 
-    return () => {
-      // Cleanup
-      document.head.removeChild(styleEl);
-    };
-  }, []);
+  return () => {
+    // Cleanup
+    document.head.removeChild(styleEl);
+  };
+}, []);
 
   // Helper function to render card
   const renderCard = (card) => {
@@ -756,7 +853,7 @@ export default function Collection({ onBack }) {
                       value={price}
                       onChange={(e) => setPrice(e.target.value)}
                       className="w-full bg-black/70 border border-gray-700 p-1 sm:p-2 pl-8 sm:pl-9 rounded-lg text-white focus:outline-none focus:border-yellow-500 text-sm sm:text-base"
-                      placeholder="Ingresa el precio"
+                      placeholder={t("collection.pricePlaceholder")}
                     />
                   </div>
                 </div>
@@ -886,13 +983,35 @@ export default function Collection({ onBack }) {
         {t("collection.title")}
       </h1>
 
-      {/* Index button */}
-      <button
-        onClick={handleOpenIndexModal}
-        className="bg-black/50 px-3 py-2 md:px-4 md:py-2 rounded-md hover:bg-black transition-all duration-300 mb-4 hover:shadow-lg border border-gray-700 text-sm md:text-base"
-      >
-        {t("collection.index")}
-      </button>
+      {/* Acciones de colección: Índice y Búsqueda */}
+      <div className="w-full max-w-5xl px-4 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={handleOpenIndexModal}
+            className="bg-black/50 px-3 py-2 md:px-4 md:py-2 rounded-md hover:bg-black transition-all duration-300 hover:shadow-lg border border-gray-700 text-sm md:text-base flex items-center"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
+            </svg>
+            {t("collection.index")}
+          </button>
+          
+          {filteredCards.length > 0 && cards.length !== filteredCards.length && (
+            <button
+              onClick={() => setSearchTerm("")}
+              className="bg-blue-900/70 px-3 py-2 rounded-md hover:bg-blue-800 transition-all duration-300 text-sm flex items-center"
+            >
+              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              {t("collection.clearSearch") || "Limpiar búsqueda"}
+            </button>
+          )}
+        </div>
+        
+        {/* Componente de búsqueda */}
+        <SearchBar />
+      </div>
 
       {/* Range indicator */}
       {gridLayout.isTwoSided ? (
